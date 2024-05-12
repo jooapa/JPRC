@@ -1,0 +1,31 @@
+! If used, the following characters need to use  -
+! backslash '\' before them - 
+! for the program to be able to read them:
+!
+! ! - Single line comment
+! , - Tuple and vector value divider
+! = - Assign value to key
+! % - Used for variables
+! < - Used for private variables
+! # - End of line character
+
+<%lol%=100# ! private variable, will not be shown in csharp
+%test%=abc# ! public variable, will be shown in csharp
+
+[kakka]#
+trol=troll %lol%x, %test%#
+test=this,is,parsed,as,array#
+
+[Strings]#
+!Char#
+Char1=a#
+
+!String
+String1=thisisastring#
+
+[Arrays]#
+!Array
+Array1=hello,this,is,vector,wi\,th,comma#
+
+!Tuple
+Tuple1=this,is,1,tuple\!#
