@@ -1,45 +1,41 @@
 @ECHO OFF
 
-ECHO Changing directory to ATRC
+ECHO Changing directory to ATRC.Test
 IF NOT pwd==%cd% (cd /d %~dp0) 
 
-dotnet clean
-
-CD ..\ATRC
-dotnet clean
+@REM Remove bin and obj just in case
 RMDIR /S /Q .\bin\
 RMDIR /S /Q .\obj\
-ECHO Running BuildNupkg.bat
+RMDIR /S /Q .\libs\
 
+CD ..\ATRC
+
+RMDIR /S /Q .\bin\
+RMDIR /S /Q .\obj\
+
+@REM Build the nupkg
+ECHO Running BuildNupkg.bat
 CALL BuildNupkg.bat
 
+@REM Set the build path and nupkg version
 SET "build_path=bin\Release"
 SET "file_version=1.0.0"
-
 ECHO Build path: %build_path%
-
 
 ECHO ========================================
 ECHO Changing directory to ATRC.Test
-
 CD ..\ATRC.Test
-
-RMDIR /S /Q .\bin\
-RMDIR /S /Q .\obj\
 
 ECHO Deleting ATRC from .nuget
 RMDIR /S /Q C:\Users\%USERNAME%\.nuget\packages\atrc\
 
 ECHO Copying ATRC to libs\
-RMDIR /S /Q .\libs
-RMDIR /S /Q .\libs
+@REM Remove libs, make libs and copy nupkg to libs
 MKDIR libs
-DEL /Q /F ".\libs\ATRC.%file_version%.nupkg"
 COPY /Y /B "..\ATRC\%build_path%\ATRC.%file_version%.nupkg" .\libs
-@REM COPY /Y /B "..\ATRC\%build_path%\net8.0\ATRC.dll" libs
 dotnet restore
 
-
+@REM Run test program
 ECHO Running ATRC.Test
 ECHO ========================================
 dotnet run

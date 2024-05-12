@@ -8,7 +8,7 @@
             foreach (var arg in args) {
                 _output += arg.ToString() + " ";
             }
-            Console.WriteLine("ATRC DEBUG:" + _output);
+            Console.WriteLine("ATRC DEBUG:|" + _output);
         }
 
     }

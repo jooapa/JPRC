@@ -1,5 +1,1 @@
 ATRC documentation
-
-Filehandler class
- - Opens, reads and writes to an ATRC file
-

@@ -5,10 +5,14 @@ namespace ATRC
         public struct ATRCVariable{
             public string Name;
             public string Value;
+            public string[] ArrayValues;
+            public bool IsArray;
         }
         public struct ATRCKey{
             public string Name;
             public string Value;
+            public string[] ArrayValues;
+            public bool IsArray;
         }
         public struct ATRCBlock{
             public string Name;

@@ -4,28 +4,30 @@
 !
 ! ! - Single line comment
 ! , - Tuple and vector value divider
-! = - Assign value to key
 ! % - Used for variables
-! < - Used for private variables
-! # - End of line character
+! Insert your own variable to the string using %!% sequence - 
+! if more than one variable needs to be inserted, give them in -
+! sequence you want them to be displayed in the value
+!
+<%lol%=100! private variable, will not be shown in csharp
+%test%=abc! public variable, will be shown in csharp
+<%testi ng1%=100
+ %testing2 % = abc 
 
-<%lol%=100# ! private variable, will not be shown in csharp
-%test%=abc# ! public variable, will be shown in csharp
+[kakka]
+trol=troll, %lol%x, %test%
+test=this,is,parsed,as,array!s
+test3=abv,abg
+!test3=abc
 
-[kakka]#
-trol=troll %lol%x, %test%#
-test=this,is,parsed,as,array#
-
-[Strings]#
-!Char#
-Char1=a#
-
+[Strings]
+!Char
+Char1=a
 !String
-String1=thisisastring#
+String1=thisisastring
 
-[Arrays]#
+[Arrays]
 !Array
-Array1=hello,this,is,vector,wi\,th,comma#
-
+Array1=hello\,this\,is\,vector\,wi\,th\,comma
 !Tuple
-Tuple1=this,is,1,tuple\!#
+Tuple1=this\,is\,1\,tuple\!
