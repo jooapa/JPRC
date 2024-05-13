@@ -28,9 +28,9 @@ namespace ATRC
             public ATRCKey[] Keys;
         }
         public partial class ATRCFileData{
-            public string Filename { get; set; }
-            public ATRCVariable[] Variables { get; set; }
-            public ATRCBlock[] Blocks { get; set; }
+            public string Filename { get; set; } = "";
+            public ATRCVariable[] Variables { get; set; } = [];
+            public ATRCBlock[] Blocks { get; set; } = [];
 
             // ==========================
             //  Block functions
@@ -40,14 +40,11 @@ namespace ATRC
                         throw new System.IO.IOException("Block name cannot contain reserved characters (%, !, ,)");
                 // Created block will be appended to the end of the file
                 // We also have to check if the block already exists
-                if (Blocks.Any(x => x.Name == block)){
-                    throw new System.IO.IOException("Block " + block + " already exists");
-                }
 
                 // Create a new block
                 ATRCBlock newBlock = new ATRCBlock();
                 newBlock.Name = block;
-                newBlock.Keys = new ATRCKey[0]; // Initialize Keys array
+                newBlock.Keys = []; // Initialize Keys array
                 var tempList = Blocks.ToList();
                 tempList.Add(newBlock);
                 Blocks = tempList.ToArray();

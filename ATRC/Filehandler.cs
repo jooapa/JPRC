@@ -244,54 +244,45 @@ namespace ATRC
             }
 
             /// <summary>
-            /// Create a new atrc file. 
-            /// p_mode: 
-            /// </summary>
-            /// <param name="p_filename">File to be created</param>
-            /// <param name="p_mode">
-            /// "c" for create - Will not overwrite existing file; Default value
-            /// "cf" for create force - Will overwriste existing file
-            /// "cv" for create - Will not overwrite existing file, and will return the file data
-            /// "cfv" for create force - Will overwriste existing file and will return the file data
-            /// </param>
-            /// <param name="p_fileData">
-            /// ATRCFileData object to be written to file, optional; null by default
-            /// </param>
-            /// <returns>Filedata if v is used, otherwise null</returns>
-            /// <exception cref="System.IO.IOException"></exception>
-            public ATRCFileData? Create(string p_filename, string p_mode = "c", ATRCFileData? p_fileData = null) {
-                ArgumentNullException.ThrowIfNull(p_filename);
-                if(System.IO.Path.GetExtension(p_filename) != ".atrc") throw new System.IO.IOException("File is not an ATRC file");
-
-                ATRCFileData _fileData = new()
-                {
-                    Filename = p_filename,
-                };
-
-                System.IO.File.WriteAllText(p_filename, "");
-                Debug.DebugConsole(_fileData.Filename, "created");
-                // TODO PARSE FILE DATA
-                if(p_mode == "cfv" || p_mode == "cv") return _fileData;
-                else return null;
-            }
-
-            /// <summary>
             /// Open a file, set filepath first using Filename property
             /// </summary>
+            /// <param name="p_mode">
+            /// "c" for create - Will not overwrite existing file
+            /// "cf" for create force - Will overwrite existing file
+            /// "r" for read - Read existing file and parse it
+            /// </param>
             /// <returns>
             /// ATRCFileData object
             /// </returns>
-            public void Read(string p_filename)
+            public void Read(string p_filename, string p_mode = "r")
             {
                 ArgumentNullException.ThrowIfNull(p_filename);
                 if (System.IO.Path.GetExtension(p_filename) != ".atrc")
                     throw new System.IO.IOException("File is not an ATRC file");
 
+                // Check if file exists, else create it
                 Filename = p_filename;
-
+                switch(p_mode){
+                    case "c":
+                        if (System.IO.File.Exists(p_filename))
+                            return;
+                        else 
+                            System.IO.File.Create(p_filename);
+                        break;
+                    case "cf":
+                        if (System.IO.File.Exists(p_filename))
+                            System.IO.File.Delete(p_filename);
+                        System.IO.File.Create(p_filename);
+                        break;
+                    case "r":
+                        if (!System.IO.File.Exists(p_filename))
+                            throw new System.IO.IOException("File does not exist");
+                        break;
+                    default:
+                        throw new System.IO.IOException("Invalid mode for Read function");
+                }
                 (Blocks, Variables) = ParseFile(p_filename);
             }
-
         }
     }
 }
