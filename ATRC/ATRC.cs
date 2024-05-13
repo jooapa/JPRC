@@ -10,6 +10,5 @@
             }
             Console.WriteLine("ATRC DEBUG:|" + _output);
         }
-
     }
 }

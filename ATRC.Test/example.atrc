@@ -1,3 +1,5 @@
+%MyVariable3%=test
+%MyVariable1%=MyValue
 ! If used, the following characters need to use  -
 ! backslash '\' before them - 
 ! for the program to be able to read them:
@@ -8,17 +10,21 @@
 ! Insert your own variable to the string using %!% sequence - 
 ! if more than one variable needs to be inserted, give them in -
 ! sequence you want them to be displayed in the value
+! %!% is reserved keywords to insert you own values
 !
 <%lol%=100! private variable, will not be shown in csharp
-%test%=abc! public variable, will be shown in csharp
+%test%=abdsc! public variable, will be shown in csharp
 <%testi ng1%=100
  %testing2 % = abc 
+[testerer]
+hereTEST=asd
 
 [kakka]
-trol=troll, %lol%x, %test%
-test=this,is,parsed,as,array!s
+trol=troll\, %lol%x\, %test%
+test=this,is,parsed,as,arr\,ay!s
 test3=abv,abg
 !test3=abc
+
 
 [Strings]
 !Char
@@ -30,4 +36,4 @@ String1=thisisastring
 !Array
 Array1=hello\,this\,is\,vector\,wi\,th\,comma
 !Tuple
-Tuple1=this\,is\,1\,tuple\!
+
