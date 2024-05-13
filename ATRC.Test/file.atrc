@@ -1,0 +1,11 @@
+[test] !DAS
+aq=valu\!e
+a=1! dsaa
+d=4! a
+c=2
+troll=lol !a
+%test%=true
+aaa=%test%
+[haha]
+a=value
+c=new value

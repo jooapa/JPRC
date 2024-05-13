@@ -19,7 +19,6 @@ CALL BuildNupkg.bat
 
 @REM Set the build path and nupkg version
 SET "build_path=bin\Release"
-SET "file_version=1.0.0"
 ECHO Build path: %build_path%
 
 ECHO ========================================
@@ -32,7 +31,7 @@ RMDIR /S /Q C:\Users\%USERNAME%\.nuget\packages\atrc\
 ECHO Copying ATRC to libs\
 @REM Remove libs, make libs and copy nupkg to libs
 MKDIR libs
-COPY /Y /B "..\ATRC\%build_path%\ATRC.%file_version%.nupkg" .\libs
+COPY /Y /B "..\ATRC\%build_path%\ATRC.*.nupkg" .\libs
 dotnet restore
 
 @REM Run test program

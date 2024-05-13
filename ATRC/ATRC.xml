@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ATRC</name>
+    </assembly>
+    <members>
+        <member name="M:ATRC.Filehandler.ATRCFileData.RemoveBlock(System.String)">
+            <summary>
+            Removes the given block from the file
+            </summary>
+            <param name="block">block to be removed</param>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ReadVariables">
+            <summary>
+            Reads all variables from the file, public and private
+            </summary>
+            <returns>ATRCVariable[]</returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.AddVariable(System.String,System.Object)">
+            <summary>
+            Add a variable to the file
+            </summary>
+            <param name="name">Variable name</param>
+            <param name="value">Variable value</param>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.A_ReadVariable(System.String)">
+            <summary>
+            Read array variable
+            </summary>
+            <param name="name">Variable name</param>
+            <returns>string[]</returns>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.S_ReadVariable(System.String)">
+            <summary>
+            Read string variable
+            </summary>
+            <param name="name">Variable name</param>
+            <returns>string</returns>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ModifyVariable(System.String,System.Object)">
+            <summary>
+            Modifies the given variable with the given value
+            </summary>
+            <param name="name">Variable name</param>
+            <param name="value">New value, string or string[]</param>
+            <exception cref="T:System.IO.IOException">Will throw exception if variable does not exist, or is private</exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.RemoveVariable(System.String)">
+            <summary>
+            Removes the given variable from the file
+            </summary>
+            <param name="name">Variable to be removed</param>
+            <exception cref="T:System.IO.IOException">Will throw exception if variable does not exist, or is private</exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.AddKey(System.String,System.String,System.Object)">
+            <summary>
+            Adds a key to the given block
+            </summary>
+            <param name="block">Block where the key will be added</param>
+            <param name="key">Key name that will be added</param>
+            <param name="value">String or string array. </param>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.A_ReadKey(System.String,System.String)">
+            <summary>
+            Reads the given key from the given block
+            </summary>
+            <param name="block">From what block to search</param>
+            <param name="key">Key name</param>
+            <returns>string[]</returns>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.S_ReadKey(System.String,System.String)">
+            <summary>
+            Reads the given key from the given block
+            </summary>
+            <param name="block">From what block to search</param>
+            <param name="key">Key name</param>
+            <returns>string</returns>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ModifyKey(System.String,System.String,System.Object)">
+            <summary>
+            Modifies the given key with the given value
+            </summary>
+            <param name="block">Block where the key is</param>
+            <param name="key">key name</param>
+            <param name="value">New key value</param>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.RemoveKey(System.String,System.String)">
+            <summary>
+            Removes the given key from the given block
+            </summary>
+            <param name="block">Block where the key will be removed from</param>
+            <param name="key">Key name</param>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.MoveKey(System.String,System.String,System.String)">
+            <summary>
+            Move key from src block to dst block
+            </summary>
+            <param name="fromBlock">source</param>
+            <param name="toBlock">destination</param>
+            <param name="key">key name</param>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.SaveToFile(System.String,System.String,System.Object,System.Int32,System.Boolean)">
+            <summary>
+            Saves the given value to the file
+            </summary>
+            <param name="block">Can be null, if variable is given</param>
+            <param name="name">Can be null, Variable or key name</param>
+            <param name="value">Can be null, Variable or key value</param>
+            <param name="action">
+            0 = Add block
+            1 = Remove block
+            2 = Add variable
+            4 = Modify variable
+            5 = Remove variable
+            6 = Add key
+            8 = Modify key
+            9 = Remove key
+            10 = Move key
+            </param>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ParseToATRC(System.String)">
+            <summary>
+            Parses the given string to ATRC format
+            
+            </summary>
+            <param name="parse">String to be parsed</param>
+            <returns>The parsed string</returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ParseLine(System.String)">
+            <summary>
+            Parse line, return parsed line
+            </summary>
+            <param name="line">line</param>
+            <returns></returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ParserValue(System.String,System.Int32)">
+            <summary>
+            Parse the value of a variable or key
+            </summary>
+            <param name="_line">Line containing value, non-trimmed</param>
+            <param name="_line_number">Line number</param>
+            <returns>Value, </returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ParseFile(System.String)">
+            <summary>
+            Parse the contents of the file
+            </summary>
+            <param name="p_filename">File location/name</param>
+            <returns>block data and variable data</returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.Read(System.String)">
+            <summary>
+            Open a file, set filepath first using Filename property
+            </summary>
+            <returns>
+            ATRCFileData object
+            </returns>
+        </member>
+    </members>
+</doc>

@@ -11,7 +11,7 @@ Run test project ```.\ATRC.TEST\Run.bat```
 
 | Function | arg1 | arg2 | arg3 | usage | will make exception if |
 |      ----|  ----|  ----|  ----|  ----|         ----|
-|void Read(string p_filename, string p_mode)|path to file|c: create, cf: create force, r: read| | read/create new .atrc file| filename isn't .atrc, invalid p_mode, read and file does not exist |
+|void Read(string p_filename)|path to file|| | read .atrc file| filename isn't .atrc, invalid p_mode, read and file does not exist |
 |void AddBlock(string block)|block name to be created|||create a new empty block|block contains reserved words (see Usage in .atrc)|
 |public void RemoveBlock(string block)|block name to be removed|||removes block along its contents|block does not exist|
 |void AddVariable(string name, object value)|variable's name to be added|variable's value, string or string[]||create a new list or string variable|name contains reserved words (see Usage in .atrc), variable already exists or it's not string or string[]|
@@ -25,6 +25,9 @@ Run test project ```.\ATRC.TEST\Run.bat```
 |void ModifyKey(string block, string key, object value)|block where it's located|key to modify|new value, string or string[]|modify existing key's value|block or key doesn't exist, value isn't string or string[]|
 |void RemoveKey(string block, string key)|key location|key to be removed||remove key from block|block or key does not exist|
 |void MoveKey(string fromBlock, string toBlock, string key)|move from source|to destination|key to be moved|move key from src to dst|neither block exist, key exists in dst or key doesn't exist in src|
+|bool ParseToBool(string value)|value to be parsed|||parses string to boolean|if value is not boolean|
+|int ParseToInt(string value)|value to be parsed|||parses string to integer|if value is not integer|
+|float ParseToFloat(string value)|value to be parsed|||parses string to float|if value is not float|
 
 ### Usage in c#
 

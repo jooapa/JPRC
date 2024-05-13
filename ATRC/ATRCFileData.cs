@@ -8,7 +8,6 @@ namespace ATRC
             public string[] ArrayValues;
             public bool IsArray;
             public bool IsPrivate; // Used only when reading in ATRCFileData class
-
             public ATRCVariable(){
                 IsPrivate = false;
                 Name = "";
@@ -38,6 +37,8 @@ namespace ATRC
             public void AddBlock(string block){
                 if(block != null && block.Contains('%') || block.Contains('!') || block.Contains(','))
                         throw new System.IO.IOException("Block name cannot contain reserved characters (%, !, ,)");
+                if(Blocks.Any(x => x.Name == block))
+                    throw new System.IO.IOException("Block " + block + " already exists");
                 // Created block will be appended to the end of the file
                 // We also have to check if the block already exists
 
@@ -489,7 +490,11 @@ namespace ATRC
                             foreach (string line in File.ReadLines(this.Filename)) {
                                 lines.Add(line); // Add the original lines
                                 string _line_trim = line.Trim(); // Trim the line
+                                string _parse_line = this.ParseLine(_line_trim);
                                 if(_block_removed) {
+                                    if(_line_trim.StartsWith('%')){
+                                        continue; // Skip lines that are vars
+                                    }
                                     if(!_line_trim.StartsWith('[') && !_block_removed_next_found) { // Skip and remove lines that are not blocks
                                         lines.Remove(line); 
                                         continue;
@@ -500,7 +505,7 @@ namespace ATRC
                                     
                                 } else {
                                     if(!_line_trim.StartsWith('[')) continue; // Skip lines that are not blocks
-                                    if(_line_trim == "[" + block + "]"){ // If we are in the correct block
+                                    if(_parse_line == "[" + block + "]"){ // If we are in the correct block
                                         _block_removed = true;
                                         lines.Remove(line); // Remove the block
                                     }
@@ -532,10 +537,11 @@ namespace ATRC
                                 string _line_trim = line.Trim(); // Trim the line
                                 if(_line_trim.StartsWith("<%")) continue; // Since we do not allow the modifying of private variables, we will skip them
                                 if(!_line_trim.StartsWith('%')) continue; // Skip lines that are not vars
+                                string _parse_line = this.ParseLine(_line_trim);
                                 // We found a variable, we will check if it is the correct one
-                                int _start_looking_for_value = _line_trim.IndexOf('=');
+                                int _start_looking_for_value = _parse_line.IndexOf('=');
                                 if(_start_looking_for_value == -1) throw new System.IO.IOException("Invalid variable declaration - No value assigned at line " + index);
-                                string _variable_name = _line_trim.AsSpan(1, _line_trim.IndexOf('%', 1) - 1).ToString(); 
+                                string _variable_name = _parse_line.AsSpan(1, _parse_line.IndexOf('%', 1) - 1).ToString(); 
                                 // Now that we have our public variable name, we will compare the two
                                 if(_variable_name != name) continue; // Skip if the variable is not the correct one
                                 // We have found the correct one
@@ -553,10 +559,11 @@ namespace ATRC
                                 string _line_trim = line.Trim(); // Trim the line
                                 if(_line_trim.StartsWith("<%")) continue; // Since we do not allow the modifying of private variables, we will skip them
                                 if(!_line_trim.StartsWith('%')) continue; // Skip lines that are not vars
+                                string _parse_line = this.ParseLine(_line_trim);
                                 // We found a variable, we will check if it is the correct one
-                                int _start_looking_for_value = _line_trim.IndexOf('=');
+                                int _start_looking_for_value = _parse_line.IndexOf('=');
                                 if(_start_looking_for_value == -1) throw new System.IO.IOException("Invalid variable declaration - No value assigned at line " + index);
-                                string _variable_name = _line_trim.AsSpan(1, _line_trim.IndexOf('%', 1) - 1).ToString(); 
+                                string _variable_name = _parse_line.AsSpan(1, _parse_line.IndexOf('%', 1) - 1).ToString(); 
                                 // Now that we have our public variable name, we will compare the two
                                 if(_variable_name != name) continue; // Skip if the variable is not the correct one
                                 // We have found the correct one
@@ -574,7 +581,8 @@ namespace ATRC
                                 if(_key_added) continue; // Skip if the key was already added
                                 string _line_trim = line.Trim(); // Trim the line
                                 if(!_line_trim.StartsWith('[')) continue; // Skip lines that are not blocks
-                                if(_line_trim == "[" + block + "]"){ // If we are in the correct block
+                                string _parse_line = this.ParseLine(_line_trim);
+                                if(_parse_line == "[" + block + "]"){ // If we are in the correct block
                                     lines.Add(name + "=" + _string_value); // Add the new key
                                     _key_added = true;
                                 } 
@@ -593,7 +601,7 @@ namespace ATRC
                                 if(_key_modified) continue; // Skip if the key was already added
                                 string _line_trim = line.Trim(); // Trim the line
                                 if(!_line_trim.StartsWith('[') && !_line_trim.StartsWith(name+"=")) continue; // Skip lines that are not block or key
-
+                                _line_trim = this.ParseLine(_line_trim);
                                 if(_line_trim == "[" + block + "]"){ // If we are in the correct block
                                     _current_block_2 = _line_trim;
                                 }
@@ -616,7 +624,7 @@ namespace ATRC
                                 if(_key_removed) continue; // Skip if the key was already added
                                 string _line_trim = line.Trim(); // Trim the line
                                 if(!_line_trim.StartsWith('[') && !_line_trim.StartsWith(name+"=")) continue; // Skip lines that are not block or key
-
+                                _line_trim = this.ParseLine(_line_trim);
                                 if(_line_trim == "[" + block + "]"){ // If we are in the correct block
                                     _current_block_3 = _line_trim;
                                 }
@@ -645,19 +653,22 @@ namespace ATRC
                                 string _line_trim = line.Trim(); // Trim the line
                                 if(_line_trim.StartsWith('!')) continue; // Skip lines that are comments
                                 if(!_line_trim.StartsWith('[') && !_line_trim.StartsWith(_key + "=")) continue; // Skip lines that are not blocks
-                                if(_line_trim.StartsWith('[')) _current_block = _line_trim;
-                                if(_line_trim == "[" + _fromBlock + "]"){ // If we are in the correct block
+                                string _parse_line = this.ParseLine(_line_trim);
+                                if(_parse_line.StartsWith('[')) _current_block = _parse_line;
+
+                                if(_parse_line == "[" + _fromBlock + "]"){ // If we are in the correct block
                                     _from_block_index = index; // We have found the block index
                                 }
-                                if(_line_trim == "[" + _toBlock + "]"){ // If we are in the correct block
+                                if(_parse_line == "[" + _toBlock + "]"){ // If we are in the correct block
                                     _to_block_index = index; // We have found the block index
                                 }
-                                if(_line_trim.StartsWith(_key + "=") && _current_block == "["+_fromBlock+"]"){ // If we are in the correct block
+                                if(_parse_line.StartsWith(_key + "=") && _current_block == "["+_fromBlock+"]"){ // If we are in the correct block
                                     _key_index = index; // We have found the key index
                                     _original_key_line = line;
                                     lines.Remove(line); // Remove the key from the original block
                                 }
                             }
+
                             // Now we will loop through the file, moving everything
                             lines.Remove(_original_key_line); // Remove the key from the original block
                             lines.Insert(
@@ -676,31 +687,126 @@ namespace ATRC
             
             /// <summary>
             /// Parses the given string to ATRC format
+            /// 
             /// </summary>
             /// <param name="parse">String to be parsed</param>
             /// <returns>The parsed string</returns>
             private string ParseToATRC(string parse){
 
                 string _parse_result = "";
+                
+                
+                // Since only value is parsed, some trickery can be done
+                string _parse_result_2 = "";
+                List<string> _vars = [];
+                bool _looking_for_vars = false;
+                char _last_char = ' ';
                 foreach(char c in parse){
-                    if(c == ','){
-                        _parse_result += "\\,";
-                        continue;
-                    }
-                    if(c == '!'){
-                        _parse_result += "\\!";
-                        continue;
-                    }
+                    Debug.DebugConsole("Char: " + c);
+                    Debug.DebugConsole("Looking for vars: " + _looking_for_vars);
+                    _last_char = c;
+                    // When we are looking for variables, we will go here.¨
+                    if(_looking_for_vars){
+                        if(c == '%'){
+                            _parse_result += "%" + _parse_result_2 + "%";
+                            _vars.Add(_parse_result_2);
+                            _looking_for_vars = false;
+                            _parse_result_2 = "";
+                            continue;
+                        }
 
-                    // TODO What if variables are to be used
-                    if(c == '%'){
-                        _parse_result += "\\%";
+                        // If there is , or !, we will just quess that it is not a variable, and we will assign everything as parsed
+                        if(c == ','){
+                            _parse_result += "\\%"+_parse_result_2 + "\\,";
+                            _looking_for_vars = false;
+                            continue;
+                        }
+                        if(c == '!'){
+                            _parse_result += "\\%"+_parse_result_2 + "\\!";
+                            _looking_for_vars = false;
+                            continue;
+                        }
+                        _parse_result_2 += c;
+                    } else {
+                        if(c == '%'){
+                            _looking_for_vars = true;
+                            continue;
+                        }
+                        if(c == ','){
+                            _parse_result += "\\,";
+                            continue;
+                        }
+                        if(c == '!'){
+                            _parse_result += "\\!";
+                            continue;
+                        }
+                        _parse_result += c;
+                    }                    
+                }
+                
+                // Need to do this...
+                if(_looking_for_vars && _last_char == '%') _parse_result+= "\\%";
+
+                Debug.DebugConsole("=== PARSE RESULT ===");
+
+                if(_vars.Count > 0){
+                    // We have found some variables, so we will need to apply the values in our code
+                    ATRCVariable[] _variables = this.ReadVariables(); // We need to read the variables
+                    foreach(string var in _vars){
+                        if(!_variables.Any(x => x.Name == var)){
+                            throw new System.IO.IOException("Variable " + var + " does not exist");
+                        }
+                        if(_variables.Any(x => x.Name  == var && x.IsPrivate)){
+                            throw new System.IO.IOException("Variable " + var + " is private and cannot be modified");
+                        }
+                        ATRCVariable _variable__ = _variables.First(x => x.Name == var);
+                        if(_variable__.IsArray){
+                            _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__.ArrayValues));
+                        } else {
+                            _parse_result = _parse_result.Replace("%"+var+"%", _variable__.Value);
+                        }
+                    }
+                    Debug.DebugConsole("=== END ===");
+                }
+                Debug.DebugConsole(_parse_result);
+                System.Environment.Exit(0);
+                return _parse_result;
+            }
+
+            /// <summary>
+            /// Parse line, return parsed line
+            /// </summary>
+            /// <param name="line">line</param>
+            /// <returns></returns>
+            private string ParseLine(string line){
+                string _parse_result = "";
+                bool _last_was_re_dash = false;
+                foreach(char c in line){
+                    if(c == '\\'){
+                        _last_was_re_dash = true;
                         continue;
                     }
-                    
+                    if(c == '!' && !_last_was_re_dash) {_last_was_re_dash = false;break;}  
                     _parse_result += c;
                 }
-                return _parse_result;
+                return _parse_result.Trim();
+            }
+
+            public bool ParseToBool(string value){
+                value = value.ToLower().Trim();
+                if(value == "true") return true;
+                if(value == "false") return false;
+                throw new System.IO.IOException("Value: " + value + " must be a boolean");
+            }
+            public int ParseToInt(string value){
+                if(!int.TryParse(value, out int result))
+                    throw new System.IO.IOException("Value: " + value + " must be an integer");
+                return result;
+            }
+            public float ParseToFloat(string value){
+                if(!float.TryParse(value, out float result))
+                    throw new System.IO.IOException("Value:" + value + " must be a float");
+                return result;
             }
         }
     }

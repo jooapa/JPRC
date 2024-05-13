@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ATRC.Test", "ATRC.Test.csproj", "{BF3E43A7-3EF7-4086-A006-6E32AB6BB272}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF3E43A7-3EF7-4086-A006-6E32AB6BB272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3E43A7-3EF7-4086-A006-6E32AB6BB272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3E43A7-3EF7-4086-A006-6E32AB6BB272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3E43A7-3EF7-4086-A006-6E32AB6BB272}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9322DBD6-45E3-4F9C-B3A0-2EF598A20C55}
+	EndGlobalSection
+EndGlobal

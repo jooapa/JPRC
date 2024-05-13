@@ -246,41 +246,19 @@ namespace ATRC
             /// <summary>
             /// Open a file, set filepath first using Filename property
             /// </summary>
-            /// <param name="p_mode">
-            /// "c" for create - Will not overwrite existing file
-            /// "cf" for create force - Will overwrite existing file
-            /// "r" for read - Read existing file and parse it
-            /// </param>
             /// <returns>
             /// ATRCFileData object
             /// </returns>
-            public void Read(string p_filename, string p_mode = "r")
+            public void Read(string p_filename)
             {
                 ArgumentNullException.ThrowIfNull(p_filename);
                 if (System.IO.Path.GetExtension(p_filename) != ".atrc")
                     throw new System.IO.IOException("File is not an ATRC file");
 
                 // Check if file exists, else create it
+                if (!System.IO.File.Exists(p_filename))
+                    throw new System.IO.IOException("File does not exist");
                 Filename = p_filename;
-                switch(p_mode){
-                    case "c":
-                        if (System.IO.File.Exists(p_filename))
-                            return;
-                        else 
-                            System.IO.File.Create(p_filename);
-                        break;
-                    case "cf":
-                        if (System.IO.File.Exists(p_filename))
-                            System.IO.File.Delete(p_filename);
-                        System.IO.File.Create(p_filename);
-                        break;
-                    case "r":
-                        if (!System.IO.File.Exists(p_filename))
-                            throw new System.IO.IOException("File does not exist");
-                        break;
-                    default:
-                        throw new System.IO.IOException("Invalid mode for Read function");
-                }
                 (Blocks, Variables) = ParseFile(p_filename);
             }
         }
