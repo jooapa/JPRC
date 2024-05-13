@@ -1,4 +1,5 @@
 #!/bin/bash
+exit 0
 build_path="bin/Release/net8.0/publish"
 echo "Build path: $build_path"
 

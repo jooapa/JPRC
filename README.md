@@ -43,7 +43,13 @@ namespace Test
             
 
             // Create a new variable
-            
+            fileData.AddVariable("MyVariable1", "MyValue");
+
+            // Modify it
+            fileData.ModifyVariable("MyVariable1", "newValue");
+
+            // Delete it
+            fileData.RemoveVariable("MyVariable1"); 
         }
     }
 }
