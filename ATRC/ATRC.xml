@@ -125,6 +125,14 @@
             10 = Move key
             </param>
         </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ObjectToSTR(System.Object)">
+            <summary>
+            Turn object to string, with it being parsed to ATRC format
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
         <member name="M:ATRC.Filehandler.ATRCFileData.ParseToATRC(System.String)">
             <summary>
             Parses the given string to ATRC format
@@ -139,6 +147,30 @@
             </summary>
             <param name="line">line</param>
             <returns></returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ParseToBool(System.String)">
+            <summary>
+            Parse value to boolean
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ParseToInt(System.String)">
+            <summary>
+            Parse string to integer
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ParseToFloat(System.String)">
+            <summary>
+            Parse string to float
+            </summary>
+            <param name="value">String</param>
+            <returns></returns>
+            <exception cref="T:System.IO.IOException"></exception>
         </member>
         <member name="M:ATRC.Filehandler.ATRCFileData.ParserValue(System.String,System.Int32)">
             <summary>

@@ -4,8 +4,10 @@ a=1! dsaa
 d=4! a
 c=2
 troll=lol !a
-%test%=true
+%test%=qa
+%test2%=THIS,TEST
 aaa=%test%
 [haha]
-a=value
+aq=aq,%test%,a,%test2%,a
+a=a,%test%,a,%test2%,a
 c=new value

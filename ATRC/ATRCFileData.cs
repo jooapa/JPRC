@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 namespace ATRC
 {
     public partial class Filehandler{
@@ -135,28 +136,51 @@ namespace ATRC
                     throw new System.IO.IOException("Variable " + name + " already exists");
                 }
 
-                string _val = "";
-                string[] _val_arr = [];
-                if(value is string) 
-                    _val = (string)value;
-                else if(value is string[])
-                    _val_arr = (string[])value;
+                string _value = ObjectToSTR(value); // This will be saved to the file
+                // from this point onwards, it will be parsed. Arrays will look like this %var1%,%var2%,te\,st
+                string _parse_result = _value;
+                if(ParseToATRC_vars.Count > 0){
+                    _variables = this.ReadVariables(); // We need to read the variables
+                    string[] __tmp = ParseToATRC_vars.ToArray();
+                    bool array = false;
+                    foreach(string var in __tmp){
+                        if(!_variables.Any(x => x.Name == var)){
+                            throw new System.IO.IOException("Variable " + var + " does not exist");
+                        }
+                        if(_variables.Any(x => x.Name  == var && x.IsPrivate)){
+                            throw new System.IO.IOException("Variable " + var + " is private and cannot be accessed");
+                        }
+                        ATRCVariable _variable__new = _variables.First(x => x.Name == var);
+                        if(_variable__new.IsArray){
+                            _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__new.ArrayValues));
+                            array = true;
+                        } else {
+                            _parse_result = _parse_result.Replace("%"+var+"%", _variable__new.Value);
+                        }
+                    }
+                }
+
+                ATRCVariable _variable__ = new();
+                if(value is string) {
+                    _variable__.Value = _parse_result;
+                    _variable__.IsArray = false;
+                }
+                else if(value is string[]){
+                    _variable__.ArrayValues = Regex.Split(_parse_result, @"(?<!\\),");
+                    _variable__.IsArray = true;
+                }
                 else
                     throw new System.IO.IOException("Value must be a string or a string array");
 
-                ATRCVariable _variable__ = new()
-                {
-                    Name = name,
-                    Value = _val,
-                    ArrayValues = _val_arr,
-                    IsArray = _val_arr.Length > 0
-                };
+                _variable__.Name = name;
+                // _variable__.IsArray = _variable__.ArrayValues.Length > 0;
+                
 
                 List<ATRCVariable> tmp = [.. Variables];
                 tmp.Add(_variable__);
                 Variables = tmp.ToArray();
 
-                this.SaveToFile(null, name, value, 2, false);
+                this.SaveToFile(null, name, _value, 2, false);
             }
             /// <summary>
             /// Read array variable
@@ -210,19 +234,41 @@ namespace ATRC
                 }
 
                 ATRCVariable _variable__ = _variables.First(x => x.Name == name);
+                string _value = ObjectToSTR(value); // This will be saved to the file
+                // from this point onwards, it will be parsed. Arrays will look like this %var1%,%var2%,te\,st
+                string _parse_result = _value;
+                if(ParseToATRC_vars.Count > 0){
+                    _variables = this.ReadVariables(); // We need to read the variables
+                    string[] __tmp = ParseToATRC_vars.ToArray();
+                    bool array = false;
+                    foreach(string var in __tmp){
+                        if(!_variables.Any(x => x.Name == var)){
+                            throw new System.IO.IOException("Variable " + var + " does not exist");
+                        }
+                        if(_variables.Any(x => x.Name  == var && x.IsPrivate)){
+                            throw new System.IO.IOException("Variable " + var + " is private and cannot be accessed");
+                        }
+                        ATRCVariable _variable__new = _variables.First(x => x.Name == var);
+                        if(_variable__new.IsArray){
+                            _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__new.ArrayValues));
+                            array = true;
+                        } else {
+                            _parse_result = _parse_result.Replace("%"+var+"%", _variable__new.Value);
+                        }
+                    }
+                }
 
                 int idx = Array.FindIndex(Variables, v => v.Name == _variable__.Name && v.Value == _variable__.Value);
                 string _val = "";
                 string[] _val_arr = [];
-                if(value is string) 
-                    _val = (string)value;
+                if(value is string){
+                    _variable__.Value = _parse_result;
+                }
                 else if(value is string[])
-                    _val_arr = (string[])value;
+                    _variable__.ArrayValues = Regex.Split(_parse_result, @"(?<!\\),");
                 else
                     throw new System.IO.IOException("Value must be a string or a string array");
-                _variable__.Value = _val;
-                _variable__.ArrayValues = _val_arr;
-                _variable__.IsArray = _val_arr.Length > 0;
+                _variable__.IsArray = _variable__.ArrayValues.Length > 0;
 
                 List<ATRCVariable> tmp = [.. Variables];
 
@@ -230,7 +276,7 @@ namespace ATRC
                 tmp.Add(_variable__);
                 Variables = tmp.ToArray();
 
-                this.SaveToFile(null, name, value, 4);
+                this.SaveToFile(null, name, _value, 4);
             }
             /// <summary>
             /// Removes the given variable from the file
@@ -282,27 +328,49 @@ namespace ATRC
                 if (Blocks.First(x => x.Name == block).Keys.Any(x => x.Name == key)){
                     throw new System.IO.IOException("Key " + key + " already exists in block " + block);
                 }
-                string _string_value = "";
-                string[] _array_value = [];
-                if(value is string) 
-                    _string_value = (string)value;
-                else if(value is string[])
-                    _array_value = (string[])value;
+                string _value = ObjectToSTR(value); // This will be saved to the file
+                // from this point onwards, it will be parsed. Arrays will look like this %var1%,%var2%,te\,st
+                string _parse_result = _value;
+                if(ParseToATRC_vars.Count > 0){
+                    ATRCVariable[] _variables = this.ReadVariables(); // We need to read the variables
+                    string[] __tmp = ParseToATRC_vars.ToArray();
+                    bool array = false;
+                    foreach(string var in __tmp){
+                        if(!_variables.Any(x => x.Name == var)){
+                            throw new System.IO.IOException("Variable " + var + " does not exist");
+                        }
+                        if(_variables.Any(x => x.Name  == var && x.IsPrivate)){
+                            throw new System.IO.IOException("Variable " + var + " is private and cannot be accessed");
+                        }
+                        ATRCVariable _variable__ = _variables.First(x => x.Name == var);
+                        if(_variable__.IsArray){
+                            _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__.ArrayValues));
+                            array = true;
+                        } else {
+                            _parse_result = _parse_result.Replace("%"+var+"%", _variable__.Value);
+                        }
+                    }
+                }
+                // Once we have checked that the block exists and the key does not exist, we can add the key
+                ATRCKey newKey = new ATRCKey();
+                if(value is string) {
+                    newKey.Value = _parse_result;
+                    newKey.IsArray = false;
+                }
+                else if(value is string[]){
+                    newKey.ArrayValues = Regex.Split(_parse_result, @"(?<!\\),");
+                    newKey.IsArray = true;
+                }
                 else
                     throw new System.IO.IOException("Value must be a string or a string array");
 
-                // Once we have checked that the block exists and the key does not exist, we can add the key
-                ATRCKey newKey = new ATRCKey();
                 newKey.Name = key;
-                newKey.IsArray = _array_value.Length > 0;
-                newKey.Value = _string_value;
-                newKey.ArrayValues = _array_value;
+                // newKey.IsArray = newKey.ArrayValues.Length > 0;
 
                 List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == block).Keys];
                 tmp.Add(newKey);
                 Blocks.First(x => x.Name == block).Keys = tmp.ToArray();
-
-                this.SaveToFile(block, key, value, 6);
+                this.SaveToFile(block, key, _value, 6);
             }
 
             /// <summary>
@@ -354,20 +422,50 @@ namespace ATRC
 
                 ATRCKey _key = Blocks.First(x => x.Name == block).Keys.First(x => x.Name == key);
                 int idx = Array.IndexOf(Blocks.First(x => x.Name == block).Keys, _key);
-                if(value is string){
-                _key.Value = (string)value;
-                } else if(value is string[]){
-                _key.ArrayValues = (string[])value;
-                } else
-                throw new System.IO.IOException("Value must be a string or a string array");
-                _key.IsArray = _key.ArrayValues.Length > 0;
+
+
                 
+                string _value = ObjectToSTR(value); // This will be saved to the file
+                // from this point onwards, it will be parsed. Arrays will look like this %var1%,%var2%,te\,st
+                string _parse_result = _value;
+                if(ParseToATRC_vars.Count > 0){
+                    ATRCVariable[] _variables = this.ReadVariables(); // We need to read the variables
+                    string[] __tmp = ParseToATRC_vars.ToArray();
+                    bool array = false;
+                    foreach(string var in __tmp){
+                        if(!_variables.Any(x => x.Name == var)){
+                            throw new System.IO.IOException("Variable " + var + " does not exist");
+                        }
+                        if(_variables.Any(x => x.Name  == var && x.IsPrivate)){
+                            throw new System.IO.IOException("Variable " + var + " is private and cannot be accessed");
+                        }
+                        ATRCVariable _variable__ = _variables.First(x => x.Name == var);
+                        if(_variable__.IsArray){
+                            _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__.ArrayValues));
+                            array = true;
+                        } else {
+                            _parse_result = _parse_result.Replace("%"+var+"%", _variable__.Value);
+                        }
+                    }
+                }
+                
+        
+                if(value is string){
+                    _key.Value = _parse_result;
+                } else if(value is string[]){
+                    _key.ArrayValues = Regex.Split(_parse_result, @"(?<!\\),");
+                } else
+                    throw new System.IO.IOException("Value must be a string or a string array");
+                _key.IsArray = _key.ArrayValues.Length > 0;
+
                 List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == block).Keys];
                 tmp.RemoveAt(idx);
                 tmp.Add(_key);
                 Blocks.First(x => x.Name == block).Keys = tmp.ToArray();
 
-                this.SaveToFile(block, key, value, 8);
+
+
+                this.SaveToFile(block, key, _value, 8);
             }
             
             /// <summary>
@@ -456,24 +554,9 @@ namespace ATRC
                 try{
                     // Block or name can't contain reserved special characters
                     List<string> lines = [];
-                    string _string_value = "";
-                    string[] _array_value = [];
+
                     if(value != null && action != 10){
-                        if(value is string) {
-                            _string_value = (string)value;
-                            _string_value = this.ParseToATRC(_string_value);
-                        }
-                        else if(value is string[]){
-                            _array_value = (string[])value;
-                            int index_parser = 0;
-                            foreach(string val in _array_value){
-                                _array_value[index_parser] = this.ParseToATRC(val);
-                                index_parser++;
-                            }
-                            _string_value = string.Join(",", _array_value);
-                        }
-                        else
-                            throw new System.IO.IOException("Value must be a string or a string array");
+                        
                     }
 
                     int index = 0;
@@ -521,7 +604,7 @@ namespace ATRC
                                     lines.Add(line); // Add the original lines
                                     continue;
                                 }
-                                lines.Add("%" + name + "%=" + _string_value);
+                                lines.Add("%" + name + "%=" + value);
                                 _variable_added = true;
                                 lines.Add(line); // Add the original lines
                             }
@@ -546,7 +629,7 @@ namespace ATRC
                                 if(_variable_name != name) continue; // Skip if the variable is not the correct one
                                 // We have found the correct one
                                 lines.Remove(line); // Remove the old variable
-                                lines.Add("%" + name + "%" + "=" + _string_value); // Add the new variable
+                                lines.Add("%" + name + "%" + "=" + value); // Add the new variable
                                 _variable_modified = true; // Set the variable to modified
                             }
                             File.WriteAllLines(this.Filename, lines);
@@ -583,7 +666,7 @@ namespace ATRC
                                 if(!_line_trim.StartsWith('[')) continue; // Skip lines that are not blocks
                                 string _parse_line = this.ParseLine(_line_trim);
                                 if(_parse_line == "[" + block + "]"){ // If we are in the correct block
-                                    lines.Add(name + "=" + _string_value); // Add the new key
+                                    lines.Add(name + "=" + value); // Add the new key
                                     _key_added = true;
                                 } 
                             }
@@ -608,7 +691,7 @@ namespace ATRC
 
                                 if(_line_trim.StartsWith(name + "=") && _current_block_2 == "["+block+"]"){ // If we are in the correct block
                                     lines.Remove(line); // Remove the old key
-                                    lines.Add(name + "=" + _string_value); // Add the new key
+                                    lines.Add(name + "=" + value); // Add the new key
                                     _key_modified = true;
                                 }
                             }
@@ -684,7 +767,38 @@ namespace ATRC
                     Console.WriteLine("An error occurred: " + ex.Message);
                 }
             }
+            /// <summary>
+            /// Turn object to string, with it being parsed to ATRC format
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
+            /// <exception cref="System.IO.IOException"></exception>
+            private string ObjectToSTR(object value){
+                ParseToATRC_vars.Clear();
+                string _string_value = "";
+                string[] _array_value = [];
+                
+                if(value is string) {
+                    _string_value = (string)value;
+                    _string_value = this.ParseToATRC(_string_value);
+                }
+                else if(value is string[]){
+                    _array_value = (string[])value;
+                    int index_parser = 0;
+                    foreach(string val in _array_value){
+                        _array_value[index_parser] = this.ParseToATRC(val);
+                        index_parser++;
+                    }
+                    _string_value = string.Join(",", _array_value);
+                }
+                else
+                    throw new System.IO.IOException("Value must be a string or a string array");
+
+                return _string_value;
+            }
             
+
+            List<string> ParseToATRC_vars = [];
             /// <summary>
             /// Parses the given string to ATRC format
             /// 
@@ -698,18 +812,15 @@ namespace ATRC
                 
                 // Since only value is parsed, some trickery can be done
                 string _parse_result_2 = "";
-                List<string> _vars = [];
                 bool _looking_for_vars = false;
                 char _last_char = ' ';
                 foreach(char c in parse){
-                    Debug.DebugConsole("Char: " + c);
-                    Debug.DebugConsole("Looking for vars: " + _looking_for_vars);
                     _last_char = c;
                     // When we are looking for variables, we will go here.¨
                     if(_looking_for_vars){
                         if(c == '%'){
                             _parse_result += "%" + _parse_result_2 + "%";
-                            _vars.Add(_parse_result_2);
+                            ParseToATRC_vars.Add(_parse_result_2);
                             _looking_for_vars = false;
                             _parse_result_2 = "";
                             continue;
@@ -743,33 +854,10 @@ namespace ATRC
                         _parse_result += c;
                     }                    
                 }
-                
-                // Need to do this...
-                if(_looking_for_vars && _last_char == '%') _parse_result+= "\\%";
-
-                Debug.DebugConsole("=== PARSE RESULT ===");
-
-                if(_vars.Count > 0){
-                    // We have found some variables, so we will need to apply the values in our code
-                    ATRCVariable[] _variables = this.ReadVariables(); // We need to read the variables
-                    foreach(string var in _vars){
-                        if(!_variables.Any(x => x.Name == var)){
-                            throw new System.IO.IOException("Variable " + var + " does not exist");
-                        }
-                        if(_variables.Any(x => x.Name  == var && x.IsPrivate)){
-                            throw new System.IO.IOException("Variable " + var + " is private and cannot be modified");
-                        }
-                        ATRCVariable _variable__ = _variables.First(x => x.Name == var);
-                        if(_variable__.IsArray){
-                            _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__.ArrayValues));
-                        } else {
-                            _parse_result = _parse_result.Replace("%"+var+"%", _variable__.Value);
-                        }
-                    }
-                    Debug.DebugConsole("=== END ===");
+                if(_looking_for_vars){
+                    _parse_result += "\\%" + _parse_result_2;
                 }
-                Debug.DebugConsole(_parse_result);
-                System.Environment.Exit(0);
+
                 return _parse_result;
             }
 
@@ -792,17 +880,35 @@ namespace ATRC
                 return _parse_result.Trim();
             }
 
+            /// <summary>
+            /// Parse value to boolean
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
+            /// <exception cref="System.IO.IOException"></exception>
             public bool ParseToBool(string value){
                 value = value.ToLower().Trim();
                 if(value == "true") return true;
                 if(value == "false") return false;
                 throw new System.IO.IOException("Value: " + value + " must be a boolean");
             }
+            /// <summary>
+            /// Parse string to integer
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
+            /// <exception cref="System.IO.IOException"></exception>
             public int ParseToInt(string value){
                 if(!int.TryParse(value, out int result))
                     throw new System.IO.IOException("Value: " + value + " must be an integer");
                 return result;
             }
+            /// <summary>
+            /// Parse string to float
+            /// </summary>
+            /// <param name="value">String</param>
+            /// <returns></returns>
+            /// <exception cref="System.IO.IOException"></exception>
             public float ParseToFloat(string value){
                 if(!float.TryParse(value, out float result))
                     throw new System.IO.IOException("Value:" + value + " must be a float");

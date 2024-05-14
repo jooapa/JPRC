@@ -9,8 +9,16 @@ namespace Test
         static void Main(string[] args)
         {
             fileData.Read("file.atrc");
-            fileData.ModifyKey("haha", "a", "a%test%a%test%");
-            Debug.DebugConsole(fileData.S_ReadKey("haha", "a"));
+            string[] test = {"aq", "%test%", "a", "%test2a%", "a"};
+            
+            // fileData.ModifyVariable("test", "qa");
+            
+            // fileData.AddKey("haha", "aq", test);
+            // fileData.AddKey("haha", "aq", "a%test%a%test2%a");
+            
+            // fileData.ModifyKey("haha", "a", test);
+            fileData.ModifyKey("haha", "a", "a%test%a%testa2%a");
+            // Debug.DebugConsole(fileData.S_ReadKey("haha", "a"));
         }
     }
 }
