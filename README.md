@@ -8,27 +8,6 @@ Build nupkg: ```.\ATRC\BuildNupkg.bat```
 
 Run test project ```.\ATRC.TEST\Run.bat```
 
-
-| Function | arg1 | arg2 | arg3 | usage | will make exception if |
-|      ----|  ----|  ----|  ----|  ----|         ----|
-|void Read(string p_filename)|path to file|| | read .atrc file| filename isn't .atrc, invalid p_mode, read and file does not exist |
-|void AddBlock(string block)|block name to be created|||create a new empty block|block contains reserved words (see Usage in .atrc)|
-|public void RemoveBlock(string block)|block name to be removed|||removes block along its contents|block does not exist|
-|void AddVariable(string name, object value)|variable's name to be added|variable's value, string or string[]||create a new list or string variable|name contains reserved words (see Usage in .atrc), variable already exists or it's not string or string[]|
-|string[] A_ReadVariable(string name)|variable to be read|||returns list variables value|variable doesn't exist or variable is private|
-|string S_ReadVariable(string name)|variable to be read|||returns string variables value|variable doesn't exist or variable is private|
-|void ModifyVariable(string name, object value)|variable to be modified|string or string[] value||modify value of variable|value is not string or string[], variable doesn't exist or variable is private|
-|void RemoveVariable(string name)|variable to be removed|||remove variable|variable doesn't exist or variable is private|
-|void AddKey(string block, string key, object value)|block where to add|key name to be added|its value, string or string[]|add a key to a block|value is not string or string[], block or key contains reserved keywords (see Usage in .atrc), block does not exist or key already exists in destination|
-|string[] A_ReadKey(string block, string key)|block where to read|key to read||read list key from block, returning it as string[]|key or block does not exist|
-|string S_ReadKey(string block, string key)|block where to read|key to read|  |read string key from block, returning it as string|key or block does not exist|
-|void ModifyKey(string block, string key, object value)|block where it's located|key to modify|new value, string or string[]|modify existing key's value|block or key doesn't exist, value isn't string or string[]|
-|void RemoveKey(string block, string key)|key location|key to be removed||remove key from block|block or key does not exist|
-|void MoveKey(string fromBlock, string toBlock, string key)|move from source|to destination|key to be moved|move key from src to dst|neither block exist, key exists in dst or key doesn't exist in src|
-|bool ParseToBool(string value)|value to be parsed|||parses string to boolean|if value is not boolean|
-|int ParseToInt(string value)|value to be parsed|||parses string to integer|if value is not integer|
-|float ParseToFloat(string value)|value to be parsed|||parses string to float|if value is not float|
-
 ### Usage in c#
 
 ```csharp
@@ -42,41 +21,36 @@ namespace Test
         
         static void Main(string[] args)
         {
-            
-            // Read file 'test.atrc'
-            fileData.Read("file.atrc", "r");
-            
-            // Creata new blocks 'test' and 'test2'
-            fileData.AddBlock("test");
-            fileData.AddBlock("test2");
-            
-            // Create two new keys 'key1' and 'key2' in block 'test' with values 'value1' and 'value2'
-            fileData.AddKey("test", "key1", "value1");
-            fileData.AddKey("test", "key2", "value2");
+            fileData.Read("file.atrc"); // Read and parse file.atrc
+            fileData.AddBlock("test"); // Create new block
+            fileData.AddKey("test", "test_key", "my_value"); // Create new key to test-block with my_value as its value
+            string[] test_array = {"my", "values"};
+            fileData.AddKey("test", "array_key", test_array); // Create new array key
 
-            string value = fileData.S_ReadKey("test", "key1"); // Read key 'key1' in block 'test'
-            Console.WriteLine(value); // Output: value1
+            // Read both keys
+            string contents_1 = fileData.S_ReadKey("test", "test_key"); // Read string key
+            string[] contents_2 = fileData.A_ReadKey("test", "array_key"); // Read array key
+    
+            // Create new variable if it does not exist
+            if(!fileData.VariableExists("system32_path")){
+                fileData.AddVariable("system32_path", "C:\\Windows\\System32");
+            }
 
-            // Remove key2 and move key1 to block 'test2'
-            fileData.RemoveKey("test", "key2");
-            fileData.MoveKey("test", "test2", "key1");
+            // Remove array and test_key
+            fileData.RemoveKey("test", "array_key");
+            fileData.ModifyKey("test", "test_key", "%system32_path%\\explorer.exe");
 
-            // We can save arrays as well
-            string[] array = new string[] { "value1", "value2", "value3" };
-            fileData.ModifyKey("test2", "key1", array); // Save array to 'key1'
+            // Move key to other location
+            fileData.AddBlock("WinShell");
+            fileData.MoveKey("test", "WinShell", "test_key");
 
-            // Remove the empty block 'test'
-            fileData.RemoveBlock("test");
-            
-
-            // Create a new variable
-            fileData.AddVariable("MyVariable1", "MyValue");
-
-            // Modify it
-            fileData.ModifyVariable("MyVariable1", "newValue");
-
-            // Delete it
-            fileData.RemoveVariable("MyVariable1"); 
+            Console.WriteLine(fileData.S_ReadKey("WinApps", "test_key")); // -> C:\Windows\System32\notepad.exe
+            /*
+            file.atrc ->
+            %system32_path%=C:\Windows\System32
+            [WinApps]
+            test_key=%system32_path%\notepad.exe
+            */
         }
     }
 }
@@ -84,12 +58,55 @@ namespace Test
 
 ### Usage in .atrc
 ```
-! .atrc file
+! whitespace is only ignored on the start of lines and everything is case-sensitive
 ! create a new block with []
 ! variable, key or block names can't contain: !, % or ,
+! variables are constants
 %variable%=value
-<%private_variable%=value
+<%private_variable%=private_value!This can't be accessed be modified or read outside the file
+
 [blockname]
 key1=value
-variable_list=%variable%, %private_variable%
+variable_list=%variable%, %private_variable%! when reading this, csharp will show {"value", " private_value"}
+
+ whitespace = hello 
+! Key would be 'whitespace ' and its key ' hello ' 
+! If you want to include !, %, or , in your value, use \
+reserved_characters=this\, is \% reserved\!
 ```
+
+### ATRCFileData methods:
+
+ - AddBlock         -> Adds given block
+ 
+ - RemoveBlock      -> Removes given block
+
+ - BlockExists      -> Check if block exists
+
+ - AddVariable      -> Adds given variable with its value
+
+ - A_ReadVariable   -> Reads list variable, returning contents in a string[]
+
+ - S_ReadVariable   -> Reads variable, returning contents in a string
+
+ - ModifyVariable   -> Modify given variable with given value
+
+ - RemoveVariable   -> Removes given variable
+
+ - VariableExists   -> Checks whether variable exists
+
+ - IsPrivateVariable-> Checks if variable is private
+
+ - AddKey           -> Adds key to the given block
+
+ - A_ReadKey        -> Reads list key, returning its contents in a string[]
+ 
+ - S_ReadKey        -> Reads key, returning its contents in a string
+
+ - ModifyKey        -> Modifies given key with the given value
+
+ - RemoveKey        -> Remove the given key from given block
+
+ - MoveKey          -> Move key from source to destination
+
+ - KeyExists        -> Checks whether the key exists

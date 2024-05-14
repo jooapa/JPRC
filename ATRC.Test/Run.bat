@@ -31,7 +31,7 @@ RMDIR /S /Q C:\Users\%USERNAME%\.nuget\packages\atrc\
 ECHO Copying ATRC to libs\
 @REM Remove libs, make libs and copy nupkg to libs
 MKDIR libs
-COPY /Y /B "..\ATRC\%build_path%\ATRC.*.nupkg" .\libs
+COPY /Y /B "..\ATRC\%build_path%\ATRC.1.1.0.nupkg" .\libs
 dotnet restore
 
 @REM Run test program

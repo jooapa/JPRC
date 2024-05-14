@@ -35,6 +35,11 @@ namespace ATRC
             // ==========================
             //  Block functions
             // ==========================
+            /// <summary>
+            /// Create a new block, will be appended to the end of the file
+            /// </summary>
+            /// <param name="block">block to be added</param>
+            /// <exception cref="System.IO.IOException">block already exists</exception>
             public void AddBlock(string block){
                 if(block != null && block.Contains('%') || block.Contains('!') || block.Contains(','))
                         throw new System.IO.IOException("Block name cannot contain reserved characters (%, !, ,)");
@@ -70,7 +75,17 @@ namespace ATRC
                 Blocks = tmp.ToArray();
                 this.SaveToFile(block, null, null, 1);
             }
-
+            /// <summary>
+            /// Checks if block exists
+            /// </summary>
+            /// <param name="block">Block to search</param>
+            /// <returns>True if exists</returns>
+            public bool BlockExists(string block){
+                if (!Blocks.Any(x => x.Name == block)){
+                    return false;
+                }
+                return true;
+            }
             // ==========================
             //  Variable functions
             // ==========================
@@ -290,7 +305,7 @@ namespace ATRC
                     throw new System.IO.IOException("Variable " + name + " does not exist");
                 }
                 if(_variables.Any(x => x.Name  == name && x.IsPrivate)){
-                    throw new System.IO.IOException("Variable " + name + " is private and cannot be modified");
+                    throw new System.IO.IOException("Variable " + name + " is private and cannot be removed");
                 }
 
                 ATRCVariable _variable__ = _variables.First(x => x.Name == name);
@@ -305,7 +320,30 @@ namespace ATRC
 
                 this.SaveToFile(null, name, null, 5);
             }
-
+            /// <summary>
+            /// Checks if variable exists
+            /// </summary>
+            /// <param name="name">Variable name</param>
+            /// <returns>True if exists, false if not</returns>
+            public bool VariableExists(string name){
+                ATRCVariable[] _variables = this.ReadVariables();
+                if (!_variables.Any(x => x.Name == name)){
+                    return false;
+                }
+                return true;
+            }
+            /// <summary>
+            /// Checks if variable is private if it exists
+            /// </summary>
+            /// <param name="name"></param>
+            /// <returns>False if it doesn't exist, or true/false if it is private or public</returns>
+            public bool IsPrivateVariable(string name){
+                ATRCVariable[] _variables = this.ReadVariables();
+                if (!_variables.Any(x => x.Name == name)){
+                    return false;
+                }
+                return _variables.First(x => x.Name == name).IsPrivate;
+            }
             // ==========================
             //  Key functions
             // ==========================
@@ -449,14 +487,14 @@ namespace ATRC
                     }
                 }
                 
-        
                 if(value is string){
-                    _key.Value = _parse_result;
+                    _key.Value = (string)_parse_result;
+                    _key.IsArray = false;
                 } else if(value is string[]){
                     _key.ArrayValues = Regex.Split(_parse_result, @"(?<!\\),");
+                    _key.IsArray = true;
                 } else
                     throw new System.IO.IOException("Value must be a string or a string array");
-                _key.IsArray = _key.ArrayValues.Length > 0;
 
                 List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == block).Keys];
                 tmp.RemoveAt(idx);
@@ -529,6 +567,21 @@ namespace ATRC
             }
 
             /// <summary>
+            /// Checks if key exists
+            /// </summary>
+            /// <param name="block">Key's block</param>
+            /// <param name="key">Key's name</param>
+            /// <returns>True if exists, false if not</returns>
+            public bool KeyExists(string block, string key){
+                if (!Blocks.Any(x => x.Name == block)){
+                    return false;
+                }
+                if (!Blocks.First(x => x.Name == block).Keys.Any(x => x.Name == key)){
+                    return false;
+                }
+                return true;
+            }
+            /// <summary>
             /// Saves the given value to the file
             /// </summary>
             /// <param name="block">Can be null, if variable is given</param>
@@ -563,7 +616,7 @@ namespace ATRC
                     switch(action){
                         case 0:
                             using (StreamWriter sw = File.AppendText(this.Filename)) {
-                                sw.WriteLine("[" + block + "]");
+                                sw.WriteLine("\n[" + block + "]");
                             }
                             break;
                         case 1: 
@@ -806,10 +859,7 @@ namespace ATRC
             /// <param name="parse">String to be parsed</param>
             /// <returns>The parsed string</returns>
             private string ParseToATRC(string parse){
-
                 string _parse_result = "";
-                
-                
                 // Since only value is parsed, some trickery can be done
                 string _parse_result_2 = "";
                 bool _looking_for_vars = false;
@@ -827,12 +877,12 @@ namespace ATRC
                         }
 
                         // If there is , or !, we will just quess that it is not a variable, and we will assign everything as parsed
-                        if(c == ','){
+                        else if(c == ','){
                             _parse_result += "\\%"+_parse_result_2 + "\\,";
                             _looking_for_vars = false;
                             continue;
                         }
-                        if(c == '!'){
+                        else if(c == '!'){
                             _parse_result += "\\%"+_parse_result_2 + "\\!";
                             _looking_for_vars = false;
                             continue;
@@ -843,12 +893,15 @@ namespace ATRC
                             _looking_for_vars = true;
                             continue;
                         }
-                        if(c == ','){
+                        else if(c == ','){
                             _parse_result += "\\,";
                             continue;
                         }
-                        if(c == '!'){
+                        else if(c == '!'){
                             _parse_result += "\\!";
+                            continue;
+                        } else if(c == '\\'){
+                            _parse_result += '\\';
                             continue;
                         }
                         _parse_result += c;
@@ -874,12 +927,13 @@ namespace ATRC
                         _last_was_re_dash = true;
                         continue;
                     }
-                    if(c == '!' && !_last_was_re_dash) {_last_was_re_dash = false;break;}  
+                    else if(c == '!' && !_last_was_re_dash) {_last_was_re_dash = false;break;}  
                     _parse_result += c;
                 }
                 return _parse_result.Trim();
             }
 
+        }
             /// <summary>
             /// Parse value to boolean
             /// </summary>
@@ -914,6 +968,5 @@ namespace ATRC
                     throw new System.IO.IOException("Value:" + value + " must be a float");
                 return result;
             }
-        }
     }
 }

@@ -75,6 +75,9 @@ namespace ATRC
                         continue; // We will skip the % sign
                     }
 
+                    if(_was_last_re_dash && c!='!' && c!='%' && c!=','){
+                        _final_value += '\\'; // Add the \ to the final value
+                    } 
                     _final_value += c;
                     _was_last_re_dash = false;
                 }
