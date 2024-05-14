@@ -4,6 +4,107 @@
         <name>ATRC</name>
     </assembly>
     <members>
+        <member name="T:ATRC.Filehandler">
+            <summary>
+            ATRC Filehandler, contains everything
+            </summary>
+        </member>
+        <member name="T:ATRC.Filehandler.ATRCVariable">
+            <summary>
+            ATRCFileData struct
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCVariable.Name">
+            <summary>
+            Variable name
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCVariable.Value">
+            <summary>
+            Variable value
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCVariable.ArrayValues">
+            <summary>
+            Variable value if array
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCVariable.IsArray">
+            <summary>
+            Is the variable an array
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCVariable.IsPrivate">
+            <summary>
+            Is the variable private
+            Used only when reading in ATRCFileData class
+            </summary>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCVariable.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:ATRC.Filehandler.ATRCKey">
+            <summary>
+            ATRCKey struct
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCKey.Name">
+            <summary>
+            Key name
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCKey.Value">
+            <summary>
+            Key value
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCKey.ArrayValues">
+            <summary>
+            Key value if array
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCKey.IsArray">
+            <summary>
+            Is the key an array
+            </summary>
+        </member>
+        <member name="T:ATRC.Filehandler.ATRCBlock">
+            <summary>
+            ATRCBlock struct
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCBlock.Name">
+            <summary>
+            Block name
+            </summary>
+        </member>
+        <member name="F:ATRC.Filehandler.ATRCBlock.Keys">
+            <summary>
+            Block keys
+            </summary>
+        </member>
+        <member name="T:ATRC.Filehandler.ATRCFileData">
+            <summary>
+            Filedata class. Contains all the data from the file
+            </summary>
+        </member>
+        <member name="P:ATRC.Filehandler.ATRCFileData.Filename">
+            <summary>
+            File name
+            </summary>
+        </member>
+        <member name="P:ATRC.Filehandler.ATRCFileData.Variables">
+            <summary>
+            Variables
+            </summary>
+        </member>
+        <member name="P:ATRC.Filehandler.ATRCFileData.Blocks">
+            <summary>
+            Blocks
+            </summary>
+        </member>
         <member name="M:ATRC.Filehandler.ATRCFileData.AddBlock(System.String)">
             <summary>
             Create a new block, will be appended to the end of the file
@@ -142,7 +243,7 @@
             <param name="key">Key's name</param>
             <returns>True if exists, false if not</returns>
         </member>
-        <member name="M:ATRC.Filehandler.ATRCFileData.SaveToFile(System.String,System.String,System.Object,System.Int32,System.Boolean)">
+        <member name="M:ATRC.Filehandler.ATRCFileData.SaveToFile(System.String,System.String,System.Object,System.Int32)">
             <summary>
             Saves the given value to the file
             </summary>
@@ -182,6 +283,27 @@
             Parse line, return parsed line
             </summary>
             <param name="line">line</param>
+            <returns></returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.CheckContain(System.String)">
+            <summary>
+            Checks if string contains reserved characters
+            </summary>
+            <param name="text"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.CheckWhiteSpacing(System.String)">
+            <summary>
+            Removes whitespace from end and start of the string
+            </summary>
+            <param name="text"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ParseParseResult(System.String)">
+            <summary>
+            Parse _parse_result
+            </summary>
+            <param name="_parse_result"></param>
             <returns></returns>
         </member>
         <member name="M:ATRC.Filehandler.ATRCFileData.ParserValue(System.String,System.Int32)">

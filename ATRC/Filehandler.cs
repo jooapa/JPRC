@@ -3,8 +3,14 @@ using System.Reflection.Metadata;
 
 namespace ATRC
 {
+    /// <summary>
+    /// ATRC Filehandler, contains everything
+    /// </summary>
     public partial class Filehandler
     {
+        /// <summary>
+        /// Filedata class. Contains all the data from the file
+        /// </summary>
         public partial class ATRCFileData{
             private bool _was_last_re_dash = false;
             private bool _was_last_private_variable = false;

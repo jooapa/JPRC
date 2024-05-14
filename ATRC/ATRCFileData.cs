@@ -2,13 +2,35 @@ using System.Text.RegularExpressions;
 namespace ATRC
 {
     public partial class Filehandler{
-
+        
+        /// <summary>
+        /// ATRCFileData struct
+        /// </summary>
         public struct ATRCVariable{
+            /// <summary>
+            /// Variable name
+            /// </summary>
             public string Name;
+            /// <summary>
+            /// Variable value
+            /// </summary>
             public string Value;
+            /// <summary>
+            /// Variable value if array
+            /// </summary>
             public string[] ArrayValues;
+            /// <summary>
+            /// Is the variable an array
+            /// </summary>
             public bool IsArray;
-            public bool IsPrivate; // Used only when reading in ATRCFileData class
+            /// <summary>
+            /// Is the variable private
+            /// Used only when reading in ATRCFileData class
+            /// </summary>
+            public bool IsPrivate;
+            /// <summary>
+            /// Constructor
+            /// </summary>
             public ATRCVariable(){
                 IsPrivate = false;
                 Name = "";
@@ -17,19 +39,52 @@ namespace ATRC
                 IsArray = false;
             }
         }
+        /// <summary>
+        /// ATRCKey struct
+        /// </summary>
         public struct ATRCKey{
+            /// <summary>
+            /// Key name
+            /// </summary>
             public string Name;
+            /// <summary>
+            /// Key value
+            /// </summary>
             public string Value;
+            /// <summary>
+            /// Key value if array
+            /// </summary>
             public string[] ArrayValues;
+            /// <summary>
+            /// Is the key an array
+            /// </summary>
             public bool IsArray;
         }
+        /// <summary>
+        /// ATRCBlock struct
+        /// </summary>
         public class ATRCBlock{
-            public string Name;
-            public ATRCKey[] Keys;
+            /// <summary>
+            /// Block name
+            /// </summary>
+            public string? Name;
+            /// <summary>
+            /// Block keys
+            /// </summary>
+            public ATRCKey[]? Keys;
         }
         public partial class ATRCFileData{
+            /// <summary>
+            /// File name
+            /// </summary>
             public string Filename { get; set; } = "";
+            /// <summary>
+            /// Variables
+            /// </summary>
             public ATRCVariable[] Variables { get; set; } = [];
+            /// <summary>
+            /// Blocks
+            /// </summary>
             public ATRCBlock[] Blocks { get; set; } = [];
 
             // ==========================
@@ -157,7 +212,6 @@ namespace ATRC
                 if(ParseToATRC_vars.Count > 0){
                     _variables = this.ReadVariables(); // We need to read the variables
                     string[] __tmp = ParseToATRC_vars.ToArray();
-                    bool array = false;
                     foreach(string var in __tmp){
                         if(!_variables.Any(x => x.Name == var)){
                             throw new System.IO.IOException("Variable " + var + " does not exist");
@@ -168,7 +222,6 @@ namespace ATRC
                         ATRCVariable _variable__new = _variables.First(x => x.Name == var);
                         if(_variable__new.IsArray){
                             _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__new.ArrayValues));
-                            array = true;
                         } else {
                             _parse_result = _parse_result.Replace("%"+var+"%", _variable__new.Value);
                         }
@@ -187,15 +240,17 @@ namespace ATRC
                 else
                     throw new System.IO.IOException("Value must be a string or a string array");
 
-                _variable__.Name = name;
-                // _variable__.IsArray = _variable__.ArrayValues.Length > 0;
+                if(name!=null)
+                    _variable__.Name = name;
+                else
+                    throw new System.IO.IOException("Variable name cannot be null");
                 
 
                 List<ATRCVariable> tmp = [.. Variables];
                 tmp.Add(_variable__);
                 Variables = tmp.ToArray();
                 _value = CheckWhiteSpacing(_value);
-                this.SaveToFile(null, name, _value, 2, false);
+                this.SaveToFile(null, name, _value, 2);
             }
             /// <summary>
             /// Read array variable
@@ -255,7 +310,6 @@ namespace ATRC
                 if(ParseToATRC_vars.Count > 0){
                     _variables = this.ReadVariables(); // We need to read the variables
                     string[] __tmp = ParseToATRC_vars.ToArray();
-                    bool array = false;
                     foreach(string var in __tmp){
                         if(!_variables.Any(x => x.Name == var)){
                             throw new System.IO.IOException("Variable " + var + " does not exist");
@@ -266,7 +320,6 @@ namespace ATRC
                         ATRCVariable _variable__new = _variables.First(x => x.Name == var);
                         if(_variable__new.IsArray){
                             _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__new.ArrayValues));
-                            array = true;
                         } else {
                             _parse_result = _parse_result.Replace("%"+var+"%", _variable__new.Value);
                         }
@@ -274,7 +327,6 @@ namespace ATRC
                 }
                 _parse_result = ParseParseResult(_parse_result);
                 int idx = Array.FindIndex(Variables, v => v.Name == _variable__.Name && v.Value == _variable__.Value);
-                string _val = "";
                 string[] _val_arr = [];
                 if(value is string){
                     _variable__.Value = _parse_result;
@@ -373,7 +425,6 @@ namespace ATRC
                 if(ParseToATRC_vars.Count > 0){
                     ATRCVariable[] _variables = this.ReadVariables(); // We need to read the variables
                     string[] __tmp = ParseToATRC_vars.ToArray();
-                    bool array = false;
                     foreach(string var in __tmp){
                         if(!_variables.Any(x => x.Name == var)){
                             throw new System.IO.IOException("Variable " + var + " does not exist");
@@ -384,7 +435,6 @@ namespace ATRC
                         ATRCVariable _variable__ = _variables.First(x => x.Name == var);
                         if(_variable__.IsArray){
                             _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__.ArrayValues));
-                            array = true;
                         } else {
                             _parse_result = _parse_result.Replace("%"+var+"%", _variable__.Value);
                         }
@@ -403,9 +453,10 @@ namespace ATRC
                 }
                 else
                     throw new System.IO.IOException("Value must be a string or a string array");
-
+                if(key!=null)
                 newKey.Name = key;
-                // newKey.IsArray = newKey.ArrayValues.Length > 0;
+                else
+                    throw new System.IO.IOException("Key name cannot be null");
 
                 List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == block).Keys];
                 tmp.Add(newKey);
@@ -477,7 +528,6 @@ namespace ATRC
                 if(ParseToATRC_vars.Count > 0){
                     ATRCVariable[] _variables = this.ReadVariables(); // We need to read the variables
                     string[] __tmp = ParseToATRC_vars.ToArray();
-                    bool array = false;
                     foreach(string var in __tmp){
                         if(!_variables.Any(x => x.Name == var)){
                             throw new System.IO.IOException("Variable " + var + " does not exist");
@@ -488,7 +538,6 @@ namespace ATRC
                         ATRCVariable _variable__ = _variables.First(x => x.Name == var);
                         if(_variable__.IsArray){
                             _parse_result = _parse_result.Replace("%"+var+"%", string.Join(",", _variable__.ArrayValues));
-                            array = true;
                         } else {
                             _parse_result = _parse_result.Replace("%"+var+"%", _variable__.Value);
                         }
@@ -606,7 +655,7 @@ namespace ATRC
             /// 9 = Remove key
             /// 10 = Move key
             /// </param>
-            private void SaveToFile(string? block, string? name, object? value, int action, bool extraInfo = false){
+            private void SaveToFile(string? block, string? name, object? value, int action){
                 // We don't have to check whether anything exists
                 // We will just modify the file
                 // File location is stored in Filename
@@ -718,7 +767,6 @@ namespace ATRC
                               break;
                         case 6: 
                             // We will parse all of this to ATRC format
-                            block = block;
                             bool _key_added = false;
                             foreach (string line in File.ReadLines(this.Filename)) {
                                 lines.Add(line); // Add the original lines
@@ -784,10 +832,12 @@ namespace ATRC
                             int _from_block_index = -1; // This will keep track of the block index
                             int _to_block_index = -1; // This will also keep track of the block index
                             int _key_index = -1; // This will keep track of the key index
-                            bool _key_moved = false;
+                            // They aren't null since they are provided earlier
+                            #pragma warning disable CS8600
                             string _fromBlock = block;
                             string _toBlock = (string)value;
                             string _key = name;
+                            #pragma warning restore CS8600
                             string _original_key_line = "";
                             string _current_block = "";
                             // First, we will have to find the block indexes and key index
@@ -943,11 +993,21 @@ namespace ATRC
                 return _parse_result.Trim();
             }
 
+            /// <summary>
+            /// Checks if string contains reserved characters
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
             private bool CheckContain(string text){
                 if(text.Contains('%') || text.Contains('!') || text.Contains(',') ||text.Contains('&')) return true;
                 else return false;
             }
 
+            /// <summary>
+            /// Removes whitespace from end and start of the string
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
             private string CheckWhiteSpacing(string text){
                 if(text[text.Length - 1] == ' '){
                     // Replace last space with &
@@ -961,7 +1021,12 @@ namespace ATRC
                 }
                 return text;
             }
-        
+            
+            /// <summary>
+            /// Parse _parse_result
+            /// </summary>
+            /// <param name="_parse_result"></param>
+            /// <returns></returns>
             private string ParseParseResult(string _parse_result){
                 _parse_result = _parse_result.Replace("\\&", "&");
                 _parse_result = _parse_result.Replace("\\!", "!");
