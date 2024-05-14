@@ -1,4 +1,5 @@
 %system32_path%=C:\Windows\System32
-
+[shell]
+ test =&s\,\%\!\&&
 [WinApps]
-test_key=%system32_path%\notepad.exe
+test_key=&s\,\%\!\&&

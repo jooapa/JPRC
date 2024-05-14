@@ -58,9 +58,9 @@ namespace Test
 
 ### Usage in .atrc
 ```
-! whitespace is only ignored on the start of lines and everything is case-sensitive
+! whitespaces are kept after = sign, if you want to add whitespace use & and everything is case-sensitive
 ! create a new block with []
-! variable, key or block names can't contain: !, % or ,
+! variable, key or block names can't contain: !, %, & or ,
 ! variables are constants
 %variable%=value
 <%private_variable%=private_value!This can't be accessed be modified or read outside the file
@@ -69,10 +69,11 @@ namespace Test
 key1=value
 variable_list=%variable%, %private_variable%! when reading this, csharp will show {"value", " private_value"}
 
- whitespace = hello 
-! Key would be 'whitespace ' and its key ' hello ' 
-! If you want to include !, %, or , in your value, use \
-reserved_characters=this\, is \% reserved\!
+whitespace = hello 
+whitespace2 = hello&
+! Key would be 'whitespace' and its key ' hello' 
+! If you want to include !, %, &, or , in your value, use \
+reserved_characters=this\, is \&\% reserved\!
 ```
 
 ### ATRCFileData methods:

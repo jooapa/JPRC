@@ -24,15 +24,19 @@ namespace Test
             }
 
             // Remove array and test_key
-            fileData.ModifyKey("test", "test_key", "%system32_path%\\notepad.exe"); // Modify key value
+            fileData.ModifyKey("test", "test_key", "%system32_path%\\notepad.exe "); // Modify key value
 
             // Move key to other location
             fileData.AddBlock("WinApps");
             fileData.MoveKey("test", "WinApps", "test_key");
             fileData.RemoveBlock("test"); // Remove block
 
-            Console.WriteLine(fileData.S_ReadKey("WinApps", "test_key")); // Read key from WinApps block
+            Console.WriteLine("'"+fileData.S_ReadKey("WinApps", "test_key")+"'"); // Read key from WinApps block
 
+            Console.WriteLine("'"+fileData.S_ReadKey("shell", "test")+"'"); // Get file contents
+            string test = fileData.S_ReadKey("shell", "test");
+            fileData.ModifyKey("WinApps", "test_key", test); // Modify key value
+            Console.WriteLine("'"+fileData.S_ReadKey("WinApps", "test_key")+"'"); // Read key from WinApps block
         }
     }
 }

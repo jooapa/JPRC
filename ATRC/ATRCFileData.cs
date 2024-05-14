@@ -41,8 +41,8 @@ namespace ATRC
             /// <param name="block">block to be added</param>
             /// <exception cref="System.IO.IOException">block already exists</exception>
             public void AddBlock(string block){
-                if(block != null && block.Contains('%') || block.Contains('!') || block.Contains(','))
-                        throw new System.IO.IOException("Block name cannot contain reserved characters (%, !, ,)");
+                if(block != null && CheckContain(block))
+                        throw new System.IO.IOException("Block name cannot contain reserved characters (%, !, &, ,)");
                 if(Blocks.Any(x => x.Name == block))
                     throw new System.IO.IOException("Block " + block + " already exists");
                 // Created block will be appended to the end of the file
@@ -143,8 +143,8 @@ namespace ATRC
             /// <param name="value">Variable value</param>
             /// <exception cref="System.IO.IOException"></exception>
             public void AddVariable(string name, object value){
-                if(name != null && name.Contains('%') || name.Contains('!') || name.Contains(','))
-                    throw new System.IO.IOException("Key or variable name cannot contain reserved characters (%, !, ,)");
+                if(name != null && CheckContain(name))
+                    throw new System.IO.IOException("Key or variable name cannot contain reserved characters (%, !, &, ,)");
                 // First, we will check if the given variable exists
                 ATRCVariable[] _variables = this.ReadVariables();
                 if (_variables.Any(x => x.Name == name)){
@@ -174,7 +174,7 @@ namespace ATRC
                         }
                     }
                 }
-
+                _parse_result = ParseParseResult(_parse_result);
                 ATRCVariable _variable__ = new();
                 if(value is string) {
                     _variable__.Value = _parse_result;
@@ -194,7 +194,7 @@ namespace ATRC
                 List<ATRCVariable> tmp = [.. Variables];
                 tmp.Add(_variable__);
                 Variables = tmp.ToArray();
-
+                _value = CheckWhiteSpacing(_value);
                 this.SaveToFile(null, name, _value, 2, false);
             }
             /// <summary>
@@ -272,7 +272,7 @@ namespace ATRC
                         }
                     }
                 }
-
+                _parse_result = ParseParseResult(_parse_result);
                 int idx = Array.FindIndex(Variables, v => v.Name == _variable__.Name && v.Value == _variable__.Value);
                 string _val = "";
                 string[] _val_arr = [];
@@ -290,7 +290,7 @@ namespace ATRC
                 tmp.RemoveAt(idx);
                 tmp.Add(_variable__);
                 Variables = tmp.ToArray();
-
+                _value = CheckWhiteSpacing(_value);
                 this.SaveToFile(null, name, _value, 4);
             }
             /// <summary>
@@ -355,10 +355,10 @@ namespace ATRC
             /// <param name="value">String or string array. </param>
             /// <exception cref="System.IO.IOException"></exception>
             public void AddKey(string block, string key, object value){
-                if(block != null && block.Contains('%') || block.Contains('!') || block.Contains(','))
-                        throw new System.IO.IOException("Block name cannot contain reserved characters (%, !, ,)");
-                if(key != null && key.Contains('%') || key.Contains('!') || key.Contains(','))
-                    throw new System.IO.IOException("Key or variable name cannot contain reserved characters (%, !, ,)");
+                if(block != null && CheckContain(block))
+                        throw new System.IO.IOException("Block name cannot contain reserved characters (%, !, &, ,)");
+                if(key != null && CheckContain(key))
+                    throw new System.IO.IOException("Key or variable name cannot contain reserved characters (%, !, &, ,)");
                 // First, we will check if the given block exists and if it contains the given key already
                 if (!Blocks.Any(x => x.Name == block)){
                     throw new System.IO.IOException("Block " + block + " does not exist");
@@ -389,6 +389,7 @@ namespace ATRC
                         }
                     }
                 }
+                _parse_result = ParseParseResult(_parse_result);
                 // Once we have checked that the block exists and the key does not exist, we can add the key
                 ATRCKey newKey = new ATRCKey();
                 if(value is string) {
@@ -408,6 +409,12 @@ namespace ATRC
                 List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == block).Keys];
                 tmp.Add(newKey);
                 Blocks.First(x => x.Name == block).Keys = tmp.ToArray();
+                                if(_value[_value.Length - 1] == ' '){
+                    // Replace last space with &
+                    _value = _value.Remove(_value.Length - 1);
+                    _value += '&';
+                }
+                _value = CheckWhiteSpacing(_value);
                 this.SaveToFile(block, key, _value, 6);
             }
 
@@ -486,7 +493,7 @@ namespace ATRC
                         }
                     }
                 }
-                
+                _parse_result = ParseParseResult(_parse_result);
                 if(value is string){
                     _key.Value = (string)_parse_result;
                     _key.IsArray = false;
@@ -502,7 +509,7 @@ namespace ATRC
                 Blocks.First(x => x.Name == block).Keys = tmp.ToArray();
 
 
-
+                _value = CheckWhiteSpacing(_value);
                 this.SaveToFile(block, key, _value, 8);
             }
             
@@ -903,6 +910,9 @@ namespace ATRC
                         } else if(c == '\\'){
                             _parse_result += '\\';
                             continue;
+                        } else if(c=='&'){
+                            _parse_result += "\\&";
+                            continue;
                         }
                         _parse_result += c;
                     }                    
@@ -910,7 +920,6 @@ namespace ATRC
                 if(_looking_for_vars){
                     _parse_result += "\\%" + _parse_result_2;
                 }
-
                 return _parse_result;
             }
 
@@ -933,6 +942,32 @@ namespace ATRC
                 return _parse_result.Trim();
             }
 
+            private bool CheckContain(string text){
+                if(text.Contains('%') || text.Contains('!') || text.Contains(',') ||text.Contains('&')) return true;
+                else return false;
+            }
+
+            private string CheckWhiteSpacing(string text){
+                if(text[text.Length - 1] == ' '){
+                    // Replace last space with &
+                    text = text.Remove(text.Length - 1);
+                    text += '&';
+                }
+                if(text[0] == ' '){
+                    // Replace first space with &
+                    text = text.Remove(0, 1);
+                    text = "&" + text;
+                }
+                return text;
+            }
+        
+            private string ParseParseResult(string _parse_result){
+                _parse_result = _parse_result.Replace("\\&", "&");
+                _parse_result = _parse_result.Replace("\\!", "!");
+                _parse_result = _parse_result.Replace("\\,", ",");
+                _parse_result = _parse_result.Replace("\\%", "%");
+                return _parse_result;
+            }
         }
             /// <summary>
             /// Parse value to boolean

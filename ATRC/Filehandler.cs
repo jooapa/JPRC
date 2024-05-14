@@ -17,9 +17,10 @@ namespace ATRC
             /// <param name="_line_number">Line number</param>
             /// <returns>Value, </returns>
             public object ParserValue(string _line, int _line_number){
+                _line = _line.Trim();
                 int _start_looking_for_value = _line.IndexOf('='); // Find the first = sign, this is where the value starts
                 if(_start_looking_for_value == -1) throw new System.IO.IOException("Invalid variable or key value declaration at line " + _line_number);
-                string _possible_value = _line.Substring(_start_looking_for_value + 1);
+                string _possible_value = _line.Substring(_start_looking_for_value + 1).Trim();
                 string _final_value = ""; // This is the final value that will be returned
                 bool _looking_for_variable = false;
                 bool _looking_for_list = false;
@@ -49,6 +50,7 @@ namespace ATRC
                         // break;
                     }
                     if(c == '!' && !_was_last_re_dash) break; // Comment found without \ before it
+                    if(c == '&' && !_was_last_re_dash){ _final_value += ' '; continue;}
                     if((c == '%' && !_was_last_re_dash) || _looking_for_variable){ // No \ before %, or we are already looking for a variable
                         if(c == '%' && !_was_last_re_dash && !_looking_for_variable){_looking_for_variable = true; continue;} // We will skip the % sign and start looking for the variable
                         _was_last_re_dash = false;
@@ -75,12 +77,13 @@ namespace ATRC
                         continue; // We will skip the % sign
                     }
 
-                    if(_was_last_re_dash && c!='!' && c!='%' && c!=','){
+                    if(_was_last_re_dash && c!='!' && c!='%' && c!=',' && c!='&'){
                         _final_value += '\\'; // Add the \ to the final value
                     } 
                     _final_value += c;
                     _was_last_re_dash = false;
                 }
+                
                 if(_looking_for_list) {
                     // In lists, to see the last non-variable value, 
                     // would require the list to look like this: value1, value2, value3, value4,
@@ -209,6 +212,7 @@ namespace ATRC
                     // At this point, we should assume it is a key, since we have checked for variables and blocks
                     if(_block_name.Length == 0) throw new System.IO.IOException("Block name not found at line " + index);
                     string _key_name = _line_trim.Substring(0, _line_trim.IndexOf('='));
+                    _key_name = _key_name.Trim(); // trim the key name
                     // Since ParseValue can return string or string[], we need to check the return type
                     object _return_value = ParserValue(_line, index);
                     if(_return_value is string){
