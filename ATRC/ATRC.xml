@@ -184,6 +184,13 @@
             <param name="name"></param>
             <returns>False if it doesn't exist, or true/false if it is private or public</returns>
         </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.CheckVariableType(System.String)">
+            <summary>
+            Check if variable is array or not
+            </summary>
+            <param name="name">Name to be searched for</param>
+            <returns>True if variable is array</returns>
+        </member>
         <member name="M:ATRC.Filehandler.ATRCFileData.AddKey(System.String,System.String,System.Object)">
             <summary>
             Adds a key to the given block
@@ -242,6 +249,34 @@
             <param name="block">Key's block</param>
             <param name="key">Key's name</param>
             <returns>True if exists, false if not</returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.CheckKeyType(System.String,System.String)">
+            <summary>
+            Checks if key is array or not, returning true if it is
+            </summary>
+            <param name="block">block where to searcg</param>
+            <param name="key">key to search</param>
+            <returns>True if key is array type</returns>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.S_KeyInsert(System.String,System.String,System.Object[])">
+            <summary>
+            Inserts the given inserts into the key value's %*% positions
+            </summary>
+            <param name="block"></param>
+            <param name="key"></param>
+            <param name="inserts"></param>
+            <returns></returns>
+            <exception cref="T:System.IO.IOException">Key doesn't exist, key is an array</exception>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.ReplaceInserts(System.String,System.Object[],System.Boolean,System.Int32)">
+            <summary>
+            Replace %*% insert with inser
+            </summary>
+            <param name="line">line with contents</param>
+            <param name="inserts">object[] of all inserts</param>
+            <param name="is_array">is the whole line from array</param>
+            <param name="index">if from array, provide your own indexing</param>
+            <returns>inserted line</returns>
         </member>
         <member name="M:ATRC.Filehandler.ATRCFileData.SaveToFile(System.String,System.String,System.Object,System.Int32)">
             <summary>
@@ -306,6 +341,30 @@
             <param name="_parse_result"></param>
             <returns></returns>
         </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.MyRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>(?&lt;!\\\\),</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Zero-width negative lookbehind.<br/>
+                ○ Match '\\' right-to-left.<br/>
+            ○ Match ','.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:ATRC.Filehandler.ATRCFileData.MyRegex1">
+            <remarks>
+            Pattern:<br/>
+            <code>(?&lt;!\\\\),</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Zero-width negative lookbehind.<br/>
+                ○ Match '\\' right-to-left.<br/>
+            ○ Match ','.<br/>
+            </code>
+            </remarks>
+        </member>
         <member name="M:ATRC.Filehandler.ATRCFileData.ParserValue(System.String,System.Int32)">
             <summary>
             Parse the value of a variable or key
@@ -352,6 +411,47 @@
             <param name="value">String</param>
             <returns></returns>
             <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the MyRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.MyRegex_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
         </member>
     </members>
 </doc>

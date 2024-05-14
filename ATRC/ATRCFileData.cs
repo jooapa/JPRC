@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 namespace ATRC
 {
@@ -198,6 +199,9 @@ namespace ATRC
             /// <param name="value">Variable value</param>
             /// <exception cref="System.IO.IOException"></exception>
             public void AddVariable(string name, object value){
+                if(name == "*"){
+                    throw new System.IO.IOException("Invalid variable declaration - Reserved keyword '*' used as variable name");
+                }
                 if(name != null && CheckContain(name))
                     throw new System.IO.IOException("Key or variable name cannot contain reserved characters (%, !, &, ,)");
                 // First, we will check if the given variable exists
@@ -397,6 +401,18 @@ namespace ATRC
                 }
                 return _variables.First(x => x.Name == name).IsPrivate;
             }
+            /// <summary>
+            /// Check if variable is array or not
+            /// </summary>
+            /// <param name="name">Name to be searched for</param>
+            /// <returns>True if variable is array</returns>
+            public bool CheckVariableType(string name){
+                ATRCVariable[] _variables = this.ReadVariables();
+                if (!_variables.Any(x => x.Name == name)){
+                    return false;
+                }
+                return _variables.First(x => x.Name == name).IsArray;
+            }
             // ==========================
             //  Key functions
             // ==========================
@@ -548,7 +564,7 @@ namespace ATRC
                     _key.Value = (string)_parse_result;
                     _key.IsArray = false;
                 } else if(value is string[]){
-                    _key.ArrayValues = Regex.Split(_parse_result, @"(?<!\\),");
+                    _key.ArrayValues = MyRegex1().Split(_parse_result);
                     _key.IsArray = true;
                 } else
                     throw new System.IO.IOException("Value must be a string or a string array");
@@ -638,6 +654,103 @@ namespace ATRC
                 }
                 return true;
             }
+
+            /// <summary>
+            /// Checks if key is array or not, returning true if it is
+            /// </summary>
+            /// <param name="block">block where to searcg</param>
+            /// <param name="key">key to search</param>
+            /// <returns>True if key is array type</returns>
+            public bool CheckKeyType(string block, string key){
+                if(!KeyExists(block, key)) return false;
+                return Blocks.First(x => x.Name == block).Keys.First(x => x.Name == key).IsArray;
+            }
+            /// <summary>
+            /// Inserts the given inserts into the key value's %*% positions
+            /// </summary>
+            /// <param name="block"></param>
+            /// <param name="key"></param>
+            /// <param name="inserts"></param>
+            /// <returns></returns>
+            /// <exception cref="System.IO.IOException">Key doesn't exist, key is an array</exception>
+            public string S_KeyInsert(string block, string key, object[] inserts){
+                if(!KeyExists(block, key)) throw new System.IO.IOException("Key " + key + " does not exist in block " + block);
+                ATRCKey _key = Blocks.First(x => x.Name == block).Keys.First(x => x.Name == key);
+                if(CheckKeyType(block, key)) throw new System.IO.IOException("Key " + key + " is an array");
+
+                string _result = "";
+                int added = 0;
+                (_result, added) = ReplaceInserts(_key.Value, inserts, false, 0);
+                return _result;
+            }
+
+            public string[] A_KeyInsert(string block, string key, object[] inserts){
+                if(!KeyExists(block, key)) throw new System.IO.IOException("Key " + key + " does not exist in block " + block);
+                if (!CheckKeyType(block, key)) throw new System.IO.IOException("Key " + key + " is not an array");
+                ATRCKey _key = Blocks.First(x => x.Name == block).Keys.First(x => x.Name == key);
+                string [] _arr_result = _key.ArrayValues;
+
+                int added = 0;
+                for(int index = 0; index < _arr_result.Length; index++){
+                    (_arr_result[index], added) = ReplaceInserts(_arr_result[index], inserts, true, added);
+                }
+                
+                return _arr_result;
+            }
+            /// <summary>
+            /// Replace %*% insert with inser
+            /// </summary>
+            /// <param name="line">line with contents</param>
+            /// <param name="inserts">object[] of all inserts</param>
+            /// <param name="is_array">is the whole line from array</param>
+            /// <param name="index">if from array, provide your own indexing</param>
+            /// <returns>inserted line</returns>
+            private (string, int) ReplaceInserts(string line, object[] inserts, bool is_array, int index){
+                Debug.DebugConsole("ReplaceInserts", "line: " + line + " inserts: " + inserts + " is_array: " + is_array + " index: " + index);
+                string _value_string = line;
+                bool _looking_for_re_dash = false;
+                bool _looking_for_vars = false;
+                string _var_name = "";
+                string _result = "";
+                int added = 0;
+                char _last_char = '\0';
+                bool just_added = false;
+                foreach(char c in _value_string){
+                    if(_looking_for_vars){
+                        _var_name += c;
+                    }
+                    if(c == '%' && !_looking_for_vars){
+                        _looking_for_vars = true;
+                        _last_char = c;
+                        continue;
+                    }
+                    else if(_looking_for_vars && _var_name == "*"){
+                        _result += inserts[index];
+                        if(!is_array)
+                            index++;
+                        else
+                            added++;
+                        _looking_for_vars = false;
+                        _var_name = "";
+                        _last_char = c;
+                        just_added = true;
+                        continue;
+                    } else if(_looking_for_vars && _var_name != "*"){
+                        if(_last_char == '%' && !just_added)
+                            _result += _last_char;
+                        _result += c;
+                        _looking_for_vars = false;
+                        _var_name = "";
+                        _last_char = c;
+                        just_added = false;
+                        continue;
+                    }
+                    _result += c;
+                    _last_char = c;
+                }
+                return (_result, added);
+            }
+            
             /// <summary>
             /// Saves the given value to the file
             /// </summary>
@@ -921,7 +1034,7 @@ namespace ATRC
                 // Since only value is parsed, some trickery can be done
                 string _parse_result_2 = "";
                 bool _looking_for_vars = false;
-                char _last_char = ' ';
+                char _last_char = '\0';
                 foreach(char c in parse){
                     _last_char = c;
                     // When we are looking for variables, we will go here.¨
@@ -1034,6 +1147,11 @@ namespace ATRC
                 _parse_result = _parse_result.Replace("\\%", "%");
                 return _parse_result;
             }
+
+            [GeneratedRegex(@"(?<!\\),")]
+            private static partial Regex MyRegex();
+            [GeneratedRegex(@"(?<!\\),")]
+            private static partial Regex MyRegex1();
         }
             /// <summary>
             /// Parse value to boolean

@@ -66,17 +66,21 @@ namespace ATRC
                             _variable_name += c;
                             continue;
                         }
-                        // Now we will check if the variable exists, and replace it with it's value
-                        if(!_variables.Exists(x => x.Name == _variable_name) && !_private_variable.Exists(x => x.Name == _variable_name)){
-                            throw new System.IO.IOException("Variable " + _variable_name + " not found at line " + _line_number);
-                        }
-                        string _variable_value = _variables.Find(x => x.Name == _variable_name).Value; // Check from public variables first
-                        _variable_value ??= _private_variable.Find(x => x.Name == _variable_name).Value; // If not found, check from private variables
-                        if(_variable_value == null) throw new System.IO.IOException("Variable " + _variable_name + " not found at line " + _line_number);
+                        if(_variable_name != "*"){ // We will skip special references
+                            // Now we will check if the variable exists, and replace it with it's value
+                            if(!_variables.Exists(x => x.Name == _variable_name) && !_private_variable.Exists(x => x.Name == _variable_name)){
+                                throw new System.IO.IOException("Variable " + _variable_name + " not found at line " + _line_number);
+                            }
+                            string _variable_value = _variables.Find(x => x.Name == _variable_name).Value; // Check from public variables first
+                            _variable_value ??= _private_variable.Find(x => x.Name == _variable_name).Value; // If not found, check from private variables
+                            if(_variable_value == null) throw new System.IO.IOException("Variable " + _variable_name + " not found at line " + _line_number);
 
-                        // We have to take into account if we are looking for a list
-                        if(_looking_for_list) {_list_values.Add(_variable_value); _final_value = "";} // We have to reset the _final_value to keep the list values separate
-                        else _final_value += _variable_value;
+                            // We have to take into account if we are looking for a list
+                            if(_looking_for_list) {_list_values.Add(_variable_value); _final_value = "";} // We have to reset the _final_value to keep the list values separate
+                            else _final_value += _variable_value;
+                        } else {
+                            _final_value += "%*%"; // We will add the * to the final value
+                        }
 
                         // Return _variable_name to it's original state
                         _variable_name = "";
@@ -154,7 +158,7 @@ namespace ATRC
                             _variable_name = _line_trim.AsSpan(1, _line_trim.IndexOf('%', 1) - 1).ToString();
                         } 
                         if(_variable_name.Length == 0) throw new System.IO.IOException("Invalid variable declaration - Length is zero at line " + index);
-                        if(_variable_name == "!") throw new System.IO.IOException("Invalid variable declaration - Reserved keyword '!' used as variable name at line " + index);
+                        if(_variable_name == "*") throw new System.IO.IOException("Invalid variable declaration - Reserved keyword '*' used as variable name at line " + index);
                         // Since ParseValue can return string or string[], we need to check the return type
                         object result = ParserValue(_line, index);
                         if(result is string){

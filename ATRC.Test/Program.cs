@@ -42,6 +42,15 @@ namespace Test
             Console.WriteLine("'"+fileData.S_ReadKey("WinApps", "test_key")+"'"); // Read key from WinApps block
             fileData.ModifyVariable("system32_path", "test"); // Modify variable value
             Console.WriteLine("'"+fileData.S_ReadKey("WinApps", "test_key")+"'"); // Read key from WinApps block
+
+            object[] inserts = ["ATRC", "1.3.0", 7];
+            Console.WriteLine(fileData.S_KeyInsert("shell", "abc", inserts));
+
+            inserts = ["ATRC", 22];
+            string [] keys = fileData.A_KeyInsert("shell", "def", inserts);
+            foreach(string key in keys){
+                Console.WriteLine(key);
+            }
         }
     }
 }
