@@ -1,5 +1,5 @@
-%system32_path%=C:\Windows\System32
+%system32_path%=test
 [shell]
  test =&s\,\%\!\&&
 [WinApps]
-test_key=&s\,\%\!\&&
+test_key=%system32_path%\lol

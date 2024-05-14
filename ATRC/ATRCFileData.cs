@@ -292,6 +292,7 @@ namespace ATRC
                 Variables = tmp.ToArray();
                 _value = CheckWhiteSpacing(_value);
                 this.SaveToFile(null, name, _value, 4);
+                Read(this.Filename);//!Temporary solution
             }
             /// <summary>
             /// Removes the given variable from the file

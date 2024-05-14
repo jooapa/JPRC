@@ -37,6 +37,11 @@ namespace Test
             string test = fileData.S_ReadKey("shell", "test");
             fileData.ModifyKey("WinApps", "test_key", test); // Modify key value
             Console.WriteLine("'"+fileData.S_ReadKey("WinApps", "test_key")+"'"); // Read key from WinApps block
+
+            fileData.ModifyKey("WinApps", "test_key", "%system32_path%\\lol"); // Modify key value
+            Console.WriteLine("'"+fileData.S_ReadKey("WinApps", "test_key")+"'"); // Read key from WinApps block
+            fileData.ModifyVariable("system32_path", "test"); // Modify variable value
+            Console.WriteLine("'"+fileData.S_ReadKey("WinApps", "test_key")+"'"); // Read key from WinApps block
         }
     }
 }
