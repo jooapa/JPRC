@@ -17,13 +17,14 @@ ATRCFileData methods:
  - RemoveKey         -> Remove the given key from given block
  - MoveKey           -> Move key from source to destination
  - KeyExists         -> Checks whether the key exists
- - KeyInsert         -> Insert an object array of variables or values in the order they will be shown in the file, for more information see the C# example 
+ - S_KeyInsert       -> Insert an object array of variables or values in the order they will be shown in the file, for more information see the C# example 
+ - A_KeyInsert       -> Insert an object array of variables or values in the order they will be shown in the file, for more information see the C# example 
 
 Example program in C#
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-```
+```csharp
 using ATRC;
 namespace Test
 {
@@ -59,7 +60,7 @@ namespace Test
             Console.WriteLine(fileData.S_ReadKey("WinApps", "test_key")); // -> C:\Windows\System32\notepad.exe
 
             object[] inserts = ["ATRC", "1.3.0", 7];
-            Console.WriteLine(fileData.S_KeyInsert("shell", "abc", inserts)); // -> Hello from ATRC. This is version 1.2.1, try 7!
+            Console.WriteLine(fileData.S_KeyInsert("shell", "abc", inserts)); // -> Hello from ATRC. This is version 1.3.0, try 7!
 
             inserts = ["ATRC", 22];
             string [] keys = fileData.A_KeyInsert("shell", "def", inserts);
@@ -89,11 +90,11 @@ namespace Test
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Example resource fil in .atrc
+Example resource file in .atrc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-```
+```ini
 ! Add whitespace to the end or start of your value with &, can also be used to add whitespace anywhere. Everything is case-sensitive
 ! create a new block with []
 ! variable, key or block names cannot contain: !, %, & or ,
@@ -124,7 +125,7 @@ whitespace2 = hello&
 ! Now the key would be 'whitespace2' and its key 'hello '
 
 ! If you want to include !, %, &, or , in your value, use \ before it
-reserved_characters=this\, is \&\% reserved\!
+reserved_characters=this\, is \&\% reserved\! ! Output -> 'this, is &% reserved!'
 ```
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

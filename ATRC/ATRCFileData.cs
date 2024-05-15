@@ -82,11 +82,11 @@ namespace ATRC
             /// <summary>
             /// Variables
             /// </summary>
-            public ATRCVariable[] Variables { get; set; } = [];
+            public ATRCVariable[] Variables { get; set; } = Array.Empty<ATRCVariable>();
             /// <summary>
             /// Blocks
             /// </summary>
-            public ATRCBlock[] Blocks { get; set; } = [];
+            public ATRCBlock[] Blocks { get; set; } = Array.Empty<ATRCBlock>();
 
             // ==========================
             //  Block functions
@@ -107,7 +107,7 @@ namespace ATRC
                 // Create a new block
                 ATRCBlock newBlock = new ATRCBlock();
                 newBlock.Name = block;
-                newBlock.Keys = []; // Initialize Keys array
+                newBlock.Keys = Array.Empty<ATRCKey>(); // Initialize Keys array
                 var tempList = Blocks.ToList();
                 tempList.Add(newBlock);
                 Blocks = tempList.ToArray();
@@ -126,7 +126,7 @@ namespace ATRC
                 }
                 ATRCBlock _key = Blocks.First(x => x.Name == block);
                 int idx = Array.IndexOf(Blocks, _key);
-                List<ATRCBlock> tmp = [.. Blocks];
+                List<ATRCBlock> tmp = Blocks.ToList();
                 tmp.RemoveAt(idx);
                 Blocks = tmp.ToArray();
                 this.SaveToFile(block, null, null, 1);
@@ -150,7 +150,7 @@ namespace ATRC
             /// </summary>
             /// <returns>ATRCVariable[]</returns>
             private ATRCVariable[] ReadVariables(){
-                List<ATRCVariable> variables = [];
+                List<ATRCVariable> variables = new();
                 int index = 0;
                 foreach (string _line in File.ReadLines(this.Filename)) {
                     index++;
@@ -163,7 +163,7 @@ namespace ATRC
 
                         string _variable_name = "";
                         string _value_string = "";
-                        string[] _value_string_array = [];
+                        string[] _value_string_array = Array.Empty<string>();
                         if(_line_trim.StartsWith("<%")){ // Check if the variable is private
                             _variable_name = _line_trim.AsSpan(2, _line_trim.IndexOf('%', 2) - 2).ToString(); // No idea why this works with -2
                         } else { // If the variable is public
@@ -232,7 +232,7 @@ namespace ATRC
                     throw new System.IO.IOException("Variable name cannot be null");
                 
 
-                List<ATRCVariable> tmp = [.. Variables];
+                List<ATRCVariable> tmp = Variables.ToList();
                 tmp.Add(_variable__);
                 Variables = tmp.ToArray();
                 _value = CheckWhiteSpacing(_value);
@@ -295,7 +295,7 @@ namespace ATRC
                 string _parse_result = Variablify(_value);
                 _parse_result = ParseParseResult(_parse_result);
                 int idx = Array.FindIndex(Variables, v => v.Name == _variable__.Name && v.Value == _variable__.Value);
-                string[] _val_arr = [];
+                string[] _val_arr = Array.Empty<string>();
                 if(value is string){
                     _variable__.Value = _parse_result;
                 }
@@ -305,7 +305,7 @@ namespace ATRC
                     throw new System.IO.IOException("Value must be a string or a string array");
                 _variable__.IsArray = _variable__.ArrayValues.Length > 0;
 
-                List<ATRCVariable> tmp = [.. Variables];
+                List<ATRCVariable> tmp = Variables.ToList();
 
                 tmp.RemoveAt(idx);
                 tmp.Add(_variable__);
@@ -333,7 +333,7 @@ namespace ATRC
                 if(!_variable__.IsPrivate){
                     int idx = Array.IndexOf(Variables, _variable__);
                     
-                    List<ATRCVariable> tmp = [.. Variables];
+                    List<ATRCVariable> tmp = Variables.ToList();
                     tmp.RemoveAt(idx);
                     Variables = tmp.ToArray();
                 }
@@ -420,7 +420,7 @@ namespace ATRC
                 else
                     throw new System.IO.IOException("Key name cannot be null");
 
-                List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == block).Keys];
+                List<ATRCKey> tmp = Blocks.First(x => x.Name == block).Keys.ToList();
                 tmp.Add(newKey);
                 Blocks.First(x => x.Name == block).Keys = tmp.ToArray();
                                 if(_value[_value.Length - 1] == ' '){
@@ -497,7 +497,7 @@ namespace ATRC
                 } else
                     throw new System.IO.IOException("Value must be a string or a string array");
 
-                List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == block).Keys];
+                List<ATRCKey> tmp = Blocks.First(x => x.Name == block).Keys.ToList();
                 tmp.RemoveAt(idx);
                 tmp.Add(_key);
                 Blocks.First(x => x.Name == block).Keys = tmp.ToArray();
@@ -523,7 +523,7 @@ namespace ATRC
 
                 ATRCKey _key = Blocks.First(x => x.Name == block).Keys.First(x => x.Name == key);
                 int idx = Array.IndexOf(Blocks.First(x => x.Name == block).Keys, _key);
-                List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == block).Keys];
+                List<ATRCKey> tmp = Blocks.First(x => x.Name == block).Keys.ToList();
                 tmp.RemoveAt(idx);
                 Blocks.First(x => x.Name == block).Keys = tmp.ToArray();
 
@@ -553,13 +553,13 @@ namespace ATRC
 
                 ATRCKey _key = Blocks.First(x => x.Name == fromBlock).Keys.First(x => x.Name == key);
                 int idx = Array.IndexOf(Blocks.First(x => x.Name == fromBlock).Keys, _key);
-                List<ATRCKey> tmp = [.. Blocks.First(x => x.Name == fromBlock).Keys];
+                List<ATRCKey> tmp = Blocks.First(x => x.Name == fromBlock).Keys.ToList();
                 tmp.RemoveAt(idx);
                 Blocks.First(x => x.Name == fromBlock).Keys = tmp.ToArray();
 
                 // Now we will add the key to the new block
                 idx = Array.IndexOf(Blocks.First(x => x.Name == toBlock).Keys, _key);
-                tmp = [.. Blocks.First(x => x.Name == toBlock).Keys];
+                tmp = Blocks.First(x => x.Name == toBlock).Keys.ToList();
                 tmp.Add(_key);
                 Blocks.First(x => x.Name == toBlock).Keys = tmp.ToArray();
                 // We'll have to send the toBlock as the value, for this the value parsing 
@@ -709,7 +709,7 @@ namespace ATRC
                 // File contens will be here, which we will need to read and modify and then save
                 try{
                     // Block or name can't contain reserved special characters
-                    List<string> lines = [];
+                    List<string> lines = new();
 
                     if(value != null && action != 10){
                         
@@ -933,7 +933,7 @@ namespace ATRC
             private string ObjectToSTR(object value){
                 ParseToATRC_vars.Clear();
                 string _string_value = "";
-                string[] _array_value = [];
+                string[] _array_value = Array.Empty<string>();
                 
                 if(value is string) {
                     _string_value = (string)value;
@@ -984,7 +984,7 @@ namespace ATRC
                 return _parse_result;
             }
 
-            List<string> ParseToATRC_vars = [];
+            List<string> ParseToATRC_vars = new();
             /// <summary>
             /// Parses the given string to ATRC format
             /// 

@@ -361,9 +361,7 @@
         </member>
         <member name="M:ATRC.Filehandler.ATRCFileData.MyRegex1">
             <remarks>
-            Pattern:<br/>
-            <code>(?&lt;!\\\\),</code><br/>
-            Explanation:<br/>
+            Pattern explanation:<br/>
             <code>
             ○ Zero-width negative lookbehind.<br/>
                 ○ Match '\\' right-to-left.<br/>

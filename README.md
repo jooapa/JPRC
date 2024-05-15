@@ -10,7 +10,7 @@ Run test project ```.\ATRC.TEST\Run.bat```
 
 Download latest
 
-```dotnet add package ATRC --version 1.3.1```
+```dotnet add package ATRC --version 1.3.2```
 
 ### Usage in c#
 
@@ -50,7 +50,7 @@ namespace Test
             Console.WriteLine(fileData.S_ReadKey("WinApps", "test_key")); // -> C:\Windows\System32\notepad.exe
 
             object[] inserts = ["ATRC", "1.3.0", 7];
-            Console.WriteLine(fileData.S_KeyInsert("shell", "abc", inserts)); // -> Hello from ATRC. This is version 1.2.1, try 7!
+            Console.WriteLine(fileData.S_KeyInsert("shell", "abc", inserts)); // -> Hello from ATRC. This is version 1.3.0, try 7!
 
             inserts = ["ATRC", 22];
             string [] keys = fileData.A_KeyInsert("shell", "def", inserts);
@@ -79,23 +79,38 @@ namespace Test
 ```
 
 ### Usage in .atrc
-```
-! whitespaces are kept after = sign, if you want to add whitespace use & and everything is case-sensitive
+```ini
+! Add whitespace to the end or start of your value with &, can also be used to add whitespace anywhere. Everything is case-sensitive
 ! create a new block with []
-! variable, key or block names can't contain: !, %, & or ,
-! variables are constants
+! variable, key or block names cannot contain: !, %, & or ,
+! variables are constants, and can't be redefined in the file
+! you can reference variables by placing them inside your keys: This is a %variable_name% reference,
+!  
 %variable%=value
-<%private_variable%=private_value!This can't be accessed be modified or read outside the file
+<%private_variable%=private_value !This can't be accessed, modified or read outside the file. 
+                                  ! It will be shown only once when the file is parsed, you must edit these variables through the file
 
 [blockname]
-key1=value
-variable_list=%variable%, %private_variable%! when reading this, csharp will show {"value", " private_value"}
+key1=value 
+! This will be read as a string and must be read as such (S_Read<Key|Variable>)
+
+key_list=value1, value2 
+! This will be read as a string[] and must be read as such (A_Read<Key|Variable>)
+
+variable_list=%variable%, %private_variable% 
+! when reading this, csharp will show {"value", " private_value"}
+
+insertable_key=Your current operating system is %*% 
+! Insert a variable to the place of %*%, will not be modify the value
 
 whitespace = hello 
+! Key would be 'whitespace' and its key 'hello' 
+
 whitespace2 = hello&
-! Key would be 'whitespace' and its key ' hello' 
-! If you want to include !, %, &, or , in your value, use \
-reserved_characters=this\, is \&\% reserved\!
+! Now the key would be 'whitespace2' and its key 'hello '
+
+! If you want to include !, %, &, or , in your value, use \ before it
+reserved_characters=this\, is \&\% reserved\! ! Output -> 'this, is &% reserved!'
 ```
 
 ### ATRCFileData methods:

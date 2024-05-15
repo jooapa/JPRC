@@ -106,21 +106,21 @@ namespace ATRC
 
 
             // Make these out of the function for parser
-            private List<ATRCVariable> _variables = [];
-            private List<ATRCVariable> _private_variable = [];
+            private List<ATRCVariable> _variables = new();
+            private List<ATRCVariable> _private_variable = new();
             /// <summary>
             /// Parse the contents of the file
             /// </summary>
             /// <param name="p_filename">File location/name</param>
             /// <returns>block data and variable data</returns>
             private (ATRCBlock[], ATRCVariable[]) ParseFile(string p_filename) {
-                List<ATRCBlock> _blocks = [];
+                List<ATRCBlock> _blocks = new();
                 _variables.Clear();
                 _private_variable.Clear();
                 
                 int _start_looking_for_value = 0;
                 string _value_string = "";
-                string[] _value_string_array = [];
+                string[] _value_string_array = Array.Empty<string>();
 
                 _was_last_private_variable = false;
                 _was_last_variable = false;
@@ -181,7 +181,7 @@ namespace ATRC
                         };
                         // We also have to reset them
                         _value_string = "";
-                        _value_string_array = [];
+                        _value_string_array = Array.Empty<string>();
                         // Add them to the correct list
                         if(_was_last_private_variable){
                             _private_variable.Add(_variable);
