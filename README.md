@@ -8,6 +8,10 @@ Build nupkg: ```.\ATRC\BuildNupkg.bat```
 
 Run test project ```.\ATRC.TEST\Run.bat```
 
+Download latest
+
+```dotnet add package ATRC --version 1.3.1```
+
 ### Usage in c#
 
 ```csharp
