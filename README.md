@@ -43,13 +43,31 @@ namespace Test
             // Move key to other location
             fileData.AddBlock("WinShell");
             fileData.MoveKey("test", "WinShell", "test_key");
-
             Console.WriteLine(fileData.S_ReadKey("WinApps", "test_key")); // -> C:\Windows\System32\notepad.exe
-            /*
-            file.atrc ->
+
+            object[] inserts = ["ATRC", "1.3.0", 7];
+            Console.WriteLine(fileData.S_KeyInsert("shell", "abc", inserts)); // -> Hello from ATRC. This is version 1.2.1, try 7!
+
+            inserts = ["ATRC", 22];
+            string [] keys = fileData.A_KeyInsert("shell", "def", inserts);
+            foreach(string key in keys){
+                Console.WriteLine(key);
+            } 
+            /*->
+            List try!%&
+            from ATRC,
+            try number: 22...
+            */
+            
+            
+            /* file.atrc ->
             %system32_path%=C:\Windows\System32
             [WinApps]
             test_key=%system32_path%\notepad.exe
+
+            [shell] ! these will be used for insert testing
+            abc = Hello from %*%. This is \!\%\&\, version %*%\, try %*%\!
+            def = List try\!\%\&\,, from %*%\,, try number: %*%...
             */
         }
     }
@@ -111,3 +129,5 @@ reserved_characters=this\, is \&\% reserved\!
  - MoveKey          -> Move key from source to destination
 
  - KeyExists        -> Checks whether the key exists
+
+  - KeyInsert       -> Insert an object array of variables or values in the order they will be shown in the file, for more information see the C# example 
