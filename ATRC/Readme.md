@@ -1,4 +1,5 @@
 ATRCFileData methods:
+
  - AddBlock          -> Adds given block
  - RemoveBlock       -> Removes given block
  - BlockExists       -> Check if block exists
@@ -19,7 +20,10 @@ ATRCFileData methods:
  - KeyInsert         -> Insert an object array of variables or values in the order they will be shown in the file, for more information see the C# example 
 
 Example program in C#
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+```
 using ATRC;
 namespace Test
 {
@@ -81,10 +85,15 @@ namespace Test
         }
     }
 }
+```
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Example resource fil in .atrc
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+```
 ! Add whitespace to the end or start of your value with &, can also be used to add whitespace anywhere. Everything is case-sensitive
 ! create a new block with []
 ! variable, key or block names cannot contain: !, %, & or ,
@@ -116,4 +125,6 @@ whitespace2 = hello&
 
 ! If you want to include !, %, &, or , in your value, use \ before it
 reserved_characters=this\, is \&\% reserved\!
+```
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

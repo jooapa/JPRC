@@ -10,21 +10,23 @@ namespace Test
         {
             fileData.Read("file.atrc"); // Read and parse file.atrc
             fileData.AddBlock("test"); // Create new block
-            fileData.AddKey("test", "test_key", "my_value"); // Create new key to test-block with my_value as its value
+            fileData.AddKey("test", "test_key", "%*%my_value"); // Create new key to test-block with my_value as its value
             string[] test_array = {"my", "values"};
             fileData.AddKey("test", "array_key", test_array); // Create new array key
 
             // Read both keys
-            string contents_1 = fileData.S_ReadKey("test", "test_key"); // Read string key
             string[] contents_2 = fileData.A_ReadKey("test", "array_key"); // Read array key
-    
+            object[] insertings = ["MUHAHA"];
+            Console.WriteLine(fileData.S_KeyInsert("test", "test_key", insertings));
+            string contents_1 = fileData.S_ReadKey("test", "test_key"); // Read string key
+            Console.WriteLine(contents_1);
             // Create new variable if it does not exist
             if(!fileData.VariableExists("system32_path")){
-                fileData.AddVariable("system32_path", "C:\\Windows\\System32");
+                fileData.AddVariable("system32_path", "%*%C:\\Windows\\System32");
             }
 
             // Remove array and test_key
-            fileData.ModifyKey("test", "test_key", "%system32_path%\\notepad.exe "); // Modify key value
+            fileData.ModifyKey("test", "test_key", "%system32_path%\\%*% "); // Modify key value
 
             // Move key to other location
             fileData.AddBlock("WinApps");
