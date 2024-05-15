@@ -1,6 +1,6 @@
 # ATRC resource file library made with C#
 
-Uses dotnet 8.0, works on linux, windows and propably macos
+Uses dotnet 7.0, works on linux, windows and propably macos
 
 --- 
 
