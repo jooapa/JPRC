@@ -8,7 +8,9 @@ ATRC/Readme.txt
 ATRC/License.txt
 out/
 !ATRC-c_cpp/ATRC.Test/libs
+ATRC-c_cpp/ATRC.Test/libs/include
 ATRC-c_cpp/ATRC.Test/libs/*.dll
+ATRC-c_cpp/ATRC.Test/libs/*.lib
 ATRC-c_cpp/ATRC.Test/libs/*.h
 # User-specific files
 *.rsuser

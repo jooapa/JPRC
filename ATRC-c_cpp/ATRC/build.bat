@@ -10,5 +10,5 @@ if(%1 == "Release") (
 )
 
 cmake --build . --config %1
-
+if %errorlevel% neq 0 exit /b %errorlevel%
 cd ..

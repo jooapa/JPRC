@@ -2,14 +2,12 @@
 //
 
 #include "ATRC.Test.h"
-#include "libs/atrc_export.h"
-#include <ATRC.h>
-
+#include "./libs/include/ATRC.h"
 using namespace std;
 
 int main()
 {
-	cout << ATRCFunction() << endl;
+	ATRCFunction();
 	cout << "Jooa on läski." << endl;
 
 	return 0;

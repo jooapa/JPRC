@@ -1,7 +1,4 @@
-﻿# CMakeList.txt : CMake project for ATRC.Test, include source and define
-# project specific logic here.
-#
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required(VERSION 3.8)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -11,10 +8,16 @@ endif()
 
 project ("ATRC.Test")
 
-add_executable (ATRC.Test "ATRC.Test.cpp" "ATRC.Test.h" "libs/atrc_export.h") 
+# Find ATRC import library
+set(ATRC_DIR "${PROJECT_SOURCE_DIR}/libs")  # Assuming libs folder is in project source
+find_library(ATRC NAMES ATRC REQUIRED PATHS ${ATRC_DIR})
 
-target_include_directories(ATRC.Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
-link_libraries(ATRC.Test ATRC)
+# Include header directory
+include_directories("${PROJECT_SOURCE_DIR}/libs/include")
+
+# Add executable and link with ATRC library
+add_executable (ATRC.Test "ATRC.Test.cpp" "ATRC.Test.h")
+target_link_libraries(ATRC.Test PRIVATE ATRC)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ATRC.Test PROPERTY CXX_STANDARD 20)
