@@ -1,5 +1,5 @@
 # ATRC Resource file library
 
-For csharp, see ATRC-csharp\
+For csharp, see \ATRC#
 
-for c/c++, see ATRC-c_cpp
+for c/c++, see \ATRC++

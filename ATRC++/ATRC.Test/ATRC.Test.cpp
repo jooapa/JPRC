@@ -5,6 +5,6 @@
 int main()
 {
     std::cout << "Jooa on läski." << std::endl;
-	ATRCFunction();
+    ATRCFunction();
     return 0;
 }

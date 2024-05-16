@@ -13,7 +13,7 @@ project ("ATRC")
 
 # Create the dynamic-link library (DLL)
 add_library (ATRC SHARED 
-    "main.c"
+    "filehandler.cpp"
     "include/ATRC.h")
 
 

@@ -7,14 +7,7 @@
 #  define ATRC_API __declspec(dllimport)
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern "C" ATRC_API void ATRCFunction();
 
-ATRC_API void ATRCFunction();
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // ATRC_H

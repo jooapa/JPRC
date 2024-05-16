@@ -53,7 +53,9 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "fstream": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "atrc.h": "c",
+        "limits.h": "c"
     },
     "cmake.sourceDirectory": "C:/Users/user/Documents/GitHub/ATRC/ATRC-c_cpp/ATRC"
 }

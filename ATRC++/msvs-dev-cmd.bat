@@ -3,17 +3,16 @@
 setlocal
 set "VSCMD_START_DIR=%CD%"
 cd /d "%VSCMD_START_DIR%"
+cd batch
 call .\globals.bat
-@rem not needed
-if not defined DevEnvDir ( 
-    call "%TOOLSPATH%\VsDevCmd.bat"
-)
+call .\msvs-dev-env.bat
+cd ..
 :: Restore the starting directory
 cd /d "%VSCMD_START_DIR%"
 
 :: Build the library
 cd ATRC
-call ..\build.bat "Debug"
+call ..\batch\build.bat "Debug"
 cd ..
 
 :: Build the test
@@ -27,5 +26,5 @@ COPY /Y /B ..\ATRC\out\ATRC.lib .\libs\
 if not exist .\libs\include mkdir .\libs\include
 COPY /Y ..\ATRC\include\ATRC.h .\libs\include
 if not exist .\out mkdir .\out
-call ..\build.bat "Debug"
+call ..\batch\build.bat "Debug"
 call .\run.bat

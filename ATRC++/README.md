@@ -1,3 +1,25 @@
+# ATRC resource file library made with C/C++
+
+## Example program in C++
+
+
+```cpp
+#include "ATRC.h"
+
+int main(){
+    
+    return 0;
+}
+```
+
+## Example resource file
+
+```
+[block_name]
+    kakka1 = 1 
+    kakka2 = lol 
+    kakka3 = true 
+```
 
 ## Building using ready made scripts
 
