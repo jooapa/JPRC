@@ -27,8 +27,8 @@ SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 
 # Set C++ standard (if CMake version is greater than 3.12)
-# if (CMAKE_VERSION VERSION_GREATER 3.12)
-# set_property(TARGET ATRC PROPERTY CXX_STANDARD 20)
-# endif()
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+set_property(TARGET ATRC PROPERTY CXX_STANDARD 20)
+endif()
 
 # TODO: Add tests and install targets if needed.
