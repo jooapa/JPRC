@@ -16,9 +16,9 @@ int main(){
 
 ```
 [block_name]
-    kakka1 = 1 
-    kakka2 = lol 
-    kakka3 = true 
+    key1 = 1 
+    key2 = lol 
+    key3 = true 
 ```
 
 ## Building using ready made scripts
