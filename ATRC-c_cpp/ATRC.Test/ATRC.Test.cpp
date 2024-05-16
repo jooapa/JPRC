@@ -1,14 +1,10 @@
-﻿// ATRC.Test.cpp : Defines the entry point for the application.
-//
-
-#include "ATRC.Test.h"
+﻿#include "ATRC.Test.h"
 #include "./libs/include/ATRC.h"
-using namespace std;
+#include <iostream>
 
 int main()
 {
+    std::cout << "Jooa on läski." << std::endl;
 	ATRCFunction();
-	cout << "Jooa on läski." << endl;
-
-	return 0;
+    return 0;
 }

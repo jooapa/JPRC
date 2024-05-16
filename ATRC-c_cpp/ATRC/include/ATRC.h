@@ -1,12 +1,20 @@
-﻿#pragma once
+﻿#ifndef ATRC_H
+#define ATRC_H
 
 #ifdef ATRC_EXPORTS
-    #define ATRC_API __declspec(dllexport)
+#  define ATRC_API __declspec(dllexport)
 #else
-    #define ATRC_API __declspec(dllimport)
+#  define ATRC_API __declspec(dllimport)
 #endif
 
-// Declare the exported function
-extern "C" ATRC_API void ATRCFunction();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern "C" ATRC_API void Filehandler();
+ATRC_API void ATRCFunction();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ATRC_H
