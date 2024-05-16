@@ -55,7 +55,9 @@
         "fstream": "cpp",
         "string": "cpp",
         "atrc.h": "c",
-        "limits.h": "c"
+        "limits.h": "c",
+        "vector": "cpp",
+        "codecvt": "cpp"
     },
     "cmake.sourceDirectory": "C:/Users/user/Documents/GitHub/ATRC/ATRC-c_cpp/ATRC"
 }

@@ -1,0 +1,5 @@
+%variable%=  jooa
+
+[block]
+key=  %variable% on läski
+option=  true
