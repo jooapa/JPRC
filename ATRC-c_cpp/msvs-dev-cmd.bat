@@ -25,10 +25,6 @@ COPY /Y /B ..\ATRC\out\ATRC.lib .\libs\
 @REM Temporary location at .\libs\
 if not exist .\libs\include mkdir .\libs\include
 COPY /Y ..\ATRC\include\ATRC.h .\libs\include
-
-@REM if not exist .\out mkdir .\out
-COPY /Y /B .\libs\ATRC.dll .\out\
-COPY /Y /B .\libs\ATRC.lib .\out\
-
+if not exist .\out mkdir .\out
 call .\build.bat "Debug"
 call .\run.bat
