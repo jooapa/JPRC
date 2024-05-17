@@ -14,7 +14,9 @@ project ("ATRC")
 # Create the dynamic-link library (DLL)
 add_library (ATRC SHARED 
     "filehandler.cpp"
-    "include/ATRC.h")
+    "include/ATRC.h"
+    "include/filer.h"
+    )
 
 
 target_include_directories(ATRC PUBLIC ${CMAKE_BINARY_DIR}/exports)

@@ -1,5 +1,7 @@
-%variable%=  jooa
-
+%variable% = jooa
+<%variable2% = asdfafasdf
 [block]
-key=  %variable% on läski
-option=  true
+key = %variable% on läski
+option = true
+!
+!
