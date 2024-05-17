@@ -2,6 +2,13 @@
 #define FILER_H
 #include <string>
 #include <iostream>
+#include <vector>
+#include "ATRC.h"
+
+
+bool BlockContainsKey(std::vector<Key>* keys, Key* key);
+bool BlockContainsBlock(std::vector<Block>* blocks, Block* block);
+bool VariableContainsVariable(std::vector<Variable>* variables, Variable* variable);
 
 // trim from start (in place)
 inline void ltrim(std::string &s) {
@@ -28,6 +35,9 @@ inline void trim(std::string &s) {
 #define ERR_INVALID_BLOCK_DECL 2
 #define ERR_INVALID_KEY_DECL 3
 #define ERR_NO_VAR_VECTOR 4
+#define ERR_REREFERENCED_VAR 5
+#define ERR_REREFERENCED_BLOCK 6
+#define ERR_REREFERENCED_KEY 7    
 
 inline void errormsg(int err_num=-1, int line_number=-1, const std::string& var_name=""){
     std::string msg = "";
@@ -47,6 +57,18 @@ inline void errormsg(int err_num=-1, int line_number=-1, const std::string& var_
             break;
         case ERR_NO_VAR_VECTOR:
             msg = "No variable vector found";
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_REREFERENCED_VAR:
+            msg = "Re-Rereferenced variable: '" + var_name + "' at line " + std::to_string(line_number);
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_REREFERENCED_BLOCK:
+            msg = "Re-referenced block: '" + var_name + "' at line " + std::to_string(line_number);
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_REREFERENCED_KEY:
+            msg = "Re-Referenced key: '" + var_name + "' at line " + std::to_string(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         default:

@@ -1,9 +1,10 @@
 %variable% = jooa
 %ytoll% = t: at
-<%variable2% = &%variable% on jonne %ytoll% hahaga&
+<%variable2% = &%variable% on %*% jonne %ytoll% hahaga&
 
 [block]!a
 key = %variable% on läski
+troll = abc
 [block2] ! asd
 optiond = true
 [block3]

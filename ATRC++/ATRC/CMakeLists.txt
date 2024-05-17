@@ -6,7 +6,7 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
-project ("ATRC")
+project ("ATRC" C CXX)
 
 # Include GenerateExportHeader module
 # include(GenerateExportHeader)
@@ -15,6 +15,8 @@ project ("ATRC")
 add_library (ATRC SHARED 
     "filehandler.cpp"
     "usage.cpp"
+    "ATRCFiledata.cpp"
+    "InsertVar.c"
     "include/ATRC.h"
     "include/filer.h"
     )
@@ -27,7 +29,7 @@ SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # Generate export header for the "ATRC" library
 # generate_export_header(ATRC EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/ATRC.h)
-
+set_target_properties(ATRC PROPERTIES LINKER_LANGUAGE CXX)
 
 # Set C++ standard (if CMake version is greater than 3.12)
 if (CMAKE_VERSION VERSION_GREATER 3.12)

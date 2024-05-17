@@ -3,25 +3,14 @@
 #include <iostream>
 #include <fstream>
 
-ATRCFiledata::ATRCFiledata() {
-    // Constructor implementation
-}
-
-ATRCFiledata::~ATRCFiledata() {
-    delete Variables;
-    Variables = nullptr;
-    delete Blocks;
-    Blocks = nullptr;
-}
-
-bool checkBlock(std::string& curr_block, const std::string& line, int line_number = -1) {
+bool checkBlock(std::string& _curr_block, const std::string& line, int line_number = -1) {
     if(line[0] != '[') return false;
     int _end_pos = line.find(']');
     if(_end_pos == std::string::npos) {
         errormsg(ERR_INVALID_BLOCK_DECL, line_number);
         throw std::invalid_argument("Invalid block declaration");
     }
-    curr_block = line.substr(1, _end_pos - 1);
+    _curr_block = line.substr(1, _end_pos - 1);
     return true;
 }
 
@@ -65,6 +54,16 @@ void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::vector<
                     errormsg(ERR_NO_VAR_VECTOR, line_number);
                     return;
                 }
+                if(_var_name.empty()) {
+                    errormsg(ERR_INVALID_VAR_DECL, line_number);
+                    return;
+                }
+                if(_var_name == "*") {
+                    _value += "%*%";
+                    _var_name = "";
+                    _looking_for_var = false;
+                    continue;
+                }
                 for (Variable var : *variables) {
                     if(var.Name == _var_name) {
                         _value += var.Value;
@@ -78,8 +77,6 @@ void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::vector<
             _var_name += c;
             continue;
         }
-
-
         _value += c;
         _last_is_re_dash = false;
     }
@@ -95,6 +92,7 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << filename << std::endl;
+        file.close();
         delete variables;
         delete blocks;
         variables = nullptr;
@@ -117,8 +115,6 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
         if (_line_trim.empty()) continue;
         if (_line_trim[0] == '!') continue;
         
-        // std::cout << "Line: " << _line_trim << std::endl;
-
 
         // Check if line is a variable
         if(_line_trim[0] == '%' || _line_trim.substr(0, 2) == "<%"){
@@ -151,10 +147,13 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
                 errormsg(ERR_INVALID_VAR_DECL, line_number, _variable.Name);
                 continue;
             }
+            if(VariableContainsVariable(variables, &_variable)) {
+                errormsg(ERR_REREFERENCED_VAR, line_number, _variable.Name);
+                continue;
+            }
             std::string _value = _line_trim.substr(_equ_pos + 1);
             ParseLineValueATRCtoSTRING(_value, line_number, variables);
             _variable.Value = _value;
-            std::cout << "Variable: " << _variable.Name << " = '" << _variable.Value << "'" << std::endl;
             variables->push_back(_variable);
             continue;
         }
@@ -162,28 +161,45 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
         if (checkBlock(_curr_block, _line_trim, line_number)) {
             // Block
             Block block;
-            block.Name = _line_trim.substr(1, _line_trim.size() - 2);
-            blocks->push_back(block);
             block.Name = _curr_block;
+            if(BlockContainsBlock(blocks, &block)) {
+                errormsg(ERR_REREFERENCED_BLOCK, line_number, block.Name);
+                continue;
+            }
+            blocks->push_back(block);
             continue;
         }
-        std::cout << "Block: '" << _curr_block << "'" << std::endl;
-        
-
+        std::string _key_name = "";
+        std::string _key_value = "";
+        int _equ_pos = _line_trim.find('=');
+        if(_equ_pos == std::string::npos) {
+            errormsg(ERR_INVALID_KEY_DECL, line_number);
+            continue;
+        }
+        _key_name = _line_trim.substr(0, _equ_pos);
+        trim(_key_name);
+        _key_value = _line_trim.substr(_equ_pos + 1);
+        ParseLineValueATRCtoSTRING(_key_value, line_number, variables);
+        Key _key;
+        _key.Name = _key_name;
+        _key.Value = _key_value;
+        if(BlockContainsKey(&(blocks->back().Keys), &_key)) {
+            errormsg(ERR_REREFERENCED_KEY, line_number, _key.Name);
+            continue;
+        }
+        blocks->back().Keys.push_back(_key);
     }
 
-    std::cout << "File parsed." << std::endl;
     file.close();
     return std::make_pair(variables, blocks);
 }
 
-extern "C" ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "utf-8") {
+ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "utf-8") {
     ATRCFiledata* filedata = new ATRCFiledata;
     filedata->Filename = filename;
     filedata->Encoding = encoding;
     // Parse contents
     std::tie(filedata->Variables, filedata->Blocks) = ParseFile(filename, encoding);
-
     if(filedata->Variables == nullptr && filedata->Blocks == nullptr) {
         std::cerr << "Failed to parse file: " << filename << std::endl;
         delete filedata;
