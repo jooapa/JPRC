@@ -13,32 +13,93 @@ ATRCFiledata::~ATRCFiledata() {
     delete Blocks;
     Blocks = nullptr;
 }
+
+bool checkBlock(std::string& curr_block, const std::string& line, int line_number = -1) {
+    if(line[0] != '[') return false;
+    int _end_pos = line.find(']');
+    if(_end_pos == std::string::npos) {
+        errormsg(ERR_INVALID_BLOCK_DECL, line_number);
+        throw std::invalid_argument("Invalid block declaration");
+    }
+    curr_block = line.substr(1, _end_pos - 1);
+    return true;
+}
+
 /**
  * reserve characters (needs \ before them):
  * %, !, &
  * reserved sequences:
  * %*%
 */
-void ParseLineValueATRCtoSTRING(std::string& line, int line_number) {
+void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::vector<Variable>* variables = nullptr) {
     trim(line);
     bool _last_is_re_dash = false;
+    bool _looking_for_var = false;
+    std::string _value = "";
+    std::string _var_name = "";
     for (char c : line) {
         if (c == '\\') {
             _last_is_re_dash = true;
             continue;
+        }   
+        if(c == '\\' && _last_is_re_dash) {
+            _value += '\\';
+            _last_is_re_dash = false;
+            continue;
         }
+        
+        if(!_last_is_re_dash && c == '!') break; // Comment
+        if(!_last_is_re_dash && c == '&') { // Whitespace
+            _value += ' ';
+            _last_is_re_dash = false;
+            continue;
+        }
+
+        if(!_last_is_re_dash && c == '%' || _looking_for_var) { // Variable
+            if(!_looking_for_var && c == '%') {
+                _looking_for_var = true;
+                continue;
+            }
+            if(_looking_for_var && c == '%') {
+                if(variables == nullptr) {
+                    errormsg(ERR_NO_VAR_VECTOR, line_number);
+                    return;
+                }
+                for (Variable var : *variables) {
+                    if(var.Name == _var_name) {
+                        _value += var.Value;
+                        break;
+                    }
+                }
+                _var_name = "";
+                _looking_for_var = false;
+                continue;
+            }
+            _var_name += c;
+            continue;
+        }
+
+
+        _value += c;
+        _last_is_re_dash = false;
     }
+
+    line = _value;
 }
 
 std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::string& filename, const std::string& encoding) {
     std::vector<Variable>* variables = new std::vector<Variable>();
     std::vector<Block>* blocks = new std::vector<Block>();
-
+    std::vector<Key> keys;
     
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << filename << std::endl;
-        return std::make_pair(nullptr, nullptr);
+        delete variables;
+        delete blocks;
+        variables = nullptr;
+        blocks = nullptr;
+        return std::make_pair(variables, blocks);
     }
 
     // Read through the file line by line
@@ -73,37 +134,42 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
             Variable _variable;
             // from %var% = value
             // to %var%
+            // to var
             std::string _name = _line_trim.substr(0, _equ_pos);
             trim(_name);
-            if(_is_public) {
-                _variable.IsPublic = true;
-                _variable.Name = _name.substr(1, _name.length() - 2);
-            } else {
-                _variable.IsPublic = false;
-                _variable.Name = _name.substr(2, _name.length() - 3);
-            }
+            // if(_is_public) {
+            //     _variable.IsPublic = true;
+            //     _variable.Name = _name.substr(1, _name.length() - 2);
+            // } else {
+            //     _variable.IsPublic = false;
+            //     _variable.Name = _name.substr(2, _name.length() - 3);
+            // }
+            _variable.IsPublic = _is_public;
+            _variable.Name = _name.substr(2-_is_public, _name.length() - (3 -_is_public));
+
             if (_variable.Name.empty() || _variable.Name == "*") {
                 errormsg(ERR_INVALID_VAR_DECL, line_number, _variable.Name);
                 continue;
             }
             std::string _value = _line_trim.substr(_equ_pos + 1);
-            ParseLineValueATRCtoSTRING(_value, line_number);
-            std::cout << "'" << _variable.Name << "' = '" << _value << "'\n";
+            ParseLineValueATRCtoSTRING(_value, line_number, variables);
             _variable.Value = _value;
+            std::cout << "Variable: " << _variable.Name << " = '" << _variable.Value << "'" << std::endl;
             variables->push_back(_variable);
             continue;
         }
         // Check if line is a block
-        if (_line_trim[0] == '[') {
+        if (checkBlock(_curr_block, _line_trim, line_number)) {
             // Block
             Block block;
             block.Name = _line_trim.substr(1, _line_trim.size() - 2);
             blocks->push_back(block);
-            _curr_block = block.Name;
+            block.Name = _curr_block;
             continue;
         }
+        std::cout << "Block: '" << _curr_block << "'" << std::endl;
         
-        // Check if line is a key
+
     }
 
     std::cout << "File parsed." << std::endl;
@@ -118,7 +184,7 @@ extern "C" ATRCFiledata* Read(const std::string& filename, const std::string& en
     // Parse contents
     std::tie(filedata->Variables, filedata->Blocks) = ParseFile(filename, encoding);
 
-    if(!filedata->Variables || !filedata->Blocks) {
+    if(filedata->Variables == nullptr && filedata->Blocks == nullptr) {
         std::cerr << "Failed to parse file: " << filename << std::endl;
         delete filedata;
         filedata = nullptr;

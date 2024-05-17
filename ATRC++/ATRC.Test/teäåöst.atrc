@@ -1,7 +1,12 @@
 %variable% = jooa
-<%variable2% = asdfafasdf
-[block]
+%ytoll% = t: at
+<%variable2% = &%variable% on jonne %ytoll% hahaga&
+
+[block]!a
 key = %variable% on läski
-option = true
+[block2] ! asd
+optiond = true
+[block3]
+optiaon = true
 !
 !
