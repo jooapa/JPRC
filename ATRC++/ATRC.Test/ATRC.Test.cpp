@@ -9,26 +9,42 @@ int main()
     if (filedata) {
         std::cout << "Filename: " << filedata->Filename << std::endl;
         std::cout << "Encoding: " << filedata->Encoding << std::endl;
-        // Clean up
-        for(Block block : *filedata->Blocks){
-            std::cout << "Block: '" << block.Name <<"'"<< std::endl;
-            for(Key key : block.Keys){
-                std::cout << "Key: '" << key.Name << "' = '" << key.Value <<"'"<< std::endl;
-            }
+        std::cout << "Autosave: " << (filedata->AutoSave ? "True":"False") << std::endl;
+        std::cout << "============================" << std::endl;
+        filedata->AutoSave = true;
+        std::string contents = "";
+        ReadKey(filedata, "block1", "key", contents);
+        std::cout << "Contents: " << contents << std::endl;
+        ReadVariable(filedata, "var", contents);
+        std::cout << "Contents: " << contents << std::endl;
+
+        if(DoesExistVariable(filedata, "var")){
+            std::cout << "Variable exists." << std::endl;
+        } else {
+            std::cout << "Variable does not exist." << std::endl;
         }
-        for(Variable var : *filedata->Variables){
-            std::cout << "Variable: '" << var.Name << "' = '" << var.Value <<"'"<< std::endl;
+
+        if(IsPublic(filedata, "var")){
+            std::cout << "Variable is public." << std::endl;
+        } else {
+            std::cout << "Variable is not public." << std::endl;
         }
+
+        if(DoesExistKey(filedata, "block1", "key")){
+            std::cout << "Key exists." << std::endl;
+        } else {
+            std::cout << "Key does not exist" << std::endl;
+        }
+        
+        ReadKey(filedata, "block1", "key", contents);
+        std::string arg1 = "tosi";
+        const std::string *args[] = { &arg1 };
+        InsertVar(contents, args);
+        std::cout << "Contents: " << contents << std::endl;
         delete filedata;
     } else {
         std::cerr << "Failed to read filedata." << std::endl;
     }
-
-
-    wchar_t line[INSERTVAR_MAX] = L"Start: %*% %abc% %*%";
-    const wchar_t *args[] = { L"Hello,", L"world!", NULL };
-    InsertVar(line, args);
-    std::wcout << line << std::endl; // Output: Start: Hello, world!
 
     return 0;
 }

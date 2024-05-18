@@ -14,6 +14,8 @@ bool checkBlock(std::string& _curr_block, const std::string& line, int line_numb
     return true;
 }
 
+void ParseLineSTRINGtoATRC(std::string &line);
+
 /**
  * reserve characters (needs \ before them):
  * %, !, &
@@ -207,4 +209,9 @@ ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "u
     }
 
     return filedata;
+}
+
+extern "C" void Save(ATRCFiledata *filedata) {
+    // std::ofstream file(filedata->Filename, std::ios::binary);
+    // file.close();
 }

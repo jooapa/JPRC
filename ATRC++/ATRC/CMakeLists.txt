@@ -16,9 +16,13 @@ add_library (ATRC SHARED
     "filehandler.cpp"
     "usage.cpp"
     "ATRCFiledata.cpp"
-    "snippets/InsertVar.c"
     "include/ATRC.h"
     "include/filer.h"
+    "snippets/InsertVar.cpp"
+    "snippets/ReadKey.cpp"
+    "snippets/ReadVariable.cpp"
+    "snippets/DoesExist_var_key.cpp"
+    "snippets/IsPublic.cpp"
     )
 
 

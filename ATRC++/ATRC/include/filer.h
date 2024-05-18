@@ -31,15 +31,20 @@ inline void trim(std::string &s) {
 }
 
 #define ERR_CLASS_FILEHANDLER 100
-#define ERR_INVALID_VAR_DECL 1
-#define ERR_INVALID_BLOCK_DECL 2
-#define ERR_INVALID_KEY_DECL 3
-#define ERR_NO_VAR_VECTOR 4
-#define ERR_REREFERENCED_VAR 5
-#define ERR_REREFERENCED_BLOCK 6
-#define ERR_REREFERENCED_KEY 7    
+#define ERR_INVALID_VAR_DECL 101
+#define ERR_INVALID_BLOCK_DECL 102
+#define ERR_INVALID_KEY_DECL 103
+#define ERR_NO_VAR_VECTOR 104
+#define ERR_REREFERENCED_VAR 105
+#define ERR_REREFERENCED_BLOCK 106
+#define ERR_REREFERENCED_KEY 107  
 
-inline void errormsg(int err_num=-1, int line_number=-1, const std::string& var_name=""){
+#define ERR_CLASS_READER 200
+#define ERR_UNAUTHORIZED_ACCESS_TO_VAR 201
+
+inline void errormsg(int err_num=-1, 
+                    int line_number=-1, const 
+                    std::string& var_name=""){
     std::string msg = "";
     int err_class = -1;
     switch(err_num){
@@ -71,11 +76,15 @@ inline void errormsg(int err_num=-1, int line_number=-1, const std::string& var_
             msg = "Re-Referenced key: '" + var_name + "' at line " + std::to_string(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
+        case ERR_UNAUTHORIZED_ACCESS_TO_VAR:
+            msg = "Unauthorized access to variable: '" + var_name + "'";
+            err_class = ERR_CLASS_READER;
+            break;
         default:
             msg = "Unknown error at line " + std::to_string(line_number);
             break;
     }
-    std::cerr << "Error<" << err_class << "-" << err_num << ">: " << msg << std::endl;
+    std::cerr << "Error<" << err_class << "?" << err_num << ">: " << msg << std::endl;
 }
 
 #endif // FILER_H

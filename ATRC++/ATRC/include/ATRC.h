@@ -19,55 +19,77 @@
 #endif
 
 #ifdef __cplusplus
-class ATRC_API Variable {
-public:
+struct ATRC_API Variable {
     std::string Name;
     std::string Value;
     bool IsPublic;
 };
 
-class ATRC_API Key {
-public:
+struct ATRC_API Key {
     std::string Name;
     std::string Value;
 };
 
-class ATRC_API Block {
-public:
+struct ATRC_API Block {
     std::string Name;
     std::vector<Key> Keys;
 };
 
-class ATRC_API ATRCFiledata {
-private:
-    std::vector<Variable> variables;
-public:
+struct ATRC_API ATRCFiledata {
     std::vector<Variable> *Variables;
     std::vector<Block> *Blocks;
     std::string Filename;
     std::string Encoding;
+    bool AutoSave = false;
 
     ATRCFiledata();
     ~ATRCFiledata();
 };
 
 extern "C" {
+/// @brief Reads file.atrc file
+/// @param filename filename to read
+/// @param encoding 'utf-8' for now
+/// @return Pointer to ATRCFiledata struct
 ATRC_API ATRCFiledata* Read(const std::string& filename, const std::string& encoding);
-}
 
-#endif
+/// @brief Read a variable to a string
+/// @param filedata Filedata struct
+/// @param varname Variable name to read
+/// @param contents Contents where to store the variable
+/// @return 
+ATRC_API void ReadVariable(ATRCFiledata *filedata, const std::string& varname, std::string& contents);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include <wchar.h>
-#define INSERTVAR_MAX 1024
+/// @brief Read a key from a block to a string
+/// @param filedata Filedata struct
+/// @param block Block where to read from
+/// @param key Key to read
+/// @param contents Contents where to store the key
+/// @return 
+ATRC_API void ReadKey(ATRCFiledata *filedata, const std::string& block, const std::string& key, std::string& contents);
+
+/// @brief Check if a variable exists
+/// @param filedata Filedata struct
+/// @param varname Variable name to check
+/// @return true if variable exists, false otherwise
+ATRC_API bool DoesExistVariable(ATRCFiledata* filedata, const std::string& varname);
+/// @brief Check if a key exists in a block
+/// @param filedata Filedata struct
+/// @param block Block to check
+/// @param key Key to check
+/// @return true if key exists, false otherwise
+ATRC_API bool DoesExistKey(ATRCFiledata* filedata, const std::string& block, const std::string& key);
+/// @brief Check if a variable is public
+/// @param filedata Filedata struct
+/// @param varname Variable name to check
+/// @return true if variable is public, false otherwise
+ATRC_API bool IsPublic(ATRCFiledata* filedata, const std::string& varname);
 /// @brief Insert variables into a string
 /// @param line Line to insert variables into
-/// @param args Variables to insert into the line, end with NULL
-ATRC_API void InsertVar(wchar_t *line, const wchar_t *args[]);
-#ifdef __cplusplus
+/// @param args Variables to insert into the line, [&arg1, &arg2, ...]
+ATRC_API void InsertVar(std::string &line, const std::string *args[]);
 }
+
 #endif
 
 #ifdef _WIN32
