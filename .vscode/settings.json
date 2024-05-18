@@ -59,7 +59,8 @@
         "vector": "cpp",
         "codecvt": "cpp",
         "cstdarg": "cpp",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "string.h": "c"
     },
     "cmake.sourceDirectory": "C:/Users/user/Documents/GitHub/ATRC/ATRC++/ATRC"
 }

@@ -24,8 +24,10 @@ int main()
         std::cerr << "Failed to read filedata." << std::endl;
     }
 
-    char line[INSERT_VAR_MAX_LINE_LENGTH] = "Start: ";
-    InsertVar(line, "Hello, ", "world!");
+    
+    char line[INSERTVAR_MAX] = "Start: %*% %abc% %*%";
+    const char *args[] = { "Hello,", "world!", NULL };
+    InsertVar(line, args);
     std::cout << line << std::endl; // Output: Start: Hello, world!
 
     return 0;
