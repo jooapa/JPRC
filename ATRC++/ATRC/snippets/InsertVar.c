@@ -3,39 +3,39 @@
 #include <string.h>
 #include <stdbool.h>
 
-void InsertVar(char *line, const char *args[]) {
-    int len = strlen(line);
+void InsertVar(wchar_t *line, const wchar_t *args[]) {
+    int len = wcslen(line);
     bool _looking_for_var = false;
-    char var[INSERTVAR_MAX] = "";
-    char _result[INSERTVAR_MAX] = "";
+    wchar_t var[INSERTVAR_MAX] = L"";
+    wchar_t _result[INSERTVAR_MAX] = L"";
     int _arg_counter = 0;
     for (int i = 0; i < len; i++) {
-        if (line[i] == '\0') break;
-        if(line[i] == '%' || _looking_for_var){
+        if (line[i] == L'\0') break;
+        if(line[i] == L'%' || _looking_for_var){
 #ifdef _WIN32
-            strncat_s(var, INSERTVAR_MAX, &line[i], 1);
+            wcsncat_s(var, INSERTVAR_MAX, &line[i], 1);
 #else
-            strncat(var, &line[i], INSERTVAR_MAX - strlen(var) - 1);
+            wcscat(var, &line[i], INSERTVAR_MAX - wcslen(var) - 1);
 #endif
-            if (line[i] == '%') {
+            if (line[i] == L'%') {
                 if(_looking_for_var){
-                    printf("Looking for var: '%s'\n", var);
+                    wprintf(L"Looking for var: '%s'\n", var);
 
-                    if(strcmp(var, "%*%") == 0){
+                    if(wcscmp(var, L"%*%") == 0){
 #ifdef _WIN32
-        strncat_s(_result, INSERTVAR_MAX, args[_arg_counter], _TRUNCATE);
+        wcsncat_s(_result, INSERTVAR_MAX, args[_arg_counter], _TRUNCATE);
 #else
-        strncat(_result, args[_arg_counter], INSERTVAR_MAX - strlen(_result) - 1);
+        wcscat(_result, args[_arg_counter], INSERTVAR_MAX - wcslen(_result) - 1);
 #endif
                     _arg_counter++;
                     } else {
 #ifdef _WIN32
-        strncat_s(_result, INSERTVAR_MAX, var, _TRUNCATE);
+        wcsncat_s(_result, INSERTVAR_MAX, var, _TRUNCATE);
 #else
-        strncat(_result, var, INSERTVAR_MAX - strlen(_result) - 1);
+        wcscat(_result, var, INSERTVAR_MAX - wcslen(_result) - 1);
 #endif
                     }
-                    var[0] = '\0';
+                    var[0] = L'\0';
                     _looking_for_var = false;
                 } else {
                     _looking_for_var = true;
@@ -46,16 +46,15 @@ void InsertVar(char *line, const char *args[]) {
 
 
 #ifdef _WIN32
-        strncat_s(_result, INSERTVAR_MAX, &line[i], 1);
+        wcsncat_s(_result, INSERTVAR_MAX, &line[i], 1);
 #else
-        strncat(_result, &line[i], INSERTVAR_MAX - strlen(_result) - 1);
+        wcscat(_result, &line[i], INSERTVAR_MAX - wcslen(_result) - 1);
 #endif
     }
     
-
 #ifdef _WIN32
-    strcpy_s(line, INSERTVAR_MAX, _result);
+    wcscpy_s(line, INSERTVAR_MAX, _result);
 #else
-    strcpy(line, _result);
+    wcscpy(line, INSERTVAR_MAX, _result);
 #endif
 }

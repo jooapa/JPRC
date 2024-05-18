@@ -24,11 +24,11 @@ int main()
         std::cerr << "Failed to read filedata." << std::endl;
     }
 
-    
-    char line[INSERTVAR_MAX] = "Start: %*% %abc% %*%";
-    const char *args[] = { "Hello,", "world!", NULL };
+
+    wchar_t line[INSERTVAR_MAX] = L"Start: %*% %abc% %*%";
+    const wchar_t *args[] = { L"Hello,", L"world!", NULL };
     InsertVar(line, args);
-    std::cout << line << std::endl; // Output: Start: Hello, world!
+    std::wcout << line << std::endl; // Output: Start: Hello, world!
 
     return 0;
 }

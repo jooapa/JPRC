@@ -57,15 +57,15 @@ ATRC_API ATRCFiledata* Read(const std::string& filename, const std::string& enco
 
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <wchar.h>
 #define INSERTVAR_MAX 1024
 /// @brief Insert variables into a string
 /// @param line Line to insert variables into
 /// @param args Variables to insert into the line, end with NULL
-ATRC_API void InsertVar(char *line, const char *args[]);
+ATRC_API void InsertVar(wchar_t *line, const wchar_t *args[]);
 #ifdef __cplusplus
 }
 #endif
