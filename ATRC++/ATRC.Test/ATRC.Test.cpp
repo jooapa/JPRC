@@ -41,6 +41,14 @@ int main()
         const std::string *args[] = { &arg1 };
         InsertVar(contents, args);
         std::cout << "Contents: " << contents << std::endl;
+
+        AddBlock(filedata, "block_test");
+        RemoveBlock(filedata, "block3");
+        for(auto block : *filedata->Blocks){
+            std::cout << "Block: " << block.Name << std::endl;
+        }
+
+        DoesExistBlock(filedata, "block1") ? std::cout << "Block exists." << std::endl : std::cout << "Block does not exist." << std::endl;
         delete filedata;
     } else {
         std::cerr << "Failed to read filedata." << std::endl;

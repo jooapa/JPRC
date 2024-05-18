@@ -29,20 +29,19 @@ void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::vector<
     std::string _value = "";
     std::string _var_name = "";
     for (char c : line) {
-        if (c == '\\') {
-            _last_is_re_dash = true;
-            continue;
-        }   
         if(c == '\\' && _last_is_re_dash) {
             _value += '\\';
             _last_is_re_dash = false;
             continue;
         }
+        if (c == '\\') {
+            _last_is_re_dash = true;
+            continue;
+        }   
         
         if(!_last_is_re_dash && c == '!') break; // Comment
         if(!_last_is_re_dash && c == '&') { // Whitespace
             _value += ' ';
-            _last_is_re_dash = false;
             continue;
         }
 
@@ -211,7 +210,21 @@ ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "u
     return filedata;
 }
 
-extern "C" void Save(ATRCFiledata *filedata) {
-    // std::ofstream file(filedata->Filename, std::ios::binary);
+/// @brief Save filedata to file
+/// @param filedata filedata
+/// @param action set empty to or -1 to do heavysave, otherwise set macro
+void Save(ATRCFiledata *filedata, int action = -1) {
+    std::ofstream file(filedata->Filename, std::ios::binary | std::ios::trunc);
+    switch (action)
+    {
+    case -1:
+        break;
+    case AUTOSAVE_ADD_BLOCK:
+        break;
+    case AUTOSAVE_REMOVE_BLOCK:
+        break;
+    default:
+        break;
+    }
     // file.close();
 }

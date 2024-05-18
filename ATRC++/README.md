@@ -45,4 +45,4 @@ Check that ```batch\globals.bat``` has the right paths
 
 To start build process, run ```msvs-dev-cmd.bat```, this script builds ATRC and ATRC.Test and runs the latter one
 
-Run ``````batch\del.bat``` to reset CMake cache and return source folders to starting point
+Run ```batch\del.bat``` to reset CMake cache and return source folders to starting point

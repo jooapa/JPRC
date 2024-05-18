@@ -24,3 +24,10 @@ extern "C" bool DoesExistKey(ATRCFiledata* filedata, const std::string& block, c
     }
     return false;
 }
+
+extern "C" bool DoesExistBlock(ATRCFiledata* filedata, const std::string& block){
+    for(Block blk : *filedata->Blocks){
+        if(blk.Name == block) return true;
+    }
+    return false;
+}

@@ -10,6 +10,10 @@ bool BlockContainsKey(std::vector<Key>* keys, Key* key);
 bool BlockContainsBlock(std::vector<Block>* blocks, Block* block);
 bool VariableContainsVariable(std::vector<Variable>* variables, Variable* variable);
 
+#define AUTOSAVE_ADD_BLOCK          0
+#define AUTOSAVE_REMOVE_BLOCK       1
+void Save(ATRCFiledata *filedata, int action);
+
 // trim from start (in place)
 inline void ltrim(std::string &s) {
 s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
@@ -30,17 +34,25 @@ inline void trim(std::string &s) {
     ltrim(s);
 }
 
-#define ERR_CLASS_FILEHANDLER 100
-#define ERR_INVALID_VAR_DECL 101
-#define ERR_INVALID_BLOCK_DECL 102
-#define ERR_INVALID_KEY_DECL 103
-#define ERR_NO_VAR_VECTOR 104
-#define ERR_REREFERENCED_VAR 105
-#define ERR_REREFERENCED_BLOCK 106
-#define ERR_REREFERENCED_KEY 107  
+#define ERR_CLASS_FILEHANDLER           100
+#define ERR_INVALID_VAR_DECL            101
+#define ERR_INVALID_BLOCK_DECL          102
+#define ERR_INVALID_KEY_DECL            103
+#define ERR_NO_VAR_VECTOR               104
+#define ERR_REREFERENCED_VAR            105
+#define ERR_REREFERENCED_BLOCK          106
+#define ERR_REREFERENCED_KEY            107  
 
-#define ERR_CLASS_READER 200
-#define ERR_UNAUTHORIZED_ACCESS_TO_VAR 201
+#define ERR_CLASS_READER                200
+#define ERR_UNAUTHORIZED_ACCESS_TO_VAR  201
+
+#define ERR_CLASS_SAVER                 300
+#define ERR_BLOCK_NOT_FOUND             301
+#define ERR_KEY_NOT_FOUND               302
+#define ERR_VAR_NOT_FOUND               303
+#define ERR_BLOCK_EXISTS                304
+#define ERR_KEY_EXISTS                  305
+#define ERR_VAR_EXISTS                  306
 
 inline void errormsg(int err_num=-1, 
                     int line_number=-1, const 
@@ -79,6 +91,30 @@ inline void errormsg(int err_num=-1,
         case ERR_UNAUTHORIZED_ACCESS_TO_VAR:
             msg = "Unauthorized access to variable: '" + var_name + "'";
             err_class = ERR_CLASS_READER;
+            break;
+        case ERR_BLOCK_NOT_FOUND:
+            msg = "Block not found: '" + var_name + "'";
+            err_class = ERR_CLASS_SAVER;
+            break;
+        case ERR_KEY_NOT_FOUND:
+            msg = "Key not found: '" + var_name + "'";
+            err_class = ERR_CLASS_SAVER;
+            break;
+        case ERR_VAR_NOT_FOUND:
+            msg = "Variable not found: '" + var_name + "'";
+            err_class = ERR_CLASS_SAVER;
+            break;
+        case ERR_BLOCK_EXISTS:
+            msg = "Block already exists: '" + var_name + "'";
+            err_class = ERR_CLASS_SAVER;
+            break;
+        case ERR_KEY_EXISTS:
+            msg = "Key already exists: '" + var_name + "'";
+            err_class = ERR_CLASS_SAVER;
+            break;
+        case ERR_VAR_EXISTS:
+            msg = "Variable already exists: '" + var_name + "'";
+            err_class = ERR_CLASS_SAVER;
             break;
         default:
             msg = "Unknown error at line " + std::to_string(line_number);
