@@ -110,6 +110,49 @@ extern "C" {
     /// @param blockname Block name to remove
     /// @returns
     ATRC_API void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname);
+
+    /// @brief Add a variable to the filedata
+    /// @param filedata Filedata struct
+    /// @param varname Variable name to add
+    /// @param value Value of the variable
+    /// @returns
+    ATRC_API void AddVariable(ATRCFiledata *filedata, const std::string& varname, const std::string& value);
+
+    /// @brief Remove a variable from the filedata
+    /// @param filedata Filedata struct
+    /// @param varname Variable name to remove
+    /// @returns
+    ATRC_API void RemoveVariable(ATRCFiledata *filedata, const std::string& varname);
+
+    /// @brief Modify a variable in the filedata
+    /// @param filedata Filedata struct
+    /// @param varname Variable name to modify
+    /// @param value New value of the variable
+    /// @returns
+    ATRC_API void ModifyVariable(ATRCFiledata *filedata, const std::string& varname, const std::string& value);
+
+    /// @brief Add a key to a block
+    /// @param filedata Filedata struct
+    /// @param block Block to add the key to
+    /// @param key Key to add
+    /// @param value Value of the key
+    /// @returns
+    ATRC_API void AddKey(ATRCFiledata *filedata, const std::string& block, const std::string& key, const std::string& value);
+
+    /// @brief Remove a key from a block
+    /// @param filedata Filedata struct
+    /// @param block Block to remove the key from
+    /// @param key Key to remove
+    /// @returns
+    ATRC_API void RemoveKey(ATRCFiledata *filedata, const std::string& block, const std::string& key);
+
+    /// @brief Modify a key in a block
+    /// @param filedata Filedata struct
+    /// @param block Block to modify
+    /// @param key Key to modify
+    /// @param value New value of the key
+    /// @returns
+    ATRC_API void ModifyKey(ATRCFiledata *filedata, const std::string& block, const std::string& key, const std::string& value);
 #ifdef __cplusplus
 }
 #endif

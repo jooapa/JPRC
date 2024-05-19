@@ -12,6 +12,13 @@ bool VariableContainsVariable(std::vector<Variable>* variables, Variable* variab
 
 #define AUTOSAVE_ADD_BLOCK          0
 #define AUTOSAVE_REMOVE_BLOCK       1
+#define AUTOSAVE_ADD_KEY            2
+#define AUTOSAVE_REMOVE_KEY         3
+#define AUTOSAVE_MODIFY_KEY         4
+#define AUTOSAVE_ADD_VAR            5
+#define AUTOSAVE_REMOVE_VAR         6
+#define AUTOSAVE_MODIFY_VAR         7
+
 void Save(ATRCFiledata *filedata, int action);
 
 // trim from start (in place)

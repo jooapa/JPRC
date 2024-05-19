@@ -142,6 +142,7 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
             //     _variable.Name = _name.substr(2, _name.length() - 3);
             // }
             _variable.IsPublic = _is_public;
+            // true = 1, false = 0
             _variable.Name = _name.substr(2-_is_public, _name.length() - (3 -_is_public));
 
             if (_variable.Name.empty() || _variable.Name == "*") {
@@ -214,17 +215,18 @@ ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "u
 /// @param filedata filedata
 /// @param action set empty to or -1 to do heavysave, otherwise set macro
 void Save(ATRCFiledata *filedata, int action = -1) {
-    std::ofstream file(filedata->Filename, std::ios::binary | std::ios::trunc);
     switch (action)
     {
-    case -1:
-        break;
-    case AUTOSAVE_ADD_BLOCK:
-        break;
-    case AUTOSAVE_REMOVE_BLOCK:
-        break;
-    default:
-        break;
+    case -1: break; //hard save
+    case AUTOSAVE_ADD_BLOCK: break;
+    case AUTOSAVE_REMOVE_BLOCK: break;
+    case AUTOSAVE_ADD_KEY: break;
+    case AUTOSAVE_REMOVE_KEY: break;
+    case AUTOSAVE_MODIFY_KEY: break;
+    case AUTOSAVE_ADD_VAR: break;
+    case AUTOSAVE_REMOVE_VAR: break;
+    case AUTOSAVE_MODIFY_VAR: break;
+    default:break;
     }
     // file.close();
 }

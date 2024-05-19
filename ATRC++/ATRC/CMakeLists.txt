@@ -24,6 +24,8 @@ add_library (ATRC SHARED
     "snippets/DoesExist_var_key_block.cpp"
     "snippets/IsPublic.cpp"
     "snippets/to_save/blocks.cpp"
+    "snippets/to_save/variables.cpp"
+    "snippets/to_save/keys.cpp"
     )
 
 
