@@ -19,7 +19,7 @@ bool VariableContainsVariable(std::vector<Variable>* variables, Variable* variab
 #define AUTOSAVE_REMOVE_VAR         6
 #define AUTOSAVE_MODIFY_VAR         7
 
-void Save(ATRCFiledata *filedata, int action);
+void Save(ATRCFiledata *filedata, int action, int xtra_info, std::string xtra_info2);
 
 // trim from start (in place)
 inline void ltrim(std::string &s) {

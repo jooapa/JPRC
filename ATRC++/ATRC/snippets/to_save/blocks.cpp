@@ -1,7 +1,9 @@
 #include "..\..\include\ATRC.h"
 #include "..\..\include\filer.h"
 #include <string>
-
+/*
+    ! TEST EVERYTHING
+*/
 extern "C" void AddBlock(ATRCFiledata *filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
@@ -12,7 +14,7 @@ extern "C" void AddBlock(ATRCFiledata *filedata, const std::string& blockname) {
     filedata->Blocks->push_back(block);
 
     if(filedata->AutoSave) {
-        Save(filedata, AUTOSAVE_ADD_BLOCK);
+        Save(filedata, AUTOSAVE_ADD_BLOCK, -1, blockname);
     }
 }
 
@@ -31,6 +33,6 @@ extern "C" void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname
     }
     filedata->Blocks->erase(filedata->Blocks->begin() + i);
     if(filedata->AutoSave) {
-        Save(filedata, AUTOSAVE_REMOVE_BLOCK);
+        Save(filedata, AUTOSAVE_REMOVE_BLOCK, i, blockname);
     }
 }

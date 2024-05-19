@@ -39,7 +39,17 @@ void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::vector<
             continue;
         }   
         
-        if(!_last_is_re_dash && c == '!') break; // Comment
+        if(!_last_is_re_dash && c == '!') { // Comment
+            // TODO FIX BUG:
+            // This is a %*%, and %*% !
+            // ->
+            // 'This is a %*%, and %*% '
+            //
+            // This is a %*%, and %*%& !
+            // ->
+            // 'This is a %*%, and %*%  '
+            break; 
+        }
         if(!_last_is_re_dash && c == '&') { // Whitespace
             _value += ' ';
             continue;
@@ -214,7 +224,9 @@ ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "u
 /// @brief Save filedata to file
 /// @param filedata filedata
 /// @param action set empty to or -1 to do heavysave, otherwise set macro
-void Save(ATRCFiledata *filedata, int action = -1) {
+/// @param xtra_info set -2 if not used, send extra info, such as index
+/// @param xtra_info2 set "" if not used, send extra info, such as name
+void Save(ATRCFiledata *filedata, int action = -1, int xtra_info = -2, std::string xtra_info2 = "") {
     switch (action)
     {
     case -1: break; //hard save

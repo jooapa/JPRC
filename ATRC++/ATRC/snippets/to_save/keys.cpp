@@ -1,7 +1,9 @@
 #include "..\..\include\ATRC.h"
 #include "..\..\include\filer.h"
 #include <string>
-
+/*
+    ! TEST EVERYTHING
+*/
 extern "C" void AddKey
                     (
                         ATRCFiledata *filedata, 
@@ -10,7 +12,6 @@ extern "C" void AddKey
                         const std::string &value
                     ){
     
-    // TODO Change function
     if(DoesExistKey(filedata, block, key)){
         errormsg(ERR_KEY_EXISTS, -1, key);
         return;
@@ -26,7 +27,7 @@ extern "C" void AddKey
         }
     }
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_ADD_KEY);
+        Save(filedata, AUTOSAVE_ADD_KEY, -1, key);
     }
 }
 
@@ -36,15 +37,50 @@ extern "C" void RemoveKey
                         const std::string &block, 
                         const std::string &key
                     ){
-    // TODO Change function
+    if(!DoesExistKey(filedata, block, key)){
+        errormsg(ERR_KEY_NOT_FOUND, -1, key);
+        return;
+    }
+    int i = 0;
+    // TODO FOR
+    for(Block _block : *filedata->Blocks){
+        if(_block.Name == block){
+            _block.Keys.erase(_block.Keys.begin() + i);
+            break;
+        }
+    }
+
+    if(filedata->AutoSave){
+        Save(filedata, AUTOSAVE_REMOVE_KEY, i, key);
+    }
+}
+
+extern "C" void ModifyKey(
+                        ATRCFiledata *filedata,
+                        const std::string &block,
+                        const std::string &key,
+                        const std::string &value
+                        ){
     if(!DoesExistKey(filedata, block, key)){
         errormsg(ERR_KEY_NOT_FOUND, -1, key);
         return;
     }
 
-    
+    int i = 0;
+    for(Block _blk : *filedata->Blocks){
+        if(_blk.Name == block){
+            for(Key _key : _blk.Keys){
+                if(_key.Name == key){
+                    _key.Value = value;
+                    break;
+                }
+                i++;
+            }
+            break;
+        }
+    }
 
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_REMOVE_KEY);
+        Save(filedata, AUTOSAVE_MODIFY_KEY, i, key);
     }
 }

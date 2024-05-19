@@ -1,7 +1,9 @@
 #include "..\..\include\ATRC.h"
 #include "..\..\include\filer.h"
 #include <string>
-
+/*
+    ! TEST EVERYTHING
+*/
 extern "C" void AddVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
@@ -12,7 +14,7 @@ extern "C" void AddVariable(ATRCFiledata *filedata, const std::string &varname, 
     var.Value = value;
     filedata->Variables->push_back(var);
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_ADD_VAR);
+        Save(filedata, AUTOSAVE_ADD_VAR, -1, varname);
     }
 }
 
@@ -34,7 +36,7 @@ extern "C" void RemoveVariable(ATRCFiledata *filedata, const std::string &varnam
     filedata->Variables->erase(filedata->Variables->begin() + i);
 
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_REMOVE_VAR);
+        Save(filedata, AUTOSAVE_REMOVE_VAR, i, varname);
     }
 }
 
@@ -54,6 +56,6 @@ extern "C" void ModifyVariable(ATRCFiledata *filedata, const std::string &varnam
     }
     filedata->Variables->at(i).Value = value;
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_MODIFY_VAR);
+        Save(filedata, AUTOSAVE_MODIFY_VAR, i, varname);
     }
 }
