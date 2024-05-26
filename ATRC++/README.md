@@ -35,7 +35,7 @@ reserved=reserved characters: \%, \&, \!
 
 ## Building using ready made scripts
 
-If needed, you can set Visual studio environmental values by running ``````batch\msvs-dev-env.bat```
+If needed, you can set Visual studio environmental values by running ```batch\msvs-dev-env.bat```
 
 Check that ```batch\globals.bat``` has the right paths
  - TOOLSPATH = Path to your tools directory containing Visual Studio dev-env scripts
