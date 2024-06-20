@@ -1,7 +1,7 @@
 #!/bin/sh
 echo "Building project..."
 
-cd "$(dirname "$0")"
+cd shell
 
 . ./globals.sh
 

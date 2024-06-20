@@ -107,7 +107,7 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
         delete variables;
         delete blocks;
         variables = nullptr;
-        blocks = nullptr;
+        blocks = nullptr;   
         return std::make_pair(variables, blocks);
     }
 
