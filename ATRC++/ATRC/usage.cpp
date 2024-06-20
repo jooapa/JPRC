@@ -2,9 +2,10 @@
 #include "include/ATRC.h"
 // #include <string>
 #include <vector>
+#include <memory>
 
-bool BlockContainsKey(std::vector<Key>* keys, Key* key) {
-    for (Key _key : *keys) {
+bool BlockContainsKey(std::vector<Key>& keys, Key* key) {
+    for (const Key& _key : keys) {
         if (_key.Name == key->Name) {
             return true;
         }
@@ -12,7 +13,8 @@ bool BlockContainsKey(std::vector<Key>* keys, Key* key) {
     return false;
 }
 
-bool BlockContainsBlock(std::vector<Block>* blocks, Block* block) {
+
+bool BlockContainsBlock(std::unique_ptr<std::vector<Block>>& blocks,Block* block) {
     for (Block _block : *blocks) {
         if (_block.Name == block->Name) {
             return true;
@@ -21,7 +23,7 @@ bool BlockContainsBlock(std::vector<Block>* blocks, Block* block) {
     return false;
 }
 
-bool VariableContainsVariable(std::vector<Variable>* variables, Variable* variable){
+bool VariableContainsVariable(std::unique_ptr<std::vector<Variable>>& variables,Variable* variable){
     for (Variable var : *variables) {
         if (var.Name == variable->Name) {
             return true;

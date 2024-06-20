@@ -1,6 +1,8 @@
 ﻿#include "ATRC.Test.h"
 #include "./libs/include/ATRC.h"
 #include <iostream>
+#include <string>
+#include <memory>
 
 inline std::string get_home_dir(std::string homePath_arg = "") {
 
@@ -24,14 +26,14 @@ inline std::string get_home_dir(std::string homePath_arg = "") {
 int main()
 {
     std::string homeDir = get_home_dir();
-
-    std::string filename = homeDir + "/test.atrc";
-    ATRCFiledata *filedata = Read(filename, "utf-8");
+    
+    std::string filename = "test.atrc";
+    std::unique_ptr<ATRCFiledata> filedata = Read(filename, "utf-8");
     if (filedata) {
 
 
         std::string contents = "";
-        ReadKey(filedata, "block", "test", contents);
+        ReadKey(filedata.get(), "block", "test", contents);
         std::cout << "'" << contents << "'" << std::endl;
         
         std::string arg = "test1";
@@ -40,7 +42,6 @@ int main()
         InsertVar(contents, args);
         std::cout << contents << std::endl;
 
-        delete filedata;
     } else {
         std::cerr << "Failed to read filedata." << std::endl;
     }

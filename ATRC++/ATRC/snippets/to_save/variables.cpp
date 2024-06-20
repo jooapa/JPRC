@@ -4,7 +4,7 @@
 /*
     ! TEST EVERYTHING
 */
-extern "C" void AddVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
+ void AddVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
     if(VariableContainsVariable(filedata->Variables, &var)){
@@ -18,7 +18,7 @@ extern "C" void AddVariable(ATRCFiledata *filedata, const std::string &varname, 
     }
 }
 
-extern "C" void RemoveVariable(ATRCFiledata *filedata, const std::string &varname){
+ void RemoveVariable(ATRCFiledata *filedata, const std::string &varname){
     Variable var;
     var.Name = varname;
     if(!VariableContainsVariable(filedata->Variables, &var)){
@@ -40,7 +40,7 @@ extern "C" void RemoveVariable(ATRCFiledata *filedata, const std::string &varnam
     }
 }
 
-extern "C" void ModifyVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
+ void ModifyVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
     if(!VariableContainsVariable(filedata->Variables, &var)){

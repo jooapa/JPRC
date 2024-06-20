@@ -1,7 +1,7 @@
 #include "../include/ATRC.h"
 #include <string>
 
-extern "C" void InsertVar(std::string &line, const std::string *args[]) {
+ void InsertVar(std::string &line, const std::string *args[]) {
     bool _looking_for_var = false;
     std::string var;
     std::string _result;

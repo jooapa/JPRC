@@ -2,6 +2,11 @@
 #include "./include/filer.h"
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <memory>
+#include <utility>
 
 bool checkBlock(std::string& _curr_block, const std::string& line, int line_number = -1) {
     if(line[0] != '[') return false;
@@ -22,7 +27,7 @@ void ParseLineSTRINGtoATRC(std::string &line);
  * reserved sequences:
  * %*%
 */
-void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::vector<Variable>* variables = nullptr) {
+void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::unique_ptr<std::vector<Variable>> &variables) {
     trim(line);
     bool _last_is_re_dash = false;
     bool _looking_for_var = false;
@@ -95,20 +100,20 @@ void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::vector<
     line = _value;
 }
 
-std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::string& filename, const std::string& encoding) {
-    std::vector<Variable>* variables = new std::vector<Variable>();
-    std::vector<Block>* blocks = new std::vector<Block>();
+std::pair<std::unique_ptr<std::vector<Variable>>, std::unique_ptr<std::vector<Block>>> 
+ParseFile(
+    const std::string& filename, 
+    const std::string& encoding
+) {
+    std::unique_ptr<std::vector<Variable>> variables = std::make_unique<std::vector<Variable>>();
+    std::unique_ptr<std::vector<Block>>  blocks = std::make_unique<std::vector<Block>>();
     std::vector<Key> keys;
     
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << filename << std::endl;
         file.close();
-        delete variables;
-        delete blocks;
-        variables = nullptr;
-        blocks = nullptr;   
-        return std::make_pair(variables, blocks);
+        return std::make_pair(std::move(variables), std::move(blocks));
     }
 
     // Read through the file line by line
@@ -195,7 +200,7 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
         Key _key;
         _key.Name = _key_name;
         _key.Value = _key_value;
-        if(BlockContainsKey(&(blocks->back().Keys), &_key)) {
+        if(BlockContainsKey(blocks->back().Keys, &_key)) {
             errormsg(ERR_REREFERENCED_KEY, line_number, _key.Name);
             continue;
         }
@@ -203,24 +208,22 @@ std::pair<std::vector<Variable>*, std::vector<Block>*> ParseFile(const std::stri
     }
 
     file.close();
-    return std::make_pair(variables, blocks);
+    return std::make_pair(std::move(variables), std::move(blocks));
 }
 
-ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "utf-8") {
-    ATRCFiledata* filedata = new ATRCFiledata;
+std::unique_ptr<ATRCFiledata> Read(const std::string& filename, const std::string& encoding = "utf-8") {
+    auto filedata = std::make_unique<ATRCFiledata>();
     filedata->Filename = filename;
     filedata->Encoding = encoding;
+
     // Parse contents
-#ifdef _WIN32
-    std::tie(
-#else
-    std::make_pair(
-#endif
-    filedata->Variables, filedata->Blocks) = ParseFile(filename, encoding);
-    if(filedata->Variables == nullptr && filedata->Blocks == nullptr) {
+    auto parsedData = ParseFile(filename, encoding);
+    // Check for successful parsing
+    if (parsedData.first->empty() && parsedData.second->empty()) {
         std::cerr << "Failed to parse file: " << filename << std::endl;
-        delete filedata;
-        filedata = nullptr;
+    } else {
+        filedata->Variables = std::move(parsedData.first);
+        filedata->Blocks = std::move(parsedData.second);
     }
 
     return filedata;
@@ -231,11 +234,7 @@ ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "u
 /// @param action set empty to or -1 to do heavysave, otherwise set macro
 /// @param xtra_info set -2 if not used, send extra info, such as index
 /// @param xtra_info2 set "" if not used, send extra info, such as name
-#ifdef _WIN32
-void Save(ATRCFiledata *filedata, int action = -1, int xtra_info = -2, std::string xtra_info2 = "") {
-#else
 void Save(ATRCFiledata *filedata, int action, int xtra_info, std::string xtra_info2) {
-#endif
     switch (action)
     {
     case -1: break; //hard save

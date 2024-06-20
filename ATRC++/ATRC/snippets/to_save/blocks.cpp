@@ -1,10 +1,11 @@
 #include "../../include/ATRC.h"
 #include "../../include/filer.h"
 #include <string>
+#include <memory>
 /*
     ! TEST EVERYTHING
 */
-extern "C" void AddBlock(ATRCFiledata *filedata, const std::string& blockname) {
+ void AddBlock(ATRCFiledata *filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
     if(BlockContainsBlock(filedata->Blocks, &block)) {
@@ -18,7 +19,7 @@ extern "C" void AddBlock(ATRCFiledata *filedata, const std::string& blockname) {
     }
 }
 
-extern "C" void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname) {
+ void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
     if(!BlockContainsBlock(filedata->Blocks, &block)) {

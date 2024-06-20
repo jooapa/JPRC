@@ -4,7 +4,7 @@
 /*
     ! TEST EVERYTHING
 */
-extern "C" void AddKey
+ void AddKey
                     (
                         ATRCFiledata *filedata, 
                         const std::string &block, 
@@ -31,7 +31,7 @@ extern "C" void AddKey
     }
 }
 
-extern "C" void RemoveKey
+ void RemoveKey
                     (
                         ATRCFiledata *filedata, 
                         const std::string &block, 
@@ -55,7 +55,7 @@ extern "C" void RemoveKey
     }
 }
 
-extern "C" void ModifyKey(
+ void ModifyKey(
                         ATRCFiledata *filedata,
                         const std::string &block,
                         const std::string &key,

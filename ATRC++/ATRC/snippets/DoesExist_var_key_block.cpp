@@ -1,7 +1,7 @@
 #include "../include/ATRC.h"
 #include "../include/filer.h"
 
-extern "C" bool DoesExistVariable(ATRCFiledata* filedata, const std::string& varname){
+ bool DoesExistVariable(ATRCFiledata* filedata, const std::string& varname){
     for(Variable var : *filedata->Variables){
         if(var.Name == varname){
             if(var.IsPublic) return true;
@@ -14,7 +14,7 @@ extern "C" bool DoesExistVariable(ATRCFiledata* filedata, const std::string& var
     return false;
 }
 
-extern "C" bool DoesExistKey(ATRCFiledata* filedata, const std::string& block, const std::string& key){
+ bool DoesExistKey(ATRCFiledata* filedata, const std::string& block, const std::string& key){
     for(Block blk : *filedata->Blocks){
         if(blk.Name == block){
             for(Key k : blk.Keys){
@@ -25,7 +25,7 @@ extern "C" bool DoesExistKey(ATRCFiledata* filedata, const std::string& block, c
     return false;
 }
 
-extern "C" bool DoesExistBlock(ATRCFiledata* filedata, const std::string& block){
+ bool DoesExistBlock(ATRCFiledata* filedata, const std::string& block){
     for(Block blk : *filedata->Blocks){
         if(blk.Name == block) return true;
     }

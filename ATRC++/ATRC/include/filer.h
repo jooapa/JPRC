@@ -2,13 +2,14 @@
 #define FILER_H
 #include <string>
 #include <iostream>
+#include <memory>
 #include <vector>
 #include "ATRC.h"
 
 
-bool BlockContainsKey(std::vector<Key>* keys, Key* key);
-bool BlockContainsBlock(std::vector<Block>* blocks, Block* block);
-bool VariableContainsVariable(std::vector<Variable>* variables, Variable* variable);
+bool BlockContainsKey(std::vector<Key>& keys, Key* key);
+bool BlockContainsBlock(std::unique_ptr<std::vector<Block>>& blocks,Block* block);
+bool VariableContainsVariable(std::unique_ptr<std::vector<Variable>>& variables, Variable* variable);
 
 #define AUTOSAVE_ADD_BLOCK          0
 #define AUTOSAVE_REMOVE_BLOCK       1

@@ -1,10 +1,11 @@
 ﻿#ifndef ATRC_H
 #define ATRC_H
 
-#ifdef __cplusplus
+// #ifdef __cplusplus
 #include <vector>
 #include <string>
-#endif
+#include <memory>
+// #endif
 
 #ifdef _WIN32
     #ifdef ATRC_EXPORTS
@@ -39,24 +40,23 @@ struct ATRC_API Block {
 };
 
 struct ATRC_API ATRCFiledata {
-    std::vector<Variable> *Variables;
-    std::vector<Block> *Blocks;
+    std::unique_ptr<std::vector<Variable>> Variables;
+    std::unique_ptr<std::vector<Block>> Blocks;
+    // std::vector<Variable> *Variables;
+    // std::vector<Block> *Blocks;
     std::string Filename;
     std::string Encoding;
     bool AutoSave = false;
-
-    ATRCFiledata();
-    ~ATRCFiledata();
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
     /// @brief Reads file.atrc file
     /// @param filename filename to read
     /// @param encoding 'utf-8' for now
     /// @return Pointer to ATRCFiledata struct
-    ATRC_API ATRCFiledata* Read(const std::string& filename, const std::string& encoding);
+    ATRC_API std::unique_ptr<ATRCFiledata> Read(const std::string& filename, const std::string& encoding);
 
     /// @brief Read a variable to a string
     /// @param filedata Filedata struct
@@ -157,9 +157,9 @@ extern "C" {
     /// @param value New value of the key
     /// @returns
     ATRC_API void ModifyKey(ATRCFiledata *filedata, const std::string& block, const std::string& key, const std::string& value);
-#ifdef __cplusplus
-}
-#endif
+// #ifdef __cplusplus
+// }
+// #endif
 
 #ifdef _WIN32
 #  pragma warning(pop)

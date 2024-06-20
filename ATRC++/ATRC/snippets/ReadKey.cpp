@@ -1,6 +1,6 @@
 #include "../include/ATRC.h"
 
-extern "C" void ReadKey(ATRCFiledata *filedata, 
+ void ReadKey(ATRCFiledata *filedata, 
                         const std::string& block, 
                         const std::string& key, 
                         std::string& contents)
