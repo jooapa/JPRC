@@ -21,6 +21,21 @@ bool checkBlock(std::string& _curr_block, const std::string& line, int line_numb
 
 void ParseLineSTRINGtoATRC(std::string &line);
 
+std::string gen_random(const int len) {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    std::string tmp_s;
+    tmp_s.reserve(len);
+
+    for (int i = 0; i < len; ++i) {
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+    
+    return tmp_s;
+}
+
 /**
  * reserve characters (needs \ before them):
  * %, !, &
@@ -208,6 +223,20 @@ ParseFile(
     }
 
     file.close();
+
+    // Will throw error if no blocks or variables are found
+    if(variables->empty()){
+        Variable _var;
+        _var.Name = "var" + gen_random(5);
+        _var.Value = "val" + gen_random(5);
+        variables->push_back(_var);
+    } 
+    if(blocks->empty()) {
+        // append a random block with randomized name
+        Block _block;
+        _block.Name = "block" + gen_random(5);
+        blocks->push_back(_block);
+    }
     return std::make_pair(std::move(variables), std::move(blocks));
 }
 
