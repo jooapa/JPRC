@@ -211,7 +211,12 @@ ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "u
     filedata->Filename = filename;
     filedata->Encoding = encoding;
     // Parse contents
-    std::tie(filedata->Variables, filedata->Blocks) = ParseFile(filename, encoding);
+#ifdef _WIN32
+    std::tie(
+#else
+    std::make_pair(
+#endif
+    filedata->Variables, filedata->Blocks) = ParseFile(filename, encoding);
     if(filedata->Variables == nullptr && filedata->Blocks == nullptr) {
         std::cerr << "Failed to parse file: " << filename << std::endl;
         delete filedata;
@@ -226,7 +231,11 @@ ATRCFiledata* Read(const std::string& filename, const std::string& encoding = "u
 /// @param action set empty to or -1 to do heavysave, otherwise set macro
 /// @param xtra_info set -2 if not used, send extra info, such as index
 /// @param xtra_info2 set "" if not used, send extra info, such as name
+#ifdef _WIN32
 void Save(ATRCFiledata *filedata, int action = -1, int xtra_info = -2, std::string xtra_info2 = "") {
+#else
+void Save(ATRCFiledata *filedata, int action, int xtra_info, std::string xtra_info2) {
+#endif
     switch (action)
     {
     case -1: break; //hard save

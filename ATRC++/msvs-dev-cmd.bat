@@ -12,7 +12,7 @@ cd /d "%VSCMD_START_DIR%"
 
 :: Build the library
 cd ATRC
-call ..\batch\build.bat "Debug"
+call ..\batch\build.bat "Release"
 cd ..
 
 :: Build the test

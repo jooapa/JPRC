@@ -6,10 +6,14 @@
 #include <string>
 #endif
 
-#ifdef ATRC_EXPORTS
-#  define ATRC_API __declspec(dllexport)
+#ifdef _WIN32
+    #ifdef ATRC_EXPORTS
+    #  define ATRC_API __declspec(dllexport)
+    #else
+    #  define ATRC_API __declspec(dllimport)
+    #endif
 #else
-#  define ATRC_API __declspec(dllimport)
+    #define ATRC_API
 #endif
 
 // Disable warning C4251 for std::vector and std::string

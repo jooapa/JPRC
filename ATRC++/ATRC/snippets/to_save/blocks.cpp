@@ -1,5 +1,5 @@
-#include "..\..\include\ATRC.h"
-#include "..\..\include\filer.h"
+#include "../../include/ATRC.h"
+#include "../../include/filer.h"
 #include <string>
 /*
     ! TEST EVERYTHING
