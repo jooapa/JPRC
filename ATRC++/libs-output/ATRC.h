@@ -101,7 +101,7 @@ struct ATRC_API ATRCFiledata {
     /// @brief Insert variables into a string
     /// @param line Line to insert variables into
     /// @param args Variables to insert into the line, [&arg1, &arg2, ...]
-    ATRC_API void InsertVar(std::string &line, const std::string *args[]);
+    ATRC_API void InsertVar(std::string &line, std::vector<std::string> &args);
 
     /// @brief Add a block to the filedata
     /// @param filedata Filedata struct

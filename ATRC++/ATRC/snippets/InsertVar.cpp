@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
- void InsertVar(std::string &line, const std::vector<std::string> &args) {
+ void InsertVar(std::string &line, std::vector<std::string> &args) {
     bool _looking_for_var = false;
     std::string var;
     std::string _result;
