@@ -1,14 +1,13 @@
 @ECHO OFF
 :: Set the starting directory
 setlocal
-set "VSCMD_START_DIR=%CD%"
-cd /d "%VSCMD_START_DIR%"
+cd /d "%~dp0"
 cd batch
 call .\globals.bat
 call .\msvs-dev-env.bat
 cd ..
 :: Restore the starting directory
-cd /d "%VSCMD_START_DIR%"
+cd /d "%~dp0"
 
 :: Build the library
 cd ATRC

@@ -1,7 +1,8 @@
 #include "../include/ATRC.h"
 #include <string>
+#include <vector>
 
- void InsertVar(std::string &line, const std::string *args[]) {
+ void InsertVar(std::string &line, const std::vector<std::string> &args) {
     bool _looking_for_var = false;
     std::string var;
     std::string _result;
@@ -14,7 +15,7 @@
             if (line[i] == '%') {
                 if (_looking_for_var) {
                     if (var == "%*%") {
-                        _result += *args[_arg_counter];
+                        _result += args[_arg_counter];
                         ++_arg_counter;
                     } else {
                         _result += var;

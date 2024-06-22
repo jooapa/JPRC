@@ -36,9 +36,7 @@ int main()
         ReadKey(filedata.get(), "block", "test", contents);
         std::cout << "'" << contents << "'" << std::endl;
         
-        std::string arg = "test1";
-        std::string arg2 = "test2";
-        const std::string *args[] = { &arg, &arg2};
+        const std::vector<std::string> args = {"Hello", "World"};
         InsertVar(contents, args);
         std::cout << contents << std::endl;
 
