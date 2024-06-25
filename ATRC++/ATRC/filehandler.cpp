@@ -117,7 +117,7 @@ void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::unique_
 
 std::pair<std::unique_ptr<std::vector<Variable>>, std::unique_ptr<std::vector<Block>>> 
 ParseFile(
-    const std::string& filename, 
+    std::string& filename, 
     const std::string& encoding
 ) {
     std::unique_ptr<std::vector<Variable>> variables = std::make_unique<std::vector<Variable>>();
@@ -176,11 +176,11 @@ ParseFile(
             _variable.Name = _name.substr(2-_is_public, _name.length() - (3 -_is_public));
 
             if (_variable.Name.empty() || _variable.Name == "*") {
-                errormsg(ERR_INVALID_VAR_DECL, line_number, _variable.Name);
+                errormsg(ERR_INVALID_VAR_DECL, line_number, _variable.Name, filename);
                 continue;
             }
             if(VariableContainsVariable(variables, &_variable)) {
-                errormsg(ERR_REREFERENCED_VAR, line_number, _variable.Name);
+                errormsg(ERR_REREFERENCED_VAR, line_number, _variable.Name, filename);
                 continue;
             }
             std::string _value = _line_trim.substr(_equ_pos + 1);
@@ -195,7 +195,7 @@ ParseFile(
             Block block;
             block.Name = _curr_block;
             if(BlockContainsBlock(blocks, &block)) {
-                errormsg(ERR_REREFERENCED_BLOCK, line_number, block.Name);
+                errormsg(ERR_REREFERENCED_BLOCK, line_number, block.Name, filename);
                 continue;
             }
             blocks->push_back(block);
@@ -216,7 +216,7 @@ ParseFile(
         _key.Name = _key_name;
         _key.Value = _key_value;
         if(BlockContainsKey(blocks->back().Keys, &_key)) {
-            errormsg(ERR_REREFERENCED_KEY, line_number, _key.Name);
+            errormsg(ERR_REREFERENCED_KEY, line_number, _key.Name, filename);
             continue;
         }
         blocks->back().Keys.push_back(_key);
@@ -240,7 +240,7 @@ ParseFile(
     return std::make_pair(std::move(variables), std::move(blocks));
 }
 
-std::unique_ptr<ATRCFiledata> Read(const std::string& filename, const std::string& encoding = "utf-8") {
+std::unique_ptr<ATRCFiledata> Read(std::string& filename, const std::string& encoding = "utf-8") {
     auto filedata = std::make_unique<ATRCFiledata>();
     filedata->Filename = filename;
     filedata->Encoding = encoding;

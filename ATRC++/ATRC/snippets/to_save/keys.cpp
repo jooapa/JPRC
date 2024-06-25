@@ -13,7 +13,7 @@
                     ){
     
     if(DoesExistKey(filedata, block, key)){
-        errormsg(ERR_KEY_EXISTS, -1, key);
+        errormsg(ERR_KEY_EXISTS, -1, key, filedata->Filename);
         return;
     }
 
@@ -38,7 +38,7 @@
                         const std::string &key
                     ){
     if(!DoesExistKey(filedata, block, key)){
-        errormsg(ERR_KEY_NOT_FOUND, -1, key);
+        errormsg(ERR_KEY_NOT_FOUND, -1, key, filedata->Filename);
         return;
     }
     int i = 0;
@@ -62,7 +62,7 @@
                         const std::string &value
                         ){
     if(!DoesExistKey(filedata, block, key)){
-        errormsg(ERR_KEY_NOT_FOUND, -1, key);
+        errormsg(ERR_KEY_NOT_FOUND, -1, key, filedata->Filename);
         return;
     }
 

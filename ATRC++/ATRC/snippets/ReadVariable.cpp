@@ -7,7 +7,7 @@
             if(var.IsPublic) {
                 contents = var.Value;
             } else {
-                errormsg(ERR_UNAUTHORIZED_ACCESS_TO_VAR, -1, varname);
+                errormsg(ERR_UNAUTHORIZED_ACCESS_TO_VAR, -1, varname, filedata->Filename);
                 contents = "";
             }
             return;

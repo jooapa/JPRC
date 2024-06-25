@@ -8,7 +8,7 @@
     Variable var;
     var.Name = varname;
     if(VariableContainsVariable(filedata->Variables, &var)){
-        errormsg(ERR_VAR_EXISTS, -1, var.Name);
+        errormsg(ERR_VAR_EXISTS, -1, var.Name, filedata->Filename);
         return;
     }
     var.Value = value;
@@ -22,7 +22,7 @@
     Variable var;
     var.Name = varname;
     if(!VariableContainsVariable(filedata->Variables, &var)){
-        errormsg(ERR_VAR_NOT_FOUND, -1, var.Name);
+        errormsg(ERR_VAR_NOT_FOUND, -1, var.Name, filedata->Filename);
         return;
     }
 
@@ -44,7 +44,7 @@
     Variable var;
     var.Name = varname;
     if(!VariableContainsVariable(filedata->Variables, &var)){
-        errormsg(ERR_VAR_NOT_FOUND, -1, var.Name);
+        errormsg(ERR_VAR_NOT_FOUND, -1, var.Name, filedata->Filename);
         return;
     }
     int i = 0;    

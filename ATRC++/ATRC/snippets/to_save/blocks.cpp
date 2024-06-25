@@ -9,7 +9,7 @@
     Block block;
     block.Name = blockname;
     if(BlockContainsBlock(filedata->Blocks, &block)) {
-        errormsg(ERR_BLOCK_EXISTS, -1, block.Name);
+        errormsg(ERR_BLOCK_EXISTS, -1, block.Name, filedata->Filename);
         return;
     }
     filedata->Blocks->push_back(block);
@@ -23,7 +23,7 @@
     Block block;
     block.Name = blockname;
     if(!BlockContainsBlock(filedata->Blocks, &block)) {
-        errormsg(ERR_BLOCK_NOT_FOUND, -1, blockname);
+        errormsg(ERR_BLOCK_NOT_FOUND, -1, blockname, filedata->Filename);
         return;
     }
 

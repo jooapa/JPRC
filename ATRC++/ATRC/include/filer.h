@@ -4,9 +4,9 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#ifdef __linux__
+// #ifdef __linux__
 #   include <algorithm>
-#endif
+// #endif
 #include "ATRC.h"
 
 
@@ -67,7 +67,9 @@ inline void trim(std::string &s) {
 
 inline void errormsg(int err_num=-1, 
                     int line_number=-1, const 
-                    std::string& var_name=""){
+                    std::string& var_name="",
+                    std::string filename="no_filename"
+                    ){
     std::string msg = "";
     int err_class = -1;
     switch(err_num){
@@ -131,7 +133,7 @@ inline void errormsg(int err_num=-1,
             msg = "Unknown error at line " + std::to_string(line_number);
             break;
     }
-    std::cerr << "ATRC Error<" << err_class << "?" << err_num << ">: " << msg << std::endl;
+    std::cerr << "ATRC Error<" << err_class << "?" << err_num << ">"<< "<" << filename << ">" <<": " << msg << std::endl;
 }
 
 #endif // FILER_H

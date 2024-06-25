@@ -56,7 +56,7 @@ struct ATRC_API ATRCFiledata {
     /// @param filename filename to read
     /// @param encoding 'utf-8' for now
     /// @return Pointer to ATRCFiledata struct
-    ATRC_API std::unique_ptr<ATRCFiledata> Read(const std::string& filename, const std::string& encoding);
+    ATRC_API std::unique_ptr<ATRCFiledata> Read(std::string& filename, const std::string& encoding);
 
     /// @brief Read a variable to a string
     /// @param filedata Filedata struct

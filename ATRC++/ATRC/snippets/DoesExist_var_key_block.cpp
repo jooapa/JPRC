@@ -6,7 +6,7 @@
         if(var.Name == varname){
             if(var.IsPublic) return true;
             else{
-                errormsg(ERR_UNAUTHORIZED_ACCESS_TO_VAR, -1, varname);
+                errormsg(ERR_UNAUTHORIZED_ACCESS_TO_VAR, -1, varname, filedata->Filename);
                 return false;            
             }
         } 
