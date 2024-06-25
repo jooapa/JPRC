@@ -4,6 +4,9 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#ifdef __linux__
+#   include <algorithm>
+#endif
 #include "ATRC.h"
 
 
@@ -128,7 +131,7 @@ inline void errormsg(int err_num=-1,
             msg = "Unknown error at line " + std::to_string(line_number);
             break;
     }
-    std::cerr << "Error<" << err_class << "?" << err_num << ">: " << msg << std::endl;
+    std::cerr << "ATRC Error<" << err_class << "?" << err_num << ">: " << msg << std::endl;
 }
 
 #endif // FILER_H
