@@ -8,11 +8,11 @@
 #include <memory>
 #include <utility>
 
-bool checkBlock(std::string& _curr_block, const std::string& line, int line_number = -1) {
+bool checkBlock(std::string& _curr_block, const std::string& line, int line_number = -1, std::string filename = "no_filename") {
     if(line[0] != '[') return false;
     int _end_pos = line.find(']');
     if(_end_pos == std::string::npos) {
-        errormsg(ERR_INVALID_BLOCK_DECL, line_number);
+        errormsg(ERR_INVALID_BLOCK_DECL, line_number, "", filename);
         throw std::invalid_argument("Invalid block declaration");
     }
     _curr_block = line.substr(1, _end_pos - 1);
@@ -42,7 +42,7 @@ std::string gen_random(const int len) {
  * reserved sequences:
  * %*%
 */
-void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::unique_ptr<std::vector<Variable>> &variables) {
+void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::unique_ptr<std::vector<Variable>> &variables, std::string filename) {
     trim(line);
     bool _last_is_re_dash = false;
     bool _looking_for_var = false;
@@ -82,11 +82,11 @@ void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::unique_
             }
             if(_looking_for_var && c == '%') {
                 if(variables == nullptr) {
-                    errormsg(ERR_NO_VAR_VECTOR, line_number);
+                    errormsg(ERR_NO_VAR_VECTOR, line_number, "", filename);
                     return;
                 }
                 if(_var_name.empty()) {
-                    errormsg(ERR_INVALID_VAR_DECL, line_number);
+                    errormsg(ERR_INVALID_VAR_DECL, line_number, "", filename);
                     return;
                 }
                 if(_var_name == "*") {
@@ -154,7 +154,7 @@ ParseFile(
             // parse name
             int _equ_pos = _line_trim.find('=');
             if(_equ_pos == std::string::npos){
-                errormsg(ERR_INVALID_VAR_DECL, line_number);
+                errormsg(ERR_INVALID_VAR_DECL, line_number, "", filename);
                 continue;
             }
 
@@ -184,13 +184,13 @@ ParseFile(
                 continue;
             }
             std::string _value = _line_trim.substr(_equ_pos + 1);
-            ParseLineValueATRCtoSTRING(_value, line_number, variables);
+            ParseLineValueATRCtoSTRING(_value, line_number, variables, filename);
             _variable.Value = _value;
             variables->push_back(_variable);
             continue;
         }
         // Check if line is a block
-        if (checkBlock(_curr_block, _line_trim, line_number)) {
+        if (checkBlock(_curr_block, _line_trim, line_number, filename)) {
             // Block
             Block block;
             block.Name = _curr_block;
@@ -205,13 +205,13 @@ ParseFile(
         std::string _key_value = "";
         int _equ_pos = _line_trim.find('=');
         if(_equ_pos == std::string::npos) {
-            errormsg(ERR_INVALID_KEY_DECL, line_number);
+            errormsg(ERR_INVALID_KEY_DECL, line_number, "", filename);
             continue;
         }
         _key_name = _line_trim.substr(0, _equ_pos);
         trim(_key_name);
         _key_value = _line_trim.substr(_equ_pos + 1);
-        ParseLineValueATRCtoSTRING(_key_value, line_number, variables);
+        ParseLineValueATRCtoSTRING(_key_value, line_number, variables, filename);
         Key _key;
         _key.Name = _key_name;
         _key.Value = _key_value;
