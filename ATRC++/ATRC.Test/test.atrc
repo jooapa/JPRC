@@ -1,4 +1,6 @@
 %lol% = troll
 <%trikk% = abc
 [block]
-test = This is a %*%, and %*%, %lol% %trikk% !
+test = This is a %*%, and %*%!
+
+test2 = hello %*0% %*1% %*% %*2%

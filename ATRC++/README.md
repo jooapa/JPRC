@@ -31,6 +31,9 @@ whitespace=&whitespaces&
 
 ! insert reserved char
 reserved=reserved characters: \%, \&, \!
+
+! insert variables in a sequence
+insert2=insert first var here: %*1% and second here: %*2*. Whatever this gets is not quaranteed: %*%
 ```
 
 ## Building using ready made scripts

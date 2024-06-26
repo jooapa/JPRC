@@ -1,8 +1,9 @@
 #include "../include/ATRC.h"
+#include "../include/filer.h"
 #include <string>
 #include <vector>
 
- void InsertVar(std::string &line, std::vector<std::string> &args) {
+ void InsertVar(std::string &line, std::vector<std::string> &args, ATRCFiledata *filedata) {
     bool _looking_for_var = false;
     std::string var;
     std::string _result;
@@ -14,9 +15,28 @@
             var += line[i];
             if (line[i] == '%') {
                 if (_looking_for_var) {
-                    if (var == "%*%") {
-                        _result += args[_arg_counter];
-                        ++_arg_counter;
+                    
+
+                    if (var.substr(0, 2) == "%*") {
+
+                        if(var == "%*%"){
+                            _result += args[_arg_counter];
+                            ++_arg_counter;
+                        } else {
+                            
+                            // check %*<digit>%
+                            if(var.size() > 3) {
+                                int inject_num = std::stoi(var.substr(2, var.size() - 3));
+                                if(args.size() > inject_num){
+                                    _result += args[inject_num];
+                                } else {
+                                    errormsg(ERR_INSERT_WRONG, -1, var + " inject: " + std::to_string(inject_num), filedata->Filename);
+                                }
+                            } else {
+                                errormsg(ERR_INSERT_WRONG, -1, var, filedata->Filename);
+                            }
+
+                        }
                     } else {
                         _result += var;
                     }

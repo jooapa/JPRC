@@ -52,7 +52,8 @@ inline void trim(std::string &s) {
 #define ERR_NO_VAR_VECTOR               104
 #define ERR_REREFERENCED_VAR            105
 #define ERR_REREFERENCED_BLOCK          106
-#define ERR_REREFERENCED_KEY            107  
+#define ERR_REREFERENCED_KEY            107
+#define ERR_INSERT_VAR                  108  
 
 #define ERR_CLASS_READER                200
 #define ERR_UNAUTHORIZED_ACCESS_TO_VAR  201
@@ -64,6 +65,7 @@ inline void trim(std::string &s) {
 #define ERR_BLOCK_EXISTS                304
 #define ERR_KEY_EXISTS                  305
 #define ERR_VAR_EXISTS                  306
+#define ERR_INSERT_WRONG                307
 
 inline void errormsg(int err_num=-1, 
                     int line_number=-1, const 
@@ -100,6 +102,10 @@ inline void errormsg(int err_num=-1,
         case ERR_REREFERENCED_KEY:
             msg = "Re-Referenced key: '" + var_name + "' at line " + std::to_string(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_INSERT_WRONG:
+            msg = "Invalid insert variable declaration: '" + var_name + "'";
+            err_class = ERR_INSERT_VAR;
             break;
         case ERR_UNAUTHORIZED_ACCESS_TO_VAR:
             msg = "Unauthorized access to variable: '" + var_name + "'";

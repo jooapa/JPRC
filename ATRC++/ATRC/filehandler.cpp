@@ -41,6 +41,7 @@ std::string gen_random(const int len) {
  * %, !, &
  * reserved sequences:
  * %*%
+ * %*<int>%
 */
 void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::unique_ptr<std::vector<Variable>> &variables, std::string filename) {
     trim(line);
@@ -89,8 +90,8 @@ void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::unique_
                     errormsg(ERR_INVALID_VAR_DECL, line_number, "", filename);
                     return;
                 }
-                if(_var_name == "*") {
-                    _value += "%*%";
+                if(_var_name[0] == '*') {
+                    _value += "%"+_var_name+"%";
                     _var_name = "";
                     _looking_for_var = false;
                     continue;
