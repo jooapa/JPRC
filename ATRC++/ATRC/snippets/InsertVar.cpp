@@ -26,7 +26,8 @@
                             
                             // check %*<digit>%
                             if(var.size() > 3) {
-                                int inject_num = std::stoi(var.substr(2, var.size() - 3));
+                                // size_t inject_num = std::stoull(var.substr(2, var.size() - 3));
+                                size_t inject_num = std::stoi(var.substr(2, var.size() - 3));
                                 if(args.size() > inject_num){
                                     _result += args[inject_num];
                                 } else {
