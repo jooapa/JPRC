@@ -4,14 +4,17 @@
 /*
     ! TEST EVERYTHING
 */
- void AddKey
-                    (
-                        ATRCFiledata *filedata, 
-                        const std::string &block, 
-                        const std::string &key, 
-                        const std::string &value
-                    ){
-    
+void AddKey
+(
+ATRCFiledata *filedata, 
+const std::string &block, 
+const std::string &key, 
+const std::string &value
+){
+    if(!DoesExistBlock(filedata, block)) {
+        errormsg(ERR_BLOCK_NOT_FOUND, -1, block, filedata->Filename);
+        return;
+    }
     if(DoesExistKey(filedata, block, key)){
         errormsg(ERR_KEY_EXISTS, -1, key, filedata->Filename);
         return;
@@ -31,12 +34,16 @@
     }
 }
 
- void RemoveKey
-                    (
-                        ATRCFiledata *filedata, 
-                        const std::string &block, 
-                        const std::string &key
-                    ){
+void RemoveKey
+(
+    ATRCFiledata *filedata, 
+    const std::string &block, 
+    const std::string &key
+){
+    if(!DoesExistBlock(filedata, block)) {
+        errormsg(ERR_BLOCK_NOT_FOUND, -1, block, filedata->Filename);
+        return;
+    }
     if(!DoesExistKey(filedata, block, key)){
         errormsg(ERR_KEY_NOT_FOUND, -1, key, filedata->Filename);
         return;
@@ -55,12 +62,16 @@
     }
 }
 
- void ModifyKey(
-                        ATRCFiledata *filedata,
-                        const std::string &block,
-                        const std::string &key,
-                        const std::string &value
-                        ){
+void ModifyKey(
+ATRCFiledata *filedata,
+const std::string &block,
+const std::string &key,
+const std::string &value
+){
+    if(!DoesExistBlock(filedata, block)) {
+        errormsg(ERR_BLOCK_NOT_FOUND, -1, block, filedata->Filename);
+        return;
+    }
     if(!DoesExistKey(filedata, block, key)){
         errormsg(ERR_KEY_NOT_FOUND, -1, key, filedata->Filename);
         return;

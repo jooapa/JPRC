@@ -1,4 +1,18 @@
 @ECHO OFF
+
+ECHO TODO:
+ECHO ZIP UP WITH THE FOLLOWING TREE:
+ECHO LICENSE.txt
+ECHO \include\
+ECHO --ATRC.h
+ECHO \libs\
+ECHO --win
+ECHO ----ATRC.lib
+ECHO ----ATRC.dll
+ECHO --linux
+ECHO ----ATRC.so
+ECHO 
+
 cd /d %~dp0
 cd ATRC
 RMDIR /S /Q out
