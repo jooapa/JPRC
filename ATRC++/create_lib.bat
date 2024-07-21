@@ -1,33 +1,25 @@
 @ECHO OFF
 
-ECHO TODO:
-ECHO ZIP UP WITH THE FOLLOWING TREE:
-ECHO LICENSE.txt
-ECHO \include\
-ECHO --ATRC.h
-ECHO \libs\
-ECHO --win
-ECHO ----ATRC.lib
-ECHO ----ATRC.dll
-ECHO --linux
-ECHO ----ATRC.so
-ECHO 
 
 cd /d %~dp0
 cd ATRC
 RMDIR /S /Q out
 cd ..
-if exist libs-output RMDIR /S /Q 
 setlocal
 call .\batch\globals.bat
 call .\batch\msvs-dev-env.bat
 cd ..\ATRC
 call ..\batch\build.bat Release
 cd /d %~dp0
-if not exist libs-output mkdir libs-output
-copy .\ATRC\out\ATRC.dll .\libs-output
-copy .\ATRC\out\ATRC.lib .\libs-output
-copy .\ATRC\include\ATRC.h .\libs-output
+RMDIR libs-output /S /Q 
+mkdir libs-output
+mkdir libs-output\include\
+mkdir libs-output\libs\win\
+mkdir libs-output\libs\linux\
+copy .\ATRC\out\ATRC.dll .\libs-output\libs\win
+copy .\ATRC\out\ATRC.lib .\libs-output\libs\win
+copy .\ATRC\include\ATRC.h .\libs-output\include\
+copy ..\LICENSE.txt .\libs-output\
 cd ATRC
 RMDIR /S /Q out
 cd /d %~dp0

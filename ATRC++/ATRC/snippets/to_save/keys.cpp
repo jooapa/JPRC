@@ -78,9 +78,9 @@ const std::string &value
     }
 
     int i = 0;
-    for(Block _blk : *filedata->Blocks){
+    for(Block &_blk : *filedata->Blocks){
         if(_blk.Name == block){
-            for(Key _key : _blk.Keys){
+            for(Key &_key : _blk.Keys){
                 if(_key.Name == key){
                     _key.Value = value;
                     break;
