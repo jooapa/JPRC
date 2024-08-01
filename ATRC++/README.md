@@ -2,6 +2,19 @@
 
 Everything else work but you can't save changes into the files from c++
 
+## Use with CMake
+
+```
+if (WIN32)
+    set(ATRC_DIR "${PROJECT_SOURCE_DIR}/ATRC/libs/win")
+elseif (UNIX)
+    set(ATRC_DIR "${PROJECT_SOURCE_DIR}/ATRC/libs/linux")
+endif()
+
+find_library(ATRC NAMES ATRC REQUIRED PATHS ${ATRC_DIR})
+include_directories("${PROJECT_SOURCE_DIR}/atrc/include")
+```
+
 ## Example program in C++
 
 

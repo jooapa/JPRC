@@ -241,10 +241,19 @@ ParseFile(
     return std::make_pair(std::move(variables), std::move(blocks));
 }
 
-std::unique_ptr<ATRCFiledata> Read(std::string& filename, const std::string& encoding = "utf-8") {
+std::unique_ptr<ATRCFiledata> Read(std::string& filename, const std::string& encoding = "utf-8", const std::string& allowed_extension) {
     auto filedata = std::make_unique<ATRCFiledata>();
     filedata->Filename = filename;
     filedata->Encoding = encoding;
+    if(allowed_extension == ""){
+        filedata->Extension = ".atrc";
+    } else{
+        if(allowed_extension[0] == '.'){
+            filedata->Extension = allowed_extension;
+        } else {
+            filedata->Extension = "." + allowed_extension;
+        }
+    }
 
     // Parse contents
     auto parsedData = ParseFile(filename, encoding);
