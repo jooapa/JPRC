@@ -15,7 +15,7 @@
     filedata->Blocks->push_back(block);
 
     if(filedata->AutoSave) {
-        Save(filedata, AUTOSAVE_ADD_BLOCK, -1, blockname);
+        Save(filedata, ATRC_SAVE::ADD_BLOCK, -1, blockname);
     }
 }
 
@@ -34,6 +34,6 @@
     }
     filedata->Blocks->erase(filedata->Blocks->begin() + i);
     if(filedata->AutoSave) {
-        Save(filedata, AUTOSAVE_REMOVE_BLOCK, i, blockname);
+        Save(filedata, ATRC_SAVE::REMOVE_BLOCK, i, blockname);
     }
 }

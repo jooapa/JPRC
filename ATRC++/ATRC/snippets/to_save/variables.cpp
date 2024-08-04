@@ -14,7 +14,7 @@ void AddVariable(ATRCFiledata *filedata, const std::string &varname, const std::
     var.Value = value;
     filedata->Variables->push_back(var);
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_ADD_VAR, -1, varname);
+        Save(filedata, ATRC_SAVE::ADD_VAR, -1, "%"+var.Name+"%="+ParseLineSTRINGtoATRC(var.Value));
     }
 }
 
@@ -36,7 +36,7 @@ void RemoveVariable(ATRCFiledata *filedata, const std::string &varname){
     filedata->Variables->erase(filedata->Variables->begin() + i);
 
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_REMOVE_VAR, i, varname);
+        Save(filedata, ATRC_SAVE::REMOVE_VAR, i, varname);
     }
 }
 
@@ -48,14 +48,15 @@ void ModifyVariable(ATRCFiledata *filedata, const std::string &varname, const st
         return;
     }
     int i = 0;    
-    for(Variable var : *filedata->Variables){
+    for(Variable &var : *filedata->Variables){
         if(var.Name == varname){
             break;
         }
         i++;
     }
     filedata->Variables->at(i).Value = value;
+    std::cout << filedata->Variables->at(i).Name +"="+ filedata->Variables->at(i).Value + "\n";
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_MODIFY_VAR, i, varname);
+        Save(filedata, ATRC_SAVE::MODIFY_VAR, i, ParseLineSTRINGtoATRC(value)); // Values taken from filedata->Variables->at(xtra_info).[type]
     }
 }

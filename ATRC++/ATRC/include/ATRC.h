@@ -43,17 +43,24 @@ struct ATRC_API ATRCFiledata {
     std::string Filename;
     std::string Extension;
     std::string Encoding;
-    // bool AutoSave = false;
+
+    /// Keep true until full save is made
+    /// Turn to false if you want to make changes to data but don't want them saved
+    bool AutoSave = true;
 };
 
 
-/// @brief Reads file.atrc file
-/// @param filename filename to read
-/// @param encoding 'utf-8' for now
+/// @brief Reads .atrc syntaxed file
+/// @param filename filename with extension
+/// @param encoding only 'utf-8' for now
 /// @param allowed_extension for user-defined file extensions. Leave empty for default ".atrc"
-/// @example std::unique_ptr<ATRFiledata> ini_data = std::unique_ptr<ATRCFiledata> Read("settings.ini", "utf-8", ".ini");
+///
+/// Examples:
+///
+/// std::unique_ptr<ATRFiledata> ini_data = std::unique_ptr<ATRCFiledata> Read("settings.ini", "utf-8", ".ini");
+/// std::unique_ptr<ATRFiledata> file_data = std::unique_ptr<ATRCFiledata> Read("settings.atrc", "utf-8");
 /// @return Pointer to ATRCFiledata struct
-ATRC_API std::unique_ptr<ATRCFiledata> Read(std::string& filename, const std::string& encoding, const std::string& allowed_extension);
+ATRC_API std::unique_ptr<ATRCFiledata> Read(const std::string& filename = "", const std::string& encoding = "utf-8", const std::string& allowed_extension = "");
 
 
 /*+++
@@ -66,7 +73,10 @@ raw pointer.
 /// @param filedata Filedata struct
 /// @param varname Variable name to read
 /// @param contents Contents where to store the variable
-/// @example ReadVariable(filedata.get(), "variable_name", variable_contents)
+///
+/// Examples:
+///
+/// ReadVariable(filedata.get(), "variable_name", variable_contents)
 ATRC_API void ReadVariable(ATRCFiledata *filedata, const std::string& varname, std::string& contents);
 
 /// @brief Read a key from a block to a string
@@ -74,21 +84,30 @@ ATRC_API void ReadVariable(ATRCFiledata *filedata, const std::string& varname, s
 /// @param block Block where to read from
 /// @param key Key to read
 /// @param contents Contents where to store the key
-/// @example ReadKey(filedata.get(), "block_name", "key_name", key_contents);
+///
+/// Examples:
+///
+/// ReadKey(filedata.get(), "block_name", "key_name", key_contents);
 ATRC_API void ReadKey(ATRCFiledata *filedata, const std::string& block, const std::string& key, std::string& contents);
 
 /// @brief Check if a block exists
 /// @param filedata Filedata struct
 /// @param block Block to check
 /// @return true if block exists, false otherwise
-/// @example bool results = DoesExistBlock(filedata.get(), "block_name");
+///
+/// Examples:
+///
+/// bool results = DoesExistBlock(filedata.get(), "block_name");
 ATRC_API bool DoesExistBlock(ATRCFiledata* filedata, const std::string& block);
 
 /// @brief Check if a variable exists
 /// @param filedata Filedata struct
 /// @param varname Variable name to check
 /// @return true if variable exists, false otherwise
-/// @example bool results = DoesExistVariable(filedata.get(), "variable_name");
+///
+/// Examples:
+///
+/// bool results = DoesExistVariable(filedata.get(), "variable_name");
 ATRC_API bool DoesExistVariable(ATRCFiledata* filedata, const std::string& varname);
 
 /// @brief Check if a key exists in a block
@@ -96,54 +115,90 @@ ATRC_API bool DoesExistVariable(ATRCFiledata* filedata, const std::string& varna
 /// @param block Block to check
 /// @param key Key to check
 /// @return true if key exists, false otherwise
-/// @example bool results = DoesExistKey(filedata.get(), "block_name", "key_name");
+///
+/// Examples:
+///
+/// bool results = DoesExistKey(filedata.get(), "block_name", "key_name");
 ATRC_API bool DoesExistKey(ATRCFiledata* filedata, const std::string& block, const std::string& key);
 
 /// @brief Check if a variable is public
 /// @param filedata Filedata struct
 /// @param varname Variable name to check
 /// @return true if variable is public, false otherwise
-/// @example bool results = IsPublic(filedata.get(), "variable_name");
+///
+/// Examples:
+///
+/// bool results = IsPublic(filedata.get(), "variable_name");
 ATRC_API bool IsPublic(ATRCFiledata* filedata, const std::string& varname);
 
 /// @brief Insert variables into a string
 /// @param line Line or string to insert variables into
 /// @param args Variables to insert into the line, [&arg1, &arg2, ...]
 /// @param filedata 
-/// @example std::vector<std::string> inserts = {"Hello"}; 
-///         InsertVar(key_or_var_value, inserts, filedata.get());
+///
+/// Examples:
+///
+/// std::vector<std::string> inserts = {"Hello"}; 
+/// InsertVar(key_or_var_value, inserts, filedata.get());
 ATRC_API void InsertVar(std::string &line, std::vector<std::string> &args, ATRCFiledata *filedata);
 
 /// @brief Add a block to the filedata
 /// @param filedata Filedata struct
 /// @param blockname Block name to add
-/// @example AddBlock(filedata.get(), "new_block");
+///
+/// Examples:
+///
+/// AddBlock(filedata.get(), "new_block");
+///
+/// On autosave the block will be appended to the bottom of the file
 ATRC_API void AddBlock(ATRCFiledata *filedata, const std::string& blockname);
 
 /// @brief Remove a block from the filedata
 /// @param filedata Filedata struct
 /// @param blockname Block name to remove
-/// @example RemoveBlock(filedata.get(), "new_block");
+///
+/// Examples:
+///
+/// RemoveBlock(filedata.get(), "new_block");
+///
+/// On autosave, everything between the next block or the end of file will be deleted
 ATRC_API void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname);
 
 /// @brief Add a variable to the filedata
 /// @param filedata Filedata struct
 /// @param varname Variable name to add
 /// @param value Value of the variable
-/// @example AddVariable(filedata.get(), "new_variable");
+///
+/// Examples:
+///
+/// AddVariable(filedata.get(), "new_variable");
+///
+/// On autosave, New variable will be appended to the top of the file
+///     Value will also be automatically parsed to ATRC syntax
 ATRC_API void AddVariable(ATRCFiledata *filedata, const std::string& varname, const std::string& value);
 
 /// @brief Remove a variable from the filedata
 /// @param filedata Filedata struct
 /// @param varname Variable name to remove
-/// @example RemoveVariable(filedata.get(), "variable");
+///
+/// Examples:
+///
+/// RemoveVariable(filedata.get(), "variable");
+///
+/// On autosave, variable's line will be removed
 ATRC_API void RemoveVariable(ATRCFiledata *filedata, const std::string& varname);
 
 /// @brief Modify a variable in the filedata
 /// @param filedata Filedata struct
 /// @param varname Variable name to modify
 /// @param value New value of the variable
-/// @example ModifyVariable(filedata.get(), "variable_name", "new_value");
+///
+/// Examples:
+///
+/// ModifyVariable(filedata.get(), "variable_name", "new_value");
+///
+/// On autosave, the line will be replaced with %{variable_name}%={new_value}
+///     Value will also be automatically parsed to ATRC syntax
 ATRC_API void ModifyVariable(ATRCFiledata *filedata, const std::string& varname, const std::string& value);
 
 /// @brief Add a key to a block
@@ -151,14 +206,20 @@ ATRC_API void ModifyVariable(ATRCFiledata *filedata, const std::string& varname,
 /// @param block Block to add the key to
 /// @param key Key to add
 /// @param value Value of the key
-/// @example AddKey(filedata.get(), "block", "new_key");
+///
+/// Examples:
+///
+/// AddKey(filedata.get(), "block", "new_key");
 ATRC_API void AddKey(ATRCFiledata *filedata, const std::string& block, const std::string& key, const std::string& value);
 
 /// @brief Remove a key from a block
 /// @param filedata Filedata struct
 /// @param block Block to remove the key from
 /// @param key Key to remove
-/// @example RemoveKey(filedata.get(), "block", "key");
+///
+/// Examples:
+///
+/// RemoveKey(filedata.get(), "block", "key");
 ATRC_API void RemoveKey(ATRCFiledata *filedata, const std::string& block, const std::string& key);
 
 /// @brief Modify a key in a block
@@ -166,8 +227,17 @@ ATRC_API void RemoveKey(ATRCFiledata *filedata, const std::string& block, const 
 /// @param block Block to modify
 /// @param key Key to modify
 /// @param value New value of the key
-/// @example ModifyKey(filedata.get(), "block", "key", "new_value");
+///
+/// Examples:
+///
+/// ModifyKey(filedata.get(), "block", "key", "new_value");
 ATRC_API void ModifyKey(ATRCFiledata *filedata, const std::string& block, const std::string& key, const std::string& value);
+
+/// @brief Save all the data
+/// Examples:
+///
+/// Save(filedata.get());
+// ATRC_API void Save(ATRCFiledata *filedata);
 
 #ifdef _WIN32
 #  pragma warning(pop)

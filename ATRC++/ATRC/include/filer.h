@@ -13,17 +13,21 @@
 bool BlockContainsKey(std::vector<Key>& keys, Key* key);
 bool BlockContainsBlock(std::unique_ptr<std::vector<Block>>& blocks,Block* block);
 bool VariableContainsVariable(std::unique_ptr<std::vector<Variable>>& variables, Variable* variable);
+std::string ParseLineSTRINGtoATRC(const std::string &line);
 
-#define AUTOSAVE_ADD_BLOCK          0
-#define AUTOSAVE_REMOVE_BLOCK       1
-#define AUTOSAVE_ADD_KEY            2
-#define AUTOSAVE_REMOVE_KEY         3
-#define AUTOSAVE_MODIFY_KEY         4
-#define AUTOSAVE_ADD_VAR            5
-#define AUTOSAVE_REMOVE_VAR         6
-#define AUTOSAVE_MODIFY_VAR         7
+enum class ATRC_SAVE{
+    FULL_SAVE = -1, 
+    ADD_BLOCK = 0, 
+    REMOVE_BLOCK,
+    ADD_KEY,
+    REMOVE_KEY,
+    MODIFY_KEY,
+    ADD_VAR,
+    REMOVE_VAR,
+    MODIFY_VAR,
+};
 
-void Save(ATRCFiledata *filedata, int action = -1, int xtra_info = -2, std::string xtra_info2 = "");
+void Save(ATRCFiledata *filedata, ATRC_SAVE action = ATRC_SAVE::FULL_SAVE, int xtra_info = -2, std::string xtra_info2 = "");
 
 // trim from start (in place)
 inline void ltrim(std::string &s) {
@@ -54,6 +58,7 @@ inline void trim(std::string &s) {
 #define ERR_REREFERENCED_BLOCK          106
 #define ERR_REREFERENCED_KEY            107
 #define ERR_INSERT_VAR                  108  
+#define ERR_INVALID_FILE                109
 
 #define ERR_CLASS_READER                200
 #define ERR_UNAUTHORIZED_ACCESS_TO_VAR  201
@@ -80,7 +85,7 @@ inline void errormsg(int err_num=-1,
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_BLOCK_DECL:
-            msg = "Invalid block declaration at line " + std::to_string(line_number);
+            msg = "Invalid block declaration at line " + std::to_string(line_number) + ". Stopping parsing";
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_KEY_DECL:
@@ -134,6 +139,10 @@ inline void errormsg(int err_num=-1,
         case ERR_VAR_EXISTS:
             msg = "Variable already exists: '" + var_name + "'";
             err_class = ERR_CLASS_SAVER;
+            break;
+        case ERR_INVALID_FILE:
+            msg = "Error with filename or its extension: '" + var_name + "'";
+            err_class = ERR_CLASS_FILEHANDLER;
             break;
         default:
             msg = "Unknown error at line " + std::to_string(line_number);

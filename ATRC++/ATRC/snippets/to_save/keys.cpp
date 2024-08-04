@@ -30,7 +30,7 @@ const std::string &value
         }
     }
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_ADD_KEY, -1, key);
+        Save(filedata, ATRC_SAVE::ADD_KEY, -1, key);
     }
 }
 
@@ -58,7 +58,7 @@ void RemoveKey
     }
 
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_REMOVE_KEY, i, key);
+        Save(filedata, ATRC_SAVE::REMOVE_KEY, i, key);
     }
 }
 
@@ -92,6 +92,6 @@ const std::string &value
     }
 
     if(filedata->AutoSave){
-        Save(filedata, AUTOSAVE_MODIFY_KEY, i, key);
+        Save(filedata, ATRC_SAVE::MODIFY_KEY, i, key);
     }
 }
