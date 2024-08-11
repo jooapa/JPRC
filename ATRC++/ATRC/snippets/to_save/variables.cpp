@@ -7,7 +7,7 @@
 void AddVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
-    if(VariableContainsVariable(filedata->Variables, &var)){
+    if(DoesExistVariable(filedata, varname)){
         errormsg(ERR_VAR_EXISTS, -1, var.Name, filedata->Filename);
         return;
     }
@@ -21,7 +21,7 @@ void AddVariable(ATRCFiledata *filedata, const std::string &varname, const std::
 void RemoveVariable(ATRCFiledata *filedata, const std::string &varname){
     Variable var;
     var.Name = varname;
-    if(!VariableContainsVariable(filedata->Variables, &var)){
+    if(!DoesExistVariable(filedata, varname)){
         errormsg(ERR_VAR_NOT_FOUND, -1, var.Name, filedata->Filename);
         return;
     }
@@ -43,7 +43,7 @@ void RemoveVariable(ATRCFiledata *filedata, const std::string &varname){
 void ModifyVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
-    if(!VariableContainsVariable(filedata->Variables, &var)){
+    if(!DoesExistVariable(filedata, varname)){
         errormsg(ERR_VAR_NOT_FOUND, -1, var.Name, filedata->Filename);
         return;
     }
@@ -55,7 +55,8 @@ void ModifyVariable(ATRCFiledata *filedata, const std::string &varname, const st
         i++;
     }
     filedata->Variables->at(i).Value = value;
-    std::cout << filedata->Variables->at(i).Name +"="+ filedata->Variables->at(i).Value + "\n";
+    std::cout << "1." << filedata->Variables->at(i).Name +"="+ filedata->Variables->at(i).Value + "\n";
+    std::cout << "2." << varname +"="+ value + "\n";
     if(filedata->AutoSave){
         Save(filedata, ATRC_SAVE::MODIFY_VAR, i, ParseLineSTRINGtoATRC(value)); // Values taken from filedata->Variables->at(xtra_info).[type]
     }

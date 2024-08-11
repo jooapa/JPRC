@@ -8,7 +8,7 @@
  void AddBlock(ATRCFiledata *filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
-    if(BlockContainsBlock(filedata->Blocks, &block)) {
+    if(BlockContainsBlock(filedata->Blocks, block)) {
         errormsg(ERR_BLOCK_EXISTS, -1, block.Name, filedata->Filename);
         return;
     }
@@ -22,7 +22,7 @@
  void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
-    if(!BlockContainsBlock(filedata->Blocks, &block)) {
+    if(!BlockContainsBlock(filedata->Blocks, block)) {
         errormsg(ERR_BLOCK_NOT_FOUND, -1, blockname, filedata->Filename);
         return;
     }

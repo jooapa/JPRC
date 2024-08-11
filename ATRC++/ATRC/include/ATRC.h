@@ -1,9 +1,9 @@
 ﻿#ifndef ATRC_H
 #define ATRC_H
 
-#include <vector>
-#include <string>
-#include <memory>
+#ifdef ATRC_API
+#  undef ATRC_API
+#endif
 
 #ifdef _WIN32
     #ifdef ATRC_EXPORTS
@@ -20,6 +20,10 @@
 #  pragma warning(push)
 #  pragma warning(disable: 4251)
 #endif
+
+#include <vector>
+#include <string>
+#include <memory>
 
 struct ATRC_API Variable {
     std::string Name;
@@ -72,7 +76,7 @@ raw pointer.
 /// @brief Read a variable to a string
 /// @param filedata Filedata struct
 /// @param varname Variable name to read
-/// @param contents Contents where to store the variable
+/// @param contents Contents where to store the variable's value
 ///
 /// Examples:
 ///
@@ -83,7 +87,7 @@ ATRC_API void ReadVariable(ATRCFiledata *filedata, const std::string& varname, s
 /// @param filedata Filedata struct
 /// @param block Block where to read from
 /// @param key Key to read
-/// @param contents Contents where to store the key
+/// @param contents Contents where to store the key's value
 ///
 /// Examples:
 ///
@@ -124,7 +128,7 @@ ATRC_API bool DoesExistKey(ATRCFiledata* filedata, const std::string& block, con
 /// @brief Check if a variable is public
 /// @param filedata Filedata struct
 /// @param varname Variable name to check
-/// @return true if variable is public, false otherwise
+/// @return true if variable is public, false otherwise. Will return false if variable doesn't exist
 ///
 /// Examples:
 ///
@@ -142,7 +146,7 @@ ATRC_API bool IsPublic(ATRCFiledata* filedata, const std::string& varname);
 /// InsertVar(key_or_var_value, inserts, filedata.get());
 ATRC_API void InsertVar(std::string &line, std::vector<std::string> &args, ATRCFiledata *filedata);
 
-/// @brief Add a block to the filedata
+/// @brief Add a block to the filedata. Function will check if the block exists before adding.
 /// @param filedata Filedata struct
 /// @param blockname Block name to add
 ///
@@ -153,7 +157,7 @@ ATRC_API void InsertVar(std::string &line, std::vector<std::string> &args, ATRCF
 /// On autosave the block will be appended to the bottom of the file
 ATRC_API void AddBlock(ATRCFiledata *filedata, const std::string& blockname);
 
-/// @brief Remove a block from the filedata
+/// @brief Remove a block from the filedata. Function will check if the block exists before removing.
 /// @param filedata Filedata struct
 /// @param blockname Block name to remove
 ///
@@ -164,7 +168,7 @@ ATRC_API void AddBlock(ATRCFiledata *filedata, const std::string& blockname);
 /// On autosave, everything between the next block or the end of file will be deleted
 ATRC_API void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname);
 
-/// @brief Add a variable to the filedata
+/// @brief Add a variable to the filedata. Function will check if the variable exists before adding.
 /// @param filedata Filedata struct
 /// @param varname Variable name to add
 /// @param value Value of the variable
@@ -177,7 +181,7 @@ ATRC_API void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname);
 ///     Value will also be automatically parsed to ATRC syntax
 ATRC_API void AddVariable(ATRCFiledata *filedata, const std::string& varname, const std::string& value);
 
-/// @brief Remove a variable from the filedata
+/// @brief Remove a variable from the filedata. Function will check if the variable exists before removing.
 /// @param filedata Filedata struct
 /// @param varname Variable name to remove
 ///
@@ -188,7 +192,7 @@ ATRC_API void AddVariable(ATRCFiledata *filedata, const std::string& varname, co
 /// On autosave, variable's line will be removed
 ATRC_API void RemoveVariable(ATRCFiledata *filedata, const std::string& varname);
 
-/// @brief Modify a variable in the filedata
+/// @brief Modify a variable in the filedata. Function will check if the variable exists before modifying.
 /// @param filedata Filedata struct
 /// @param varname Variable name to modify
 /// @param value New value of the variable
@@ -201,7 +205,7 @@ ATRC_API void RemoveVariable(ATRCFiledata *filedata, const std::string& varname)
 ///     Value will also be automatically parsed to ATRC syntax
 ATRC_API void ModifyVariable(ATRCFiledata *filedata, const std::string& varname, const std::string& value);
 
-/// @brief Add a key to a block
+/// @brief Add a key to a block. Function will check if the key and block exist before adding.
 /// @param filedata Filedata struct
 /// @param block Block to add the key to
 /// @param key Key to add
@@ -212,7 +216,7 @@ ATRC_API void ModifyVariable(ATRCFiledata *filedata, const std::string& varname,
 /// AddKey(filedata.get(), "block", "new_key");
 ATRC_API void AddKey(ATRCFiledata *filedata, const std::string& block, const std::string& key, const std::string& value);
 
-/// @brief Remove a key from a block
+/// @brief Remove a key from a block. Function will check if the key and block exist before removing.
 /// @param filedata Filedata struct
 /// @param block Block to remove the key from
 /// @param key Key to remove
@@ -222,7 +226,7 @@ ATRC_API void AddKey(ATRCFiledata *filedata, const std::string& block, const std
 /// RemoveKey(filedata.get(), "block", "key");
 ATRC_API void RemoveKey(ATRCFiledata *filedata, const std::string& block, const std::string& key);
 
-/// @brief Modify a key in a block
+/// @brief Modify a key in a block. Function will check if the key and block exist before modifying.
 /// @param filedata Filedata struct
 /// @param block Block to modify
 /// @param key Key to modify

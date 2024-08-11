@@ -1,5 +1,6 @@
-Hi, Earth?=Hello, World! & %*% 
-troll = troll
+%MYTEST%=Hello, World! & %*% 
+%MYTEST%=Hello, World! & %*% 
+%troll% = troll
 [block]
 test = This is a %*%, and %*%\!
 
@@ -8,3 +9,14 @@ test2 = hello %*0% %*1% %*% %*2%
 [HELLO]
 
 a=a
+
+!%MYTEST%=Hello, World! & %*% 
+!%troll% = troll
+![block]
+!test = This is a %*%, and %*%\!
+!
+!test2 = hello %*0% %*1% %*% %*2%
+!
+![HELLO]
+!
+!a=a

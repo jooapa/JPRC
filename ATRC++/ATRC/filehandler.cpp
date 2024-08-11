@@ -91,14 +91,17 @@ std::string gen_random(const int len) {
  * reserved sequences:
  * %*%
  * %*<int>%
+ * 
+ * function trims line input 
+ * **line** will be replaced with the value
 */
-void ParseLineValueATRCtoSTRING(std::string& line, int line_number, std::unique_ptr<std::vector<Variable>> &variables, std::string filename) {
+void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const std::unique_ptr<std::vector<Variable>> &variables, const std::string filename) {
     trim(line);
     bool _last_is_re_dash = false;
     bool _looking_for_var = false;
     std::string _value = "";
     std::string _var_name = "";
-    for (char c : line) {
+    for (const char &c : line) {
         if(c == '\\' && _last_is_re_dash) {
             _value += '\\';
             _last_is_re_dash = false;
@@ -240,7 +243,7 @@ ParseFile(
                 errormsg(ERR_INVALID_VAR_DECL, line_number, _variable.Name, filename);
                 continue;
             }
-            if(VariableContainsVariable(variables, &_variable)) {
+            if(VariableContainsVariable(variables, _variable)) {
                 errormsg(ERR_REREFERENCED_VAR, line_number, _variable.Name, filename);
                 continue;
             }
@@ -260,7 +263,7 @@ ParseFile(
             // Block
             Block block;
             block.Name = _curr_block;
-            if(BlockContainsBlock(blocks, &block)) {
+            if(BlockContainsBlock(blocks,block)) {
                 errormsg(ERR_REREFERENCED_BLOCK, line_number, block.Name, filename);
                 continue;
             }
@@ -281,7 +284,7 @@ ParseFile(
         Key _key;
         _key.Name = _key_name;
         _key.Value = _key_value;
-        if(BlockContainsKey(blocks->back().Keys, &_key)) {
+        if(BlockContainsKey(blocks->back().Keys,_key)) {
             errormsg(ERR_REREFERENCED_KEY, line_number, _key.Name, filename);
             continue;
         }
@@ -370,8 +373,7 @@ file.close();
 /// @param action set empty to or -1 to do heavysave, otherwise set macro
 /// @param xtra_info set -2 if not used, send extra info, such as index
 /// @param xtra_info2 set "" if not used, send extra info, such as name
-void Save(ATRCFiledata *filedata, ATRC_SAVE action, int xtra_info, std::string xtra_info2) {
-    
+void Save(ATRCFiledata *filedata, const ATRC_SAVE &action, const int &xtra_info, const std::string &xtra_info2) {    
     std::string line = "";
     std::string final_data = "";
     switch (action)

@@ -10,9 +10,9 @@
 #include "ATRC.h"
 
 
-bool BlockContainsKey(std::vector<Key>& keys, Key* key);
-bool BlockContainsBlock(std::unique_ptr<std::vector<Block>>& blocks,Block* block);
-bool VariableContainsVariable(std::unique_ptr<std::vector<Variable>>& variables, Variable* variable);
+bool BlockContainsKey(std::vector<Key>& keys, const Key& key);
+bool BlockContainsBlock(std::unique_ptr<std::vector<Block>>& blocks,const Block& block);
+bool VariableContainsVariable(std::unique_ptr<std::vector<Variable>>& variables, const Variable& variable);
 std::string ParseLineSTRINGtoATRC(const std::string &line);
 
 enum class ATRC_SAVE{
@@ -27,7 +27,7 @@ enum class ATRC_SAVE{
     MODIFY_VAR,
 };
 
-void Save(ATRCFiledata *filedata, ATRC_SAVE action = ATRC_SAVE::FULL_SAVE, int xtra_info = -2, std::string xtra_info2 = "");
+void Save(ATRCFiledata *filedata, const ATRC_SAVE &action = ATRC_SAVE::FULL_SAVE, const int &xtra_info = -2, const std::string &xtra_info2 = "");
 
 // trim from start (in place)
 inline void ltrim(std::string &s) {
