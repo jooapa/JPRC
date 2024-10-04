@@ -13,6 +13,7 @@ endif()
 
 find_library(ATRC NAMES ATRC REQUIRED PATHS ${ATRC_DIR})
 include_directories("${PROJECT_SOURCE_DIR}/atrc/include")
+target_link_libraries(${project_name} PRIVATE ${ATRC_DIR})
 ```
 
 ## Example program in C++
