@@ -1,4 +1,0 @@
-[shell]
- test =&s\,\%\!\&&
- abc = Hello from %*%. This is \!\%\&\, version %*%\, try %*%\!
- def = List try\!\%\&\,, from %*%\,, try number: %*%...
