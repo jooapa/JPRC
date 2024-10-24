@@ -182,9 +182,11 @@ ModifyKey
 
 #ifdef INCLUDE_ATRC_STDLIB
 #include <stdint.h>
+
 #define     SUCCESSFULL_ACTION      1
 #define     UNSUCCESFULL_ACTION     0
-extern int  atrc_stdlib_errval;
+
+ATRC_API extern int atrc_stdlib_errval;
 
 ATRC_API std::vector<std::string> 
 atrc_to_list

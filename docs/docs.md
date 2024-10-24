@@ -607,7 +607,7 @@ ModifyKey(fd, "blockname", "keyname", "newvalue");
 ```cpp
 #define     SUCCESSFULL_ACTION      1
 #define     UNSUCCESFULL_ACTION     0
-extern int  atrc_stdlib_errval;
+ATRC_API extern int atrc_stdlib_errval;
 ```
 
 #### remarks

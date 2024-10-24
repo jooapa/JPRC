@@ -41,8 +41,8 @@ int main()
         }
 
         bool bool_res = atrc_to_bool(ReadKey(fd, "block", "key"));
-        // if(atrc_stdlib_errval == SUCCESSFULL_ACTION) 
-            std::cout << bool_res << "\n";
+        if(atrc_stdlib_errval == SUCCESSFULL_ACTION) 
+            std::cout << "QQ" << bool_res << "--\n" << std::endl;
     } else {
         std::cerr << "Failed to read filedata." << std::endl;
     }

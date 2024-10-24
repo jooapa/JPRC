@@ -2,18 +2,16 @@
 
 project("ATRC.Test")
 
-# Set ATRC import library directory
-set(ATRC_DIR "${PROJECT_SOURCE_DIR}/libs")
-
-# Find ATRC library
-find_library(ATRC NAMES ATRC REQUIRED PATHS ${ATRC_DIR})
-message(STATUS "ATRC library found at: ${ATRC}")
-
-# Include header directory
-include_directories("${PROJECT_SOURCE_DIR}/libs/include")
 
 # Add executable and link with ATRC library
-add_executable(ATRC.Test ATRC.Test.cpp ATRC.Test.h)
+add_executable(ATRC.Test "ATRC.Test.cpp" "ATRC.Test.h")
+
+if (WIN32)
+    set(ATRC_DIR "${PROJECT_SOURCE_DIR}/libs/")
+endif()
+
+find_library(ATRC NAMES ATRC REQUIRED PATHS ${ATRC_DIR})
+include_directories("${PROJECT_SOURCE_DIR}/libs/include")
 target_link_libraries(ATRC.Test PRIVATE ${ATRC})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

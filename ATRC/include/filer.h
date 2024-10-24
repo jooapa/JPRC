@@ -55,14 +55,6 @@ inline void trim(std::string &s) {
     ltrim(s);
 }
 
-inline std::string str_to_lower(const std::string &str){
-    std::string res=str;
-    for(char &c : res){
-        std::tolower(c);
-    }
-    return res;
-}
-
 // File
 #define ERR_CLASS_FILEHANDLER           100
 

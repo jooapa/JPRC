@@ -1,9 +1,16 @@
 #define INCLUDE_ATRC_STDLIB
 #include <ATRC.hpp>
 #include <filer.h>
+#include <iostream>
 
 int atrc_stdlib_errval = SUCCESSFULL_ACTION;
 
+std::string str_to_lower(std::string str){
+    for(char &c : str){
+        c = std::tolower(c);
+    }
+    return str;
+}
 std::vector<std::string> atrc_to_list(char separator, const std::string &value){
     std::vector<std::string> res;
     if(value.size() == 0){
@@ -48,7 +55,9 @@ uint64_t atrc_to_uint64_t(const std::string &value){
         atrc_stdlib_errval = SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument& e) {
         atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        std::cerr << e.what() << std::endl;
     } catch (const std::out_of_range& e) {
+        std::cerr << e.what() << std::endl;
         atrc_stdlib_errval = UNSUCCESFULL_ACTION;
     }
     return res;
@@ -61,7 +70,9 @@ int64_t atrc_to_int64_t(const std::string &value){
         atrc_stdlib_errval = SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument& e) {
         atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        std::cerr << e.what() << std::endl;
     } catch (const std::out_of_range& e) {
+        std::cerr << e.what() << std::endl;
         atrc_stdlib_errval = UNSUCCESFULL_ACTION;
     }
     return res;
@@ -74,7 +85,9 @@ double atrc_to_double(const std::string &value){
         atrc_stdlib_errval = SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument& e) {
         atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        std::cerr << e.what() << std::endl;
     } catch (const std::out_of_range& e) {
+        std::cerr << e.what() << std::endl;
         atrc_stdlib_errval = UNSUCCESFULL_ACTION;
     }
     return res;
