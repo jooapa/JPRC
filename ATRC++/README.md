@@ -20,10 +20,10 @@ target_link_libraries(${project_name} PRIVATE ${ATRC})
 
 
 ```cpp
-#include <ATRC.h>
+#include <ATRC.hpp>
 
 int main(){
-    std::unique_ptr<ATRCFiledata> fd = Read("path_to_file", "utf-8", "");
+    ATRC_FD fd = Read("path_to_file", "utf-8", "");
     
     // Read key from a block
     std::string block_name = "settings";
@@ -31,7 +31,7 @@ int main(){
     std::string key_contents = "";
 
     if(DoesExistBlock(block_name)){
-        ReadKey(fd.get(), block_name, key_name, key_contents);
+        ReadKey(fd, block_name, key_name, key_contents);
         std::cout << key_contents << std::endl;
     } else {
         std::cout << "Block [" << block_name << "] does not exist" << std::endl;
@@ -41,13 +41,13 @@ int main(){
     std::string variable_name = "os";
     std::string variable_contents = "";
     if(
-        DoesExistVariable(fd.get(), variable_name) 
-        && IsPublic(fd.get(), variable_name))
+        DoesExistVariable(fd, variable_name) 
+        && IsPublic(fd, variable_name))
     {
-        ReadVariable(fd.get(), variable_name, variable_contents);
+        ReadVariable(fd, variable_name, variable_contents);
     } else {
         variable_contents = "windows_nt";
-        AddVariable(fd.get(), variable_name, variable_contents);
+        AddVariable(fd, variable_name, variable_contents);
     }
 
 

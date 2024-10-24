@@ -1,6 +1,6 @@
-#include "../include/ATRC.h"
+#include "../include/ATRC.hpp"
 
- bool IsPublic(ATRCFiledata* filedata, const std::string& varname){
+ bool IsPublic(ATRC_FD* filedata, const std::string& varname){
     for(Variable var : *filedata->Variables){
         if(var.Name == varname){
             return var.IsPublic;

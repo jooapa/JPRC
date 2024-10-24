@@ -1,19 +1,21 @@
-#include "../include/ATRC.h"
+#include "../include/ATRC.hpp"
 
- void ReadKey(ATRCFiledata *filedata, 
+std::string ReadKey(ATRC_FD *filedata, 
                         const std::string& block, 
-                        const std::string& key, 
-                        std::string& contents)
+                        const std::string& key
+                    )
 {
+    std::string res = "";
     for(Block blk : *filedata->Blocks){
         if(blk.Name == block){
             for(Key k : blk.Keys){
                 if(k.Name == key){
-                    contents = k.Value;
-                    return;
+                    res = k.Value;
+                    return res;
                 }
             }
         }
     }
-    contents = "";
+    res = "";
+    return res;
 }

@@ -1,10 +1,10 @@
-#include "../../include/ATRC.h"
+#include "../../include/ATRC.hpp"
 #include "../../include/filer.h"
 #include <string>
 /*
     ! TEST EVERYTHING
 */
-void AddVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
+void AddVariable(ATRC_FD *filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
     if(DoesExistVariable(filedata, varname)){
@@ -18,7 +18,7 @@ void AddVariable(ATRCFiledata *filedata, const std::string &varname, const std::
     }
 }
 
-void RemoveVariable(ATRCFiledata *filedata, const std::string &varname){
+void RemoveVariable(ATRC_FD *filedata, const std::string &varname){
     Variable var;
     var.Name = varname;
     if(!DoesExistVariable(filedata, varname)){
@@ -40,7 +40,7 @@ void RemoveVariable(ATRCFiledata *filedata, const std::string &varname){
     }
 }
 
-void ModifyVariable(ATRCFiledata *filedata, const std::string &varname, const std::string &value){
+void ModifyVariable(ATRC_FD *filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
     if(!DoesExistVariable(filedata, varname)){
@@ -55,8 +55,8 @@ void ModifyVariable(ATRCFiledata *filedata, const std::string &varname, const st
         i++;
     }
     filedata->Variables->at(i).Value = value;
-    std::cout << "1." << filedata->Variables->at(i).Name +"="+ filedata->Variables->at(i).Value + "\n";
-    std::cout << "2." << varname +"="+ value + "\n";
+    // std::cout << "1." << filedata->Variables->at(i).Name +"="+ filedata->Variables->at(i).Value + "\n";
+    // std::cout << "2." << varname +"="+ value + "\n";
     if(filedata->AutoSave){
         Save(filedata, ATRC_SAVE::MODIFY_VAR, i, ParseLineSTRINGtoATRC(value)); // Values taken from filedata->Variables->at(xtra_info).[type]
     }

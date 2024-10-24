@@ -15,7 +15,7 @@ LD_LIBRARY_PATH=libs:$LD_LIBRARY_PATH
 if [ ! -d "libs/include" ]; then
     mkdir libs/include
 fi
-cp ../ATRC/include/ATRC.h ./libs/include
+cp ../ATRC/include/ATRC.hpp ./libs/include
 
 if [ ! -d "out" ]; then
     mkdir out

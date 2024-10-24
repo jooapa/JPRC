@@ -1,9 +1,9 @@
-#include "../include/ATRC.h"
+#include "../include/ATRC.hpp"
 #include "../include/filer.h"
 #include <string>
 #include <vector>
 
- void InsertVar(std::string &line, std::vector<std::string> &args, ATRCFiledata *filedata) {
+ void InsertVar(std::string &line, std::vector<std::string> &args, ATRC_FD *filedata) {
     bool _looking_for_var = false;
     std::string var;
     std::string _result;

@@ -18,7 +18,7 @@ mkdir libs-output\libs\win\
 mkdir libs-output\libs\linux\
 copy .\ATRC\out\ATRC.dll .\libs-output\libs\win
 copy .\ATRC\out\ATRC.lib .\libs-output\libs\win
-copy .\ATRC\include\ATRC.h .\libs-output\include\
+copy .\ATRC\include\ATRC.hpp .\libs-output\include\
 copy ..\LICENSE.txt .\libs-output\
 cd ATRC
 RMDIR /S /Q out

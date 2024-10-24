@@ -1,4 +1,4 @@
-#include "../../include/ATRC.h"
+#include "../../include/ATRC.hpp"
 #include "../../include/filer.h"
 #include <string>
 /*
@@ -6,7 +6,7 @@
 */
 void AddKey
 (
-ATRCFiledata *filedata, 
+ATRC_FD *filedata, 
 const std::string &block, 
 const std::string &key, 
 const std::string &value
@@ -23,20 +23,20 @@ const std::string &value
     Key _key;
     _key.Name = key;
     _key.Value = value;
-    for(Block _block : *filedata->Blocks){
+    for(Block &_block : *filedata->Blocks){
         if(_block.Name == block){
             _block.Keys.push_back(_key);
             break;
         }
     }
     if(filedata->AutoSave){
-        Save(filedata, ATRC_SAVE::ADD_KEY, -1, key);
+        Save(filedata, ATRC_SAVE::ADD_KEY, -1, key, value, block);
     }
 }
 
 void RemoveKey
 (
-    ATRCFiledata *filedata, 
+    ATRC_FD *filedata, 
     const std::string &block, 
     const std::string &key
 ){
@@ -49,21 +49,29 @@ void RemoveKey
         return;
     }
     int i = 0;
-    // TODO FOR
-    for(Block _block : *filedata->Blocks){
-        if(_block.Name == block){
-            _block.Keys.erase(_block.Keys.begin() + i);
+    for (Block &_block : *filedata->Blocks) {
+        if (_block.Name == block) {
+            auto it = _block.Keys.begin();
+            while (it != _block.Keys.end()) {
+                if (it->Name == key) {
+                    it = _block.Keys.erase(it);
+                } else {
+                    ++it;
+                    i++;
+                }
+            }
             break;
         }
     }
 
+
     if(filedata->AutoSave){
-        Save(filedata, ATRC_SAVE::REMOVE_KEY, i, key);
+        Save(filedata, ATRC_SAVE::REMOVE_KEY, i, key, "", block);
     }
 }
 
 void ModifyKey(
-ATRCFiledata *filedata,
+ATRC_FD *filedata,
 const std::string &block,
 const std::string &key,
 const std::string &value
@@ -92,6 +100,6 @@ const std::string &value
     }
 
     if(filedata->AutoSave){
-        Save(filedata, ATRC_SAVE::MODIFY_KEY, i, key);
+        Save(filedata, ATRC_SAVE::MODIFY_KEY, i, key, value, block);
     }
 }

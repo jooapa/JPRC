@@ -7,7 +7,7 @@
 // #ifdef __linux__
 #   include <algorithm>
 // #endif
-#include "ATRC.h"
+#include "ATRC.hpp"
 
 
 bool BlockContainsKey(std::vector<Key>& keys, const Key& key);
@@ -27,7 +27,13 @@ enum class ATRC_SAVE{
     MODIFY_VAR,
 };
 
-void Save(ATRCFiledata *filedata, const ATRC_SAVE &action = ATRC_SAVE::FULL_SAVE, const int &xtra_info = -2, const std::string &xtra_info2 = "");
+void Save(ATRC_FD *filedata, 
+const ATRC_SAVE &action = ATRC_SAVE::FULL_SAVE, 
+const int &xtra_info = -2, 
+const std::string &xtra_info2 = "",
+const std::string &xtra_info3 = "",
+const std::string &xtra_info4 = ""
+);
 
 // trim from start (in place)
 inline void ltrim(std::string &s) {
@@ -49,6 +55,14 @@ inline void trim(std::string &s) {
     ltrim(s);
 }
 
+inline std::string str_to_lower(const std::string &str){
+    std::string res=str;
+    for(char &c : res){
+        std::tolower(c);
+    }
+    return res;
+}
+
 #define ERR_CLASS_FILEHANDLER           100
 #define ERR_INVALID_VAR_DECL            101
 #define ERR_INVALID_BLOCK_DECL          102
@@ -59,6 +73,7 @@ inline void trim(std::string &s) {
 #define ERR_REREFERENCED_KEY            107
 #define ERR_INSERT_VAR                  108  
 #define ERR_INVALID_FILE                109
+#define ERR_CLASS_STDLIB                110
 
 #define ERR_CLASS_READER                200
 #define ERR_UNAUTHORIZED_ACCESS_TO_VAR  201
@@ -71,6 +86,7 @@ inline void trim(std::string &s) {
 #define ERR_KEY_EXISTS                  305
 #define ERR_VAR_EXISTS                  306
 #define ERR_INSERT_WRONG                307
+#define ERR_STDLIB_CAST_ERROR           308
 
 inline void errormsg(int err_num=-1, 
                     int line_number=-1, const 

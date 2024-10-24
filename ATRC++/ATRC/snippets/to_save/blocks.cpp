@@ -1,11 +1,11 @@
-#include "../../include/ATRC.h"
+#include "../../include/ATRC.hpp"
 #include "../../include/filer.h"
 #include <string>
 #include <memory>
 /*
     ! TEST EVERYTHING
 */
- void AddBlock(ATRCFiledata *filedata, const std::string& blockname) {
+ void AddBlock(ATRC_FD *filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
     if(BlockContainsBlock(filedata->Blocks, block)) {
@@ -19,7 +19,7 @@
     }
 }
 
- void RemoveBlock(ATRCFiledata *filedata, const std::string& blockname) {
+ void RemoveBlock(ATRC_FD *filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
     if(!BlockContainsBlock(filedata->Blocks, block)) {

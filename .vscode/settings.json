@@ -54,7 +54,7 @@
         "xutility": "cpp",
         "fstream": "cpp",
         "string": "cpp",
-        "atrc.h": "c",
+        "ATRC.hpp": "c",
         "limits.h": "c",
         "vector": "cpp",
         "codecvt": "cpp",

@@ -1,5 +1,5 @@
 #include "include/filer.h"
-#include "include/ATRC.h"
+#include "include/ATRC.hpp"
 // #include <string>
 #include <vector>
 #include <memory>
@@ -25,7 +25,6 @@ bool BlockContainsBlock(std::unique_ptr<std::vector<Block>>& blocks, const Block
 
 bool VariableContainsVariable(std::unique_ptr<std::vector<Variable>>& variables, const Variable &variable){
     for (Variable &var : *variables) {
-        std::cout << var.Name << variable.Name << std::endl;
         if (var.Name == variable.Name) {
             return true;
         }
