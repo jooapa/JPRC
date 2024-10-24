@@ -1,6 +1,4 @@
-# ATRC resource file library made with C/C++. Works with windows, propably with linux
-
-Everything else work but you can't save changes into the files from c++
+# ATRC resource file library made
 
 ## Use with CMake
 

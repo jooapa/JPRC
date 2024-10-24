@@ -5,8 +5,6 @@ cd /d "%~dp0"
 cd batch
 call .\globals.bat
 call .\msvs-dev-env.bat
-cd ..
-:: Restore the starting directory
 cd /d "%~dp0"
 
 :: Build the library
