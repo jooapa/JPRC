@@ -1,9 +1,11 @@
+%ScreenRatio%=4:3
+
 [hello]
 ququ=1233
 
 [moro]
 hello = A;B;C;D;E
-
+hello = "Aa
 
 [test]
 tehi=helloa

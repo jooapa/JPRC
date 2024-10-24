@@ -6,7 +6,7 @@
 */
 void AddKey
 (
-ATRC_FD *filedata, 
+std::shared_ptr<ATRC_FD> filedata, 
 const std::string &block, 
 const std::string &key, 
 const std::string &value
@@ -36,7 +36,7 @@ const std::string &value
 
 void RemoveKey
 (
-    ATRC_FD *filedata, 
+    std::shared_ptr<ATRC_FD> filedata, 
     const std::string &block, 
     const std::string &key
 ){
@@ -71,7 +71,7 @@ void RemoveKey
 }
 
 void ModifyKey(
-ATRC_FD *filedata,
+std::shared_ptr<ATRC_FD> filedata,
 const std::string &block,
 const std::string &key,
 const std::string &value

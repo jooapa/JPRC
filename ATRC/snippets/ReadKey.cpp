@@ -1,6 +1,6 @@
 #include "../include/ATRC.hpp"
 
-std::string ReadKey(ATRC_FD *filedata, 
+std::string ReadKey(std::shared_ptr<ATRC_FD> filedata, 
                         const std::string& block, 
                         const std::string& key
                     )

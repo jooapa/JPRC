@@ -310,12 +310,9 @@ ParseFile(
 }
 
 
-ATRC_FD* Read(
-    const std::string& filename, 
-    const std::string& encoding, 
-    const std::string &allowed_extension) 
+std::shared_ptr<ATRC_FD> Read(const std::string& filename, const std::string& encoding, const std::string& allowed_extension)
     {
-    ATRC_FD *filedata = new ATRC_FD();
+    std::shared_ptr<ATRC_FD> filedata(new ATRC_FD);
     filedata->Filename = filename;
     filedata->Encoding = encoding;
     if(allowed_extension == ""){
@@ -339,10 +336,6 @@ ATRC_FD* Read(
     }
 
     return filedata;
-}
-
-void DeleteATRCFiledata(ATRC_FD *filedata){
-    delete filedata;
 }
 
 
@@ -377,7 +370,7 @@ file.close();
 /// @param xtra_info2 set "" if not used, send extra info, such as name
 void Save
 (
-    ATRC_FD *filedata, 
+    std::shared_ptr<ATRC_FD> filedata, 
     const ATRC_SAVE &action, 
     const int &xtra_info,
     const std::string &xtra_info2,

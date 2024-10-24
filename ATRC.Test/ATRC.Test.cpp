@@ -7,10 +7,12 @@
 
 int main()
 {
-    std::string filename = "test.ini";
-    PATRC_FD fd = Read(filename, "utf-8", ".ini");
+    std::string filename = "test.atrc";
+    std::shared_ptr<ATRC_FD> fd = Read(filename, "utf-8");
     fd->AutoSave = true;
     if (fd) {
+
+
         AddBlock(fd, "test");
         
         AddKey(fd, "test", "troll", "aaa");
@@ -33,7 +35,14 @@ int main()
             std::cout << s << "\n";
         }
 
-        DeleteATRCFiledata(fd);
+        res = atrc_to_list(':', ReadVariable(fd, "ScreenRatio"));
+        for(std::string &s : res){
+            std::cout << s << "\n";
+        }
+
+        bool bool_res = atrc_to_bool(ReadKey(fd, "block", "key"));
+        // if(atrc_stdlib_errval == SUCCESSFULL_ACTION) 
+            std::cout << bool_res << "\n";
     } else {
         std::cerr << "Failed to read filedata." << std::endl;
     }

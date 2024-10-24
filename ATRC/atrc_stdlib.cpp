@@ -2,7 +2,7 @@
 #include <ATRC.hpp>
 #include <filer.h>
 
-int  atrc_stdlib_errval = SUCCESSFULL_ACTION;
+int atrc_stdlib_errval = SUCCESSFULL_ACTION;
 
 std::vector<std::string> atrc_to_list(char separator, const std::string &value){
     std::vector<std::string> res;
@@ -43,20 +43,39 @@ bool atrc_to_bool(const std::string &value){
 
 uint64_t atrc_to_uint64_t(const std::string &value){
     uint64_t res = 0;
+    try {
+        res = std::stoull(value);
+        atrc_stdlib_errval = SUCCESSFULL_ACTION;
+    } catch (const std::invalid_argument& e) {
+        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+    } catch (const std::out_of_range& e) {
+        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+    }
     return res;
 }
 
 int64_t atrc_to_int64_t(const std::string &value){
     int64_t res = 0;
-    return res;
-}
-
-float atrc_to_float(const std::string &value){
-    float res = 0;
+    try {
+        res = std::stoll(value);
+        atrc_stdlib_errval = SUCCESSFULL_ACTION;
+    } catch (const std::invalid_argument& e) {
+        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+    } catch (const std::out_of_range& e) {
+        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+    }
     return res;
 }
 
 double atrc_to_double(const std::string &value){
     double res = 0;
+    try {
+        res = std::stod(value);
+        atrc_stdlib_errval = SUCCESSFULL_ACTION;
+    } catch (const std::invalid_argument& e) {
+        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+    } catch (const std::out_of_range& e) {
+        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+    }
     return res;
 }

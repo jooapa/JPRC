@@ -27,7 +27,7 @@ enum class ATRC_SAVE{
     MODIFY_VAR,
 };
 
-void Save(ATRC_FD *filedata, 
+void Save(std::shared_ptr<ATRC_FD> filedata, 
 const ATRC_SAVE &action = ATRC_SAVE::FULL_SAVE, 
 const int &xtra_info = -2, 
 const std::string &xtra_info2 = "",
@@ -63,7 +63,10 @@ inline std::string str_to_lower(const std::string &str){
     return res;
 }
 
+// File
 #define ERR_CLASS_FILEHANDLER           100
+
+// Error types
 #define ERR_INVALID_VAR_DECL            101
 #define ERR_INVALID_BLOCK_DECL          102
 #define ERR_INVALID_KEY_DECL            103
@@ -73,12 +76,17 @@ inline std::string str_to_lower(const std::string &str){
 #define ERR_REREFERENCED_KEY            107
 #define ERR_INSERT_VAR                  108  
 #define ERR_INVALID_FILE                109
-#define ERR_CLASS_STDLIB                110
 
+// File
 #define ERR_CLASS_READER                200
+
+// Error types
 #define ERR_UNAUTHORIZED_ACCESS_TO_VAR  201
 
+// File
 #define ERR_CLASS_SAVER                 300
+
+// Error types
 #define ERR_BLOCK_NOT_FOUND             301
 #define ERR_KEY_NOT_FOUND               302
 #define ERR_VAR_NOT_FOUND               303
@@ -86,7 +94,12 @@ inline std::string str_to_lower(const std::string &str){
 #define ERR_KEY_EXISTS                  305
 #define ERR_VAR_EXISTS                  306
 #define ERR_INSERT_WRONG                307
-#define ERR_STDLIB_CAST_ERROR           308
+
+// File
+#define ERR_CLASS_STDLIB                401
+
+// Error types
+#define ERR_STDLIB_CAST_ERROR           402
 
 inline void errormsg(int err_num=-1, 
                     int line_number=-1, const 
@@ -96,6 +109,10 @@ inline void errormsg(int err_num=-1,
     std::string msg = "";
     int err_class = -1;
     switch(err_num){
+        case ERR_STDLIB_CAST_ERROR:
+            msg = "Unsuccesfull cast to other type in a STDLIB function: '" + var_name + "' at line " + std::to_string(line_number);
+            err_class = ERR_CLASS_STDLIB;
+            break;
         case ERR_INVALID_VAR_DECL:
             msg = "Invalid variable declaration: '" + var_name +"' at line " + std::to_string(line_number);
             err_class = ERR_CLASS_FILEHANDLER;

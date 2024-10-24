@@ -5,7 +5,7 @@
 /*
     ! TEST EVERYTHING
 */
- void AddBlock(ATRC_FD *filedata, const std::string& blockname) {
+ void AddBlock(std::shared_ptr<ATRC_FD> filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
     if(BlockContainsBlock(filedata->Blocks, block)) {
@@ -19,7 +19,7 @@
     }
 }
 
- void RemoveBlock(ATRC_FD *filedata, const std::string& blockname) {
+ void RemoveBlock(std::shared_ptr<ATRC_FD> filedata, const std::string& blockname) {
     Block block;
     block.Name = blockname;
     if(!BlockContainsBlock(filedata->Blocks, block)) {

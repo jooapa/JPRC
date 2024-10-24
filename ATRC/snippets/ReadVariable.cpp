@@ -1,7 +1,7 @@
 #include "../include/ATRC.hpp"
 #include "../include/filer.h"
 
-std::string ReadVariable(ATRC_FD *filedata, const std::string& varname) {
+std::string ReadVariable(std::shared_ptr<ATRC_FD> filedata, const std::string& varname) {
     std::string res = "";
     for(Variable var : *filedata->Variables){
         if(var.Name == varname){

@@ -4,7 +4,7 @@
 /*
     ! TEST EVERYTHING
 */
-void AddVariable(ATRC_FD *filedata, const std::string &varname, const std::string &value){
+void AddVariable(std::shared_ptr<ATRC_FD> filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
     if(DoesExistVariable(filedata, varname)){
@@ -18,7 +18,7 @@ void AddVariable(ATRC_FD *filedata, const std::string &varname, const std::strin
     }
 }
 
-void RemoveVariable(ATRC_FD *filedata, const std::string &varname){
+void RemoveVariable(std::shared_ptr<ATRC_FD> filedata, const std::string &varname){
     Variable var;
     var.Name = varname;
     if(!DoesExistVariable(filedata, varname)){
@@ -40,7 +40,7 @@ void RemoveVariable(ATRC_FD *filedata, const std::string &varname){
     }
 }
 
-void ModifyVariable(ATRC_FD *filedata, const std::string &varname, const std::string &value){
+void ModifyVariable(std::shared_ptr<ATRC_FD> filedata, const std::string &varname, const std::string &value){
     Variable var;
     var.Name = varname;
     if(!DoesExistVariable(filedata, varname)){

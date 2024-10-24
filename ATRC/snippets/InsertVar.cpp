@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
- void InsertVar(std::string &line, std::vector<std::string> &args, ATRC_FD *filedata) {
+ void InsertVar(std::string &line, std::vector<std::string> &args, std::shared_ptr<ATRC_FD> filedata) {
     bool _looking_for_var = false;
     std::string var;
     std::string _result;
