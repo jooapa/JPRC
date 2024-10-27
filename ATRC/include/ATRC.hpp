@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#undef ATRC_HPP
 #ifndef ATRC_HPP
 #define ATRC_HPP
 
