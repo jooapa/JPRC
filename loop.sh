@@ -6,14 +6,20 @@ PROJECT_ROOT=$(pwd)
 VERSION="2.0.0"
 OUT_DIR="${PROJECT_ROOT}/out"
 
+ERROR_ENCOUNTERED=0
+
+ATTEMPT_COUNT=2
+
+counter=$1
+
 # Now loop through each preset in CMakePresets.json and build accordingly
 declare -a presets=(
-    # "linux-x64-debug" "linux-x64-release"
-    # "linux-x86-debug" "linux-x86-release"
+    "linux-x64-debug"   "linux-x64-release"
+    "linux-x86-debug"   "linux-x86-release"
     "windows-x64-debug" "windows-x64-release"
     "windows-x86-debug" "windows-x86-release"
-    # "macos-x64-debug" "macos-x64-release"
-    # "macos-x86-debug" "macos-x86-release"
+    # "macos-x64-debug"   "macos-x64-release"
+    # "macos-x86-debug"   "macos-x86-release"
 )
 
 # Loop through each preset and run the corresponding CMake build command
@@ -52,16 +58,35 @@ for preset in "${presets[@]}"; do
     command="cmake --preset $preset -B${OUT_DIR}/${preset}/build -DCMAKE_BUILD_TYPE=$build_type -DCMAKE_TOOLCHAIN_FILE=$toolchain_file"
     echo "Running command: $command"
     eval $command
-    
+    if [ $? -ne 0 ]; then
+        echo "Error encountered while running command: $command"
+        ERROR_ENCOUNTERED=1
+    fi
     # Build all targets after generating the CMake files
     command="cmake --build ${OUT_DIR}/${preset}/build --config $build_type --parallel"
     echo "Running command: $command"
     eval $command
-        
+    if [ $? -ne 0 ]; then
+        echo "Error encountered while running command: $command"
+        ERROR_ENCOUNTERED=1
+    fi
+# cmake --preset windows-x86-release -B/mnt/c/Users/anton/Documents/GitHub/ATRC/out/windows-x86-release/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/mnt/c/Users/anton/Documents/GitHub/ATRC/cmake/toolchain-windows-x86.cmake
+# cmake --build /mnt/c/Users/anton/Documents/GitHub/ATRC/out/windows-x86-release/build --config Release --parallel 
     echo "Completed building for preset: $preset"
 done
 
 echo "All builds completed!"
+
+if [ "$ERROR_ENCOUNTERED" -ne 0 ]; then
+    echo "One or more errors were encountered during the build process."
+    counter=$((counter + 1))
+    if [ "$counter" -lt $ATTEMPT_COUNT ]; then
+        echo "Retrying the build process... Attempt: $counter"
+        exec "$0" "$counter"
+    fi
+    echo "Build process failed after ${counter} attempts."
+    exit 1
+fi
 
 
 # Define the build directories
@@ -69,7 +94,7 @@ OUTPUT_DIR="${PROJECT_ROOT}/ATRC_${VERSION}"
 
 # Define an array of the platforms and architectures you want to build for
 declare -a platforms=(
-    # "Linux" 
+    "Linux" 
     "Windows"
     # "macOS"
  )
@@ -97,20 +122,26 @@ for platform in "${platforms[@]}"; do
             fi
             FILENAME_OUT="${prefix}ATRC_${platform}_${arch,,}"
             
-            echo \n $FILENAME_IN, $FILENAME_OUT, $IN_DIR
 
             # Copy the library files
             if [[ "$platform" == "Windows" ]]; then
-                # a -> def
-                nm "${IN_DIR}/${FILENAME_IN}.dll.a" > "${IN_DIR}/${FILENAME_IN}.def"
-                if [[ "$arch" == "x86" ]]; then
-                    x86_64-w64-mingw32-dlltool -d "${IN_DIR}/${FILENAME_IN}.def" -l "${IN_DIR}/${FILENAME_IN}.dll.a" -D "${IN_DIR}/${FILENAME_IN}.dll"
-                    echo "x86_64-w64-mingw32-dlltool -d ${IN_DIR}/${FILENAME_IN}.def -l ${IN_DIR}/${FILENAME_IN}.dll.a -D ${IN_DIR}/${FILENAME_IN}.dll"
+                RELATIVE_PATH=$(realpath --relative-to="$(pwd)" "${IN_DIR}/${FILENAME_IN}.dll")
+                DEF_RELATIVE=$(realpath --relative-to="$(pwd)" "${IN_DIR}/${FILENAME_IN}.def")
+                LIB_RELATIVE=$(realpath --relative-to="$(pwd)" "${IN_DIR}/${FILENAME_IN}.lib")
+                DLL_RELATIVE=$(realpath --relative-to="$(pwd)" "${IN_DIR}/${FILENAME_IN}.dll")
+                if [[ "$arch" == "x64" ]]; then
+                    pexports.exe "$RELATIVE_PATH" > "${IN_DIR}/${FILENAME_IN}.def"
+                    x86_64-w64-mingw32-dlltool -d "$DEF_RELATIVE" -l "$LIB_RELATIVE" -k --dllname "$DLL_RELATIVE"
                 else
-                    i686-w64-mingw32-dlltool -d "${IN_DIR}/${FILENAME_IN}.def" -l "${IN_DIR}/${FILENAME_IN}.dll.a" -D "${IN_DIR}/${FILENAME_IN}.dll"
+                    pexports.exe "$RELATIVE_PATH" > "${IN_DIR}/${FILENAME_IN}.def"
+                    i686-w64-mingw32-dlltool -d "$DEF_RELATIVE" -l "$LIB_RELATIVE" -k --dllname "$DLL_RELATIVE"
                 fi
-                # cp -r "${IN_DIR}/${FILENAME_IN}.dll" "${OUT_DIR}/${FILENAME_OUT}.dll"
-                # cp -r "${IN_DIR}/${FILENAME_IN}.lib" "${OUT_DIR}/${FILENAME_OUT}.lib"
+                cp -r "${IN_DIR}/${FILENAME_IN}.dll" "${OUT_DIR}/${FILENAME_OUT}.dll"
+                cp -r "${IN_DIR}/${FILENAME_IN}.lib" "${OUT_DIR}/${FILENAME_OUT}.lib"
+            elif [[ "$platform" == "macOS" ]]; then
+                cp -r "${IN_DIR}/${FILENAME_IN}.dylib" "${OUT_DIR}/${FILENAME_OUT}.dylib"
+            else 
+                cp -r "${IN_DIR}/${FILENAME_IN}.so" "${OUT_DIR}/${FILENAME_OUT}.so"
             fi
         done
     done
@@ -121,5 +152,5 @@ mkdir -p "$OUTPUT_DIR/include"
 
 # Copy stuff
 cp -r "${PROJECT_ROOT}/ATRC/include/ATRC.hpp" "${OUTPUT_DIR}/include/ATRC.hpp"
-cp -r "${PROJECT_ROOT}/docs/docs.md" "${OUTPUT_DIR}/docs/docs.md"
+cp -r "${PROJECT_ROOT}/docs/*" "${OUTPUT_DIR}/docs/"
 cp -r "${PROJECT_ROOT}/LICENSE.txt" "${OUTPUT_DIR}/LICENSE.txt"

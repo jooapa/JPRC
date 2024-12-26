@@ -1,4 +1,108 @@
-﻿#pragma once
+using System;
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
+
+namespace ATRC {
+    public static class ATRC {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Variable {
+            public IntPtr Name;
+            public IntPtr Value;
+            public bool IsPublic;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Key {
+            public IntPtr Name;
+            public IntPtr Value;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Block {
+            public IntPtr Name;
+            public IntPtr Keys;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ATRCFileData {
+            public IntPtr Variables;
+            public IntPtr Blocks;
+            public IntPtr Filename;
+            public bool AutoSave;
+            
+        }
+
+        // DLL Imports for C++ Functions
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr Read(string path);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr ReadVariable(IntPtr filedata, string varname);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr ReadKey(IntPtr filedata, string block, string key);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool DoesExistBlock(IntPtr filedata, string block);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool DoesExistVariable(IntPtr filedata, string varname);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool DoesExistKey(IntPtr filedata, string block, string key);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool IsPublic(IntPtr filedata, string varname);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void InsertVar(IntPtr filedata, string line, IntPtr args);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void AddBlock(IntPtr filedata, string blockname);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void RemoveBlock(IntPtr filedata, string blockname);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void AddVariable(IntPtr filedata, string varname, string value);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void RemoveVariable(IntPtr filedata, string varname);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ModifyVariable(IntPtr filedata, string varname, string value);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void AddKey(IntPtr filedata, string block, string key, string value);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void RemoveKey(IntPtr filedata, string block, string key);
+
+        [DllImport("ATRC.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ModifyKey(IntPtr filedata, string block, string key, string value);
+
+        // Helper methods for marshaling
+        public static string MarshalString(IntPtr ptr) {
+            return Marshal.PtrToStringAnsi(ptr);
+        }
+
+        public static string GetVariable(IntPtr filedata, string varname) {
+            IntPtr resultPtr = ReadVariable(filedata, varname);
+            return MarshalString(resultPtr);
+        }
+
+        public static string GetKey(IntPtr filedata, string block, string key) {
+            IntPtr resultPtr = ReadKey(filedata, block, key);
+            return MarshalString(resultPtr);
+        }
+    }
+}
+
+
+
+/*
+ 
+ #pragma once
 
 #ifndef ATRC_HPP
 #define ATRC_HPP
@@ -6,19 +110,39 @@
 #ifdef ATRC_API
 #  undef ATRC_API
 #endif
-
-#ifdef _WIN32
+#ifdef _WRAPPER_EXIM_
+#  undef _WRAPPER_EXIM_
+#endif
+#if defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
     #ifdef ATRC_EXPORTS
-    #  define ATRC_API __declspec(dllexport)
-    #  define _WRAPPER_EXIM_ __declspec(dllexport)
+        #define ATRC_API __declspec(dllexport)
+        #define _WRAPPER_EXIM_ __declspec(dllexport)
     #else
-    #  define ATRC_API __declspec(dllimport)
-    #  define _WRAPPER_EXIM_ __declspec(dllimport)
+        #define ATRC_API __declspec(dllimport)
+        #define _WRAPPER_EXIM_ __declspec(dllimport)
     #endif
 #else
-    #define ATRC_API
-    #define _WRAPPER_EXIM_
+    #ifdef __GNUC__
+        #if __GNUC__ >= 4
+            #ifdef ATRC_EXPORTS
+                #define ATRC_API __attribute__((visibility("default")))
+                #define _WRAPPER_EXIM_ __attribute__((visibility("default")))
+            #else
+                #define ATRC_API
+                #define _WRAPPER_EXIM_
+            #endif
+        #else
+            #define ATRC_API
+            #define _WRAPPER_EXIM_
+        #endif
+    #else
+        #define ATRC_API
+        #define _WRAPPER_EXIM_
+    #endif
 #endif
+
+#define FILEHEADER "#!__ATRC__\0"
+
 
 // Disable warning C4251 for std::vector and std::string
 #ifdef _WIN32
@@ -270,3 +394,5 @@ _WRAPPER_EXIM_ void _W_ModifyKey_(PATRC_FD filedata, const std::string& block, c
 
 
 #endif // ATRC_HPP
+
+ */

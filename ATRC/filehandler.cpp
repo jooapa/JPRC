@@ -1,4 +1,4 @@
-#include "./include/ATRC.hpp"
+#include "./include/DEV_INC.hpp"
 #include "./include/filer.h"
 #include <iostream>
 #include <fstream>
@@ -17,7 +17,7 @@
 // when fatal, it will show error
 int checkBlock(std::string& _curr_block, const std::string& line, int line_number = -1, std::string filename = "no_filename") {
     if(line[0] != '[') return checkblock_failure;
-    int _end_pos = line.find(']');
+    size_t _end_pos = line.find(']');
     if(_end_pos == std::string::npos) {
         errormsg(ERR_INVALID_BLOCK_DECL, line_number, "", filename);
         return checkblock_fatal;
@@ -28,7 +28,7 @@ int checkBlock(std::string& _curr_block, const std::string& line, int line_numbe
 
 std::string ParseLineSTRINGtoATRC(const std::string &line){
     /*+++
-    ! -> \!
+    # -> \#
     & -> \&
     % -> \%
     %var% -> %var%
@@ -53,8 +53,8 @@ std::string ParseLineSTRINGtoATRC(const std::string &line){
                 in_var = true;
                 continue;
             }
-            else if(c == '!'){
-                res += "\\!";
+            else if(c == '#'){
+                res += "\\#";
                 continue;
             }
             else if(c == '&'){
@@ -87,7 +87,7 @@ std::string gen_random(const int len) {
 
 /**
  * reserve characters (needs \ before them):
- * %, !, &
+ * %, #, &
  * reserved sequences:
  * %*%
  * %*<int>%
@@ -112,13 +112,13 @@ void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const
             continue;
         }   
         
-        if(!_last_is_re_dash && c == '!') { // Comment
+        if(!_last_is_re_dash && c == '#') { // Comment
             // TODO FIX BUG:
-            // This is a %*%, and %*% !
+            // This is a %*%, and %*% #
             // ->
             // 'This is a %*%, and %*% '
             //
-            // This is a %*%, and %*%& !
+            // This is a %*%, and %*%& #
             // ->
             // 'This is a %*%, and %*%  '
             break; 
@@ -128,7 +128,7 @@ void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const
             continue;
         }
 
-        if(!_last_is_re_dash && c == '%' || _looking_for_var) { // Variable
+        if((!_last_is_re_dash && c == '%') || _looking_for_var) { // Variable
             if(!_looking_for_var && c == '%') {
                 _looking_for_var = true;
                 continue;
@@ -173,42 +173,40 @@ ParseFile(
     const std::string& filename, 
     const std::string& encoding,
     const std::string& extension
-) {
+) {;
     std::unique_ptr<std::vector<Variable>> variables = std::make_unique<std::vector<Variable>>();
     std::unique_ptr<std::vector<Block>>  blocks = std::make_unique<std::vector<Block>>();
     std::vector<Key> keys;
-
-    int extension_int = filename.find_last_of('.');
-    if(extension_int == std::string::npos){
-        errormsg(ERR_INVALID_FILE, -1, "Invalid file extension, " + filename + " | " + extension, filename);
-        return std::make_pair(std::move(variables), std::move(blocks));
-    }
-    if(filename.substr(extension_int, filename.length() - filename.find_last_of('.')) != extension){
-        errormsg(ERR_INVALID_FILE, -1, "Wrong extension, " + filename + " | " + extension, filename);
-        return std::make_pair(std::move(variables), std::move(blocks));
-    }
-    
+    if(encoding == "" || extension == ""){}
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         errormsg(ERR_INVALID_FILE, -1, "Failed opening: " + filename, filename);
         file.close();
         return std::make_pair(std::move(variables), std::move(blocks));
     }
-
     // Read through the file line by line
     std::string line;
     int line_number = 0;
-    bool _is_re_dash = false;
     std::string _curr_block = "";
     while (std::getline(file, line)) {
-        line_number++;
-        // Process line
+        if(line_number++ == 0){
+            std::string CUR_HEADER = line;
+            trim(CUR_HEADER);
+            std::string FL_HEADER = FILEHEADER;
+            trim(FL_HEADER);
+            if(CUR_HEADER != FL_HEADER){
+                errormsg(ERR_INVALID_FILE, -1, "Invalid file header: " + filename, filename);
+                file.close();
+                return std::make_pair(std::move(variables), std::move(blocks));
+            }
+            continue;
+        }
         std::string _line_trim = line;
         ltrim(_line_trim);
 
         // Skip empty lines and comments
         if (_line_trim == "") continue;
-        if (_line_trim[0] == '!') continue;
+        if (_line_trim[0] == '#') continue;
         
 
         // Check if line is a variable
@@ -216,7 +214,7 @@ ParseFile(
             bool _is_public = false;
             if(_line_trim[0] == '%') _is_public = true;
             // parse name
-            int _equ_pos = _line_trim.find('=');
+            size_t _equ_pos = _line_trim.find('=');
             if(_equ_pos == std::string::npos){
                 errormsg(ERR_INVALID_VAR_DECL, line_number, "", filename);
                 continue;
@@ -272,7 +270,7 @@ ParseFile(
         }
         std::string _key_name = "";
         std::string _key_value = "";
-        int _equ_pos = _line_trim.find('=');
+        size_t _equ_pos = _line_trim.find('=');
         if(_equ_pos == std::string::npos) {
             errormsg(ERR_INVALID_KEY_DECL, line_number, "", filename);
             continue;
@@ -308,29 +306,6 @@ ParseFile(
     }
     return std::make_pair(std::move(variables), std::move(blocks));
 }
-
-
-
-std::shared_ptr<ATRC_FD> Read(const std::string& path)
-    {
-    // Create filedata
-    std::shared_ptr<ATRC_FD> filedata = std::make_shared<ATRC_FD>(path);
-    // Parse contents
-    std::string filename = path;
-    std::string encoding = "UTF-8";
-    std::string extension = "atrc";
-    auto parsedData = ParseFile(filename, encoding, extension);
-    // Check for successful parsing
-    if (parsedData.first->empty() && parsedData.second->empty()) {
-        std::cerr << "Failed to parse file: " << filename << std::endl;
-    } else {
-        filedata->Variables = std::move(parsedData.first);
-        filedata->Blocks = std::move(parsedData.second);
-    }
-
-    return filedata;
-}
-
 
 void save_final_data(const std::string &filename, const std::string &final_data){
     std::ofstream ofs(filename, std::ofstream::trunc);
@@ -451,7 +426,6 @@ const std::string &xtra_info4
                 );
                 return;
             }
-            bool block_found = false;
             bool key_added = false;
             std::string curr_block = "";
             while (std::getline(file, line)) {
@@ -471,7 +445,6 @@ const std::string &xtra_info4
                     }
                     if(check ==checkblock_success){
                         if(curr_block == xtra_info4){
-                            block_found = true;
                             final_data += line + "\n";
                             final_data += xtra_info2 + "=" + xtra_info3 + "\n";
                             key_added = true;
@@ -612,8 +585,9 @@ const std::string &xtra_info4
             file.close();
             return;
         }
-        final_data += xtra_info2 + "\n"; //xtra_info2 contains the whole %var%=val
+        uint64_t ln_num = 0;
         while(std::getline(file, line)){
+            if(ln_num++ == 1) final_data += xtra_info2 + "\n";
             final_data += line + "\n";
         }
         file.close();

@@ -12,7 +12,12 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(BUILD_SHARED_LIBS ON)
 
 # Set additional flags for Linux
-set(CMAKE_C_FLAGS "-fPIC")
-set(CMAKE_CXX_FLAGS "-fPIC")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_C_FLAGS "-fPIC -O0 -Wall -Wextra -g")
+    set(CMAKE_CXX_FLAGS "-fPIC -O0 -Wall -Wextra -g")
+else()
+    set(CMAKE_C_FLAGS "-fPIC -O3 -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS "-fPIC -O3 -Wall -Wextra")
+endif()
 
 # Any other platform-specific configurations can go here

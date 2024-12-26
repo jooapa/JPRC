@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>ATRC.Wrapper</PackageId>
+    <Version>2.0.0</Version>
+    <Authors>Antako1</Authors>
+    <Description>Wrapper for ATRC C++ library</Description>
+    <RepositoryUrl>https://github.com/Antonako1/ATRC</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>ATRC.Wrapper</AssemblyName>
+    <RootNamespace>ATRC.Wrapper</RootNamespace>
+    <OutputType>Library</OutputType>
+    <RuntimeIdentifiers>linux-x64;win-x64;osx-x64;linux-x86;win-x86</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include=".\ATRC.Core\ATRC.Core.csproj" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
+  </ItemGroup>
+</Project>

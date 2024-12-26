@@ -1,5 +1,5 @@
 #define INCLUDE_ATRC_STDLIB
-#include <ATRC.hpp>
+#include <DEV_INC.hpp>
 #include <filer.h>
 #include <iostream>
 
@@ -92,3 +92,4 @@ double atrc_to_double(const std::string &value){
     }
     return res;
 }
+

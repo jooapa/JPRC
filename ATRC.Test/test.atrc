@@ -1,4 +1,6 @@
+#!__ATRC__
 %ScreenRatio%=4:3
+%test%=100
 [block]
 key=TruE
 [hello]
