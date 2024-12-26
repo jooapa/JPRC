@@ -27,7 +27,17 @@ enum class ATRC_SAVE{
     MODIFY_VAR,
 };
 
-void Save(std::shared_ptr<ATRC_FD> filedata, 
+void Save(
+std::shared_ptr<ATRC_FD> filedata, 
+const ATRC_SAVE &action = ATRC_SAVE::FULL_SAVE, 
+const int &xtra_info = -2, 
+const std::string &xtra_info2 = "",
+const std::string &xtra_info3 = "",
+const std::string &xtra_info4 = ""
+);
+
+void _W_Save_(
+PATRC_FD filedata,
 const ATRC_SAVE &action = ATRC_SAVE::FULL_SAVE, 
 const int &xtra_info = -2, 
 const std::string &xtra_info2 = "",
@@ -175,5 +185,16 @@ inline void errormsg(int err_num=-1,
     }
     std::cerr << "ATRC Error<" << err_class << "?" << err_num << ">"<< "<" << filename << ">" <<": " << msg << std::endl;
 }
+
+std::pair<
+    std::unique_ptr<std::vector<Variable>>, 
+    std::unique_ptr<std::vector<Block>>
+> 
+ParseFile
+(
+    const std::string &filename, 
+    const std::string &encoding, 
+    const std::string &extension
+    );
 
 #endif // FILER_H

@@ -63,16 +63,18 @@ reserved=reserved characters: \%, \&, \!
 insert2=insert second variable here: %*1% and first one here: %*0*
 ```
 
-## Building using ready made scripts
+## Building
 
-If needed, you can set Visual studio environmental values by running ```batch\msvs-dev-env.bat```
+```sh
+    # Create build files:
+    cmake --preset {preset_type} -B./out/{out_dir}/build -DCMAKE_BUILD_TYPE={Release|Debug} -DCMAKE_TOOLCHAIN_FILE=./cmake/{toolchain_file}.cmake
 
-Check that ```batch\globals.bat``` has the right paths
- - TOOLSPATH = Path to your tools directory containing Visual Studio dev-env scripts
- - CMAKEPATH = Path to your CMAKE
- - NINJAPATH = Path to your Ninja
- - COMPILERPATH = Path to your compiler
+    # Example
+    cmake --preset linux-x64-release -B./out/linux-x64-release/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./cmake/toolchain-linux-x64.cmake
 
-To start build process, run ```msvs-dev-cmd.bat```, this script builds ATRC and ATRC.Test and runs the latter one
-
-Run ```batch\del.bat``` to reset CMake cache and return source folders to starting point
+    # Create release package
+    sudo apt update
+    sudo apt install cmake clang ninja-build lld mingw-w64 7zip
+    chmod +x ./loop.sh
+    ./loop.sh
+```

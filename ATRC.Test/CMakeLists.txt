@@ -1,29 +1,29 @@
-﻿cmake_minimum_required(VERSION 3.8)
+﻿# Add executable for testing
+add_executable(ATRC.Test 
+    "ATRC.Test.cpp"
+    "ATRC.Test.h"
+)
 
-project("ATRC.Test")
+# Link the test executable with the ATRC library
+target_link_libraries(ATRC.Test PRIVATE ATRC)
 
+# Set include directories (if needed)
+include_directories("${PROJECT_SOURCE_DIR}/ATRC/include")
 
-# Add executable and link with ATRC library
-add_executable(ATRC.Test "ATRC.Test.cpp" "ATRC.Test.h")
-
-if (WIN32)
-    set(ATRC_DIR "${PROJECT_SOURCE_DIR}/libs/")
-endif()
-
-find_library(ATRC NAMES ATRC REQUIRED PATHS ${ATRC_DIR})
-include_directories("${PROJECT_SOURCE_DIR}/libs/include")
-target_link_libraries(ATRC.Test PRIVATE ${ATRC})
-
+# Set C++ standard for tests (if CMake version is greater than 3.12)
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET ATRC.Test PROPERTY CXX_STANDARD 20)
+    set_property(TARGET ATRC.Test PROPERTY CXX_STANDARD 20)
 endif()
 
+# Optional RPATH settings for UNIX-based systems
 if (UNIX)
-  # Specify build and install RPATH
-  set(CMAKE_BUILD_RPATH "${ATRC_DIR}")
-  set(CMAKE_INSTALL_RPATH "${ATRC_DIR}")
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    set(CMAKE_BUILD_RPATH "${PROJECT_SOURCE_DIR}/ATRC/libs")
+    set(CMAKE_INSTALL_RPATH "${PROJECT_SOURCE_DIR}/ATRC/libs")
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif()
 
-# Optional: Specify additional build settings or targets here
+# Enable testing
+enable_testing()
 
+# Add custom test targets if needed
+# add_custom_target(run_tests COMMAND ${CMAKE_BINARY_DIR}/ATRC.Test)

@@ -5,7 +5,8 @@
 /*
     ! TEST EVERYTHING
 */
- void AddBlock(std::shared_ptr<ATRC_FD> filedata, const std::string& blockname) {
+
+void _W_AddBlock_(PATRC_FD filedata, const std::string& blockname){
     Block block;
     block.Name = blockname;
     if(BlockContainsBlock(filedata->Blocks, block)) {
@@ -15,11 +16,10 @@
     filedata->Blocks->push_back(block);
 
     if(filedata->AutoSave) {
-        Save(filedata, ATRC_SAVE::ADD_BLOCK, -1, blockname);
+        _W_Save_(filedata, ATRC_SAVE::ADD_BLOCK, -1, blockname);
     }
 }
-
- void RemoveBlock(std::shared_ptr<ATRC_FD> filedata, const std::string& blockname) {
+void _W_RemoveBlock_(PATRC_FD filedata, const std::string& blockname){
     Block block;
     block.Name = blockname;
     if(!BlockContainsBlock(filedata->Blocks, block)) {
@@ -34,6 +34,14 @@
     }
     filedata->Blocks->erase(filedata->Blocks->begin() + i);
     if(filedata->AutoSave) {
-        Save(filedata, ATRC_SAVE::REMOVE_BLOCK, i, blockname);
+        _W_Save_(filedata, ATRC_SAVE::REMOVE_BLOCK, i, blockname);
     }
+}
+
+void AddBlock(std::shared_ptr<ATRC_FD> filedata, const std::string& blockname) {
+    return _W_AddBlock_(filedata.get(), blockname);
+}
+
+ void RemoveBlock(std::shared_ptr<ATRC_FD> filedata, const std::string& blockname) {
+    return _W_RemoveBlock_(filedata.get(), blockname);
 }

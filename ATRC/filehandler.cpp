@@ -310,23 +310,16 @@ ParseFile(
 }
 
 
-std::shared_ptr<ATRC_FD> Read(const std::string& filename, const std::string& encoding, const std::string& allowed_extension)
-    {
-    std::shared_ptr<ATRC_FD> filedata(new ATRC_FD);
-    filedata->Filename = filename;
-    filedata->Encoding = encoding;
-    if(allowed_extension == ""){
-        filedata->Extension = ".atrc";
-    } else{
-        if(allowed_extension[0] == '.'){
-            filedata->Extension = allowed_extension;
-        } else {
-            filedata->Extension = "." + allowed_extension;
-        }
-    }
 
+std::shared_ptr<ATRC_FD> Read(const std::string& path)
+    {
+    // Create filedata
+    std::shared_ptr<ATRC_FD> filedata = std::make_shared<ATRC_FD>(path);
     // Parse contents
-    auto parsedData = ParseFile(filename, encoding, filedata->Extension);
+    std::string filename = path;
+    std::string encoding = "UTF-8";
+    std::string extension = "atrc";
+    auto parsedData = ParseFile(filename, encoding, extension);
     // Check for successful parsing
     if (parsedData.first->empty() && parsedData.second->empty()) {
         std::cerr << "Failed to parse file: " << filename << std::endl;
@@ -363,22 +356,18 @@ while(std::getline(file, line)){
 file.close();
 ---*/
 
-/// @brief Save filedata to file
-/// @param filedata filedata
-/// @param action set empty to or -1 to do heavysave, otherwise set macro
-/// @param xtra_info set -2 if not used, send extra info, such as index
-/// @param xtra_info2 set "" if not used, send extra info, such as name
-void Save
-(
-    std::shared_ptr<ATRC_FD> filedata, 
-    const ATRC_SAVE &action, 
-    const int &xtra_info,
-    const std::string &xtra_info2,
-    const std::string &xtra_info3,
-    const std::string &xtra_info4
-)
-{    
-    std::string line = "";
+
+
+
+void _W_Save_(
+PATRC_FD filedata,
+const ATRC_SAVE &action, 
+const int &xtra_info,
+const std::string &xtra_info2,
+const std::string &xtra_info3,
+const std::string &xtra_info4
+){
+        std::string line = "";
     std::string final_data = "";
     switch (action)
     {
@@ -434,7 +423,7 @@ void Save
                     file.close();
                     break;
                 }
-                if(check = checkblock_success){
+                if(check ==checkblock_success){
                     if(block_found_){
                         block_removed = true;
                     }
@@ -480,7 +469,7 @@ void Save
                         file.close();
                         break;
                     }
-                    if(check = checkblock_success){
+                    if(check ==checkblock_success){
                         if(curr_block == xtra_info4){
                             block_found = true;
                             final_data += line + "\n";
@@ -540,7 +529,7 @@ void Save
                         file.close();
                         break;
                     }
-                    if(check = checkblock_success){
+                    if(check == checkblock_success){
                         if(curr_block == xtra_info4){
                             block_found = true;
                             final_data += line + "\n";
@@ -596,7 +585,7 @@ void Save
                         file.close();
                         break;
                     }
-                    if(check = checkblock_success){
+                    if(check ==checkblock_success){
                         if(curr_block == xtra_info4){
                             block_found = true;
                             final_data += line + "\n";
@@ -695,4 +684,22 @@ void Save
         break;
     }
     }
+}
+
+/// @brief Save filedata to file
+/// @param filedata filedata
+/// @param action set empty to or -1 to do heavysave, otherwise set macro
+/// @param xtra_info set -2 if not used, send extra info, such as index
+/// @param xtra_info2 set "" if not used, send extra info, such as name
+void Save
+(
+    std::shared_ptr<ATRC_FD> filedata, 
+    const ATRC_SAVE &action, 
+    const int &xtra_info,
+    const std::string &xtra_info2,
+    const std::string &xtra_info3,
+    const std::string &xtra_info4
+)
+{    
+    return _W_Save_(filedata.get(), action, xtra_info, xtra_info2, xtra_info3, xtra_info4);
 }

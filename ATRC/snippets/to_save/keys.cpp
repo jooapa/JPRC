@@ -4,18 +4,13 @@
 /*
     ! TEST EVERYTHING
 */
-void AddKey
-(
-std::shared_ptr<ATRC_FD> filedata, 
-const std::string &block, 
-const std::string &key, 
-const std::string &value
-){
-    if(!DoesExistBlock(filedata, block)) {
+
+void _W_AddKey_(PATRC_FD filedata, const std::string& block, const std::string& key, const std::string& value){
+    if(!_W_DoesExistBlock_(filedata, block)) {
         errormsg(ERR_BLOCK_NOT_FOUND, -1, block, filedata->Filename);
         return;
     }
-    if(DoesExistKey(filedata, block, key)){
+    if(_W_DoesExistKey_(filedata, block, key)){
         errormsg(ERR_KEY_EXISTS, -1, key, filedata->Filename);
         return;
     }
@@ -30,21 +25,15 @@ const std::string &value
         }
     }
     if(filedata->AutoSave){
-        Save(filedata, ATRC_SAVE::ADD_KEY, -1, key, value, block);
+        _W_Save_(filedata, ATRC_SAVE::ADD_KEY, -1, key, value, block);
     }
 }
-
-void RemoveKey
-(
-    std::shared_ptr<ATRC_FD> filedata, 
-    const std::string &block, 
-    const std::string &key
-){
-    if(!DoesExistBlock(filedata, block)) {
+void _W_RemoveKey_(PATRC_FD filedata, const std::string& block, const std::string& key){
+    if(!_W_DoesExistBlock_(filedata, block)) {
         errormsg(ERR_BLOCK_NOT_FOUND, -1, block, filedata->Filename);
         return;
     }
-    if(!DoesExistKey(filedata, block, key)){
+    if(!_W_DoesExistKey_(filedata, block, key)){
         errormsg(ERR_KEY_NOT_FOUND, -1, key, filedata->Filename);
         return;
     }
@@ -66,21 +55,15 @@ void RemoveKey
 
 
     if(filedata->AutoSave){
-        Save(filedata, ATRC_SAVE::REMOVE_KEY, i, key, "", block);
+        _W_Save_(filedata, ATRC_SAVE::REMOVE_KEY, i, key, "", block);
     }
 }
-
-void ModifyKey(
-std::shared_ptr<ATRC_FD> filedata,
-const std::string &block,
-const std::string &key,
-const std::string &value
-){
-    if(!DoesExistBlock(filedata, block)) {
+void _W_ModifyKey_(PATRC_FD filedata, const std::string& block, const std::string& key, const std::string& value){
+    if(!_W_DoesExistBlock_(filedata, block)) {
         errormsg(ERR_BLOCK_NOT_FOUND, -1, block, filedata->Filename);
         return;
     }
-    if(!DoesExistKey(filedata, block, key)){
+    if(!_W_DoesExistKey_(filedata, block, key)){
         errormsg(ERR_KEY_NOT_FOUND, -1, key, filedata->Filename);
         return;
     }
@@ -100,6 +83,35 @@ const std::string &value
     }
 
     if(filedata->AutoSave){
-        Save(filedata, ATRC_SAVE::MODIFY_KEY, i, key, value, block);
+        _W_Save_(filedata, ATRC_SAVE::MODIFY_KEY, i, key, value, block);
     }
+}
+
+
+void AddKey
+(
+std::shared_ptr<ATRC_FD> filedata, 
+const std::string &block, 
+const std::string &key, 
+const std::string &value
+){
+    return _W_AddKey_(filedata.get(), block, key, value);
+}
+
+void RemoveKey
+(
+    std::shared_ptr<ATRC_FD> filedata, 
+    const std::string &block, 
+    const std::string &key
+){
+    return _W_RemoveKey_(filedata.get(), block, key);
+}
+
+void ModifyKey(
+std::shared_ptr<ATRC_FD> filedata,
+const std::string &block,
+const std::string &key,
+const std::string &value
+){
+    return _W_ModifyKey_(filedata.get(), block, key, value);
 }

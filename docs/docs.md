@@ -71,10 +71,28 @@ typedef struct _ATRCFiledata{
     std::unique_ptr<std::vector<Variable>> Variables;
     std::unique_ptr<std::vector<Block>> Blocks;
     std::string Filename;
-    std::string Extension;
-    std::string Encoding;
 
+    /// true to save a changes
     bool AutoSave = false;
+
+    _ATRCFiledata(const std::string &path);
+    bool IRead();
+    std::string IReadVariable(const std::string& varname);
+    std::string IReadKey(const std::string& block, const std::string& key);
+    bool IDoesExistBlock(const std::string& block);
+    bool IDoesExistVariable(const std::string& varname);
+    bool IDoesExistKey(const std::string& block, const std::string& key);
+    bool IIsPublic(const std::string& varname);
+    void IInsertVar(std::string &line, std::vector<std::string> &args);
+    std::string IInsertVar_S(const std::string &line, std::vector<std::string> &args);
+    void IAddBlock(const std::string& blockname);
+    void IRemoveBlock(const std::string& blockname);
+    void IAddVariable(const std::string& varname, const std::string& value);
+    void IRemoveVariable(const std::string& varname);
+    void IModifyVariable(const std::string& varname, const std::string& value);
+    void IAddKey(const std::string& block, const std::string& key, const std::string& value);
+    void IRemoveKey(const std::string& block, const std::string& key);
+    void IModifyKey(const std::string& block, const std::string& key, const std::string& value);
 } ATRC_FD, *PATRC_FD;
 ```
 
@@ -85,6 +103,23 @@ typedef struct _ATRCFiledata{
  - `Extension`: File extension. See Read() for more information.
  - `Encoding`: File encoding. See Read() for more information.
  - `AutoSave`: AutoSave saves the changes that happen while AutoSave is true
+ - `Read`: Same as `Read`
+ - `IReadVariable`: Same as `ReadVariable` 
+ - `IReadKey`: Same as `ReadKey` 
+ - `IDoesExistBlock`: Same as `DoesExistBlock` 
+ - `IDoesExistVariable`: Same as `DoesExistVariable` 
+ - `IDoesExistKey`: Same as `DoesExistKey` 
+ - `IIsPublic`: Same as `IsPublic` 
+ - `IInsertVar`: Same as `InsertVar` 
+ - `IInsertVar_S`: Same as `InsertVar_S` 
+ - `IAddBlock`: Same as `AddBlock` 
+ - `IRemoveBlock`: Same as `RemoveBlock` 
+ - `IAddVariable`: Same as `AddVariable` 
+ - `IRemoveVariable`: Same as `RemoveVariable` 
+ - `IModifyVariable`: Same as `ModifyVariable` 
+ - `IAddKey`: Same as `AddKey` 
+ - `IRemoveKey`: Same as `RemoveKey` 
+ - `IModifyKey`: Same as `ModifyKey` 
 
 #### remarks
  The only value you should change yourself is `AutoSave`
@@ -323,7 +358,7 @@ if(IsPublic(fd, "varname")){
 
 
 
-### InsertVar
+### InsertVar & InsertVar_S
 
 Inserts/Injects text to insert marks
 
@@ -335,15 +370,24 @@ InsertVar
     std::vector<std::string> &args, 
     std::shared_ptr<ATRC_FD> filedata
 );
+
+ATRC_API std::string 
+InsertVar_S
+(
+    const std::string &line,
+    std::vector<std::string> &args, 
+    std::shared_ptr<ATRC_FD> filedata
+);
 ```
 
 #### args
- - `line`: String with insert markings. Result is saved here aswell
+ - `line`: String with insert markings. Result is saved here aswell in InsertVar
  - `args`: Array with text to insert
  - `filedata`: filedata's shared ptr
 
 #### returns
  - void. Result is saved to line
+ - std::string. Result is returned
  
 #### remarks
  If the program runs out of insert markings or args, error message is being displayed.
@@ -355,6 +399,8 @@ std::vector<std::string> inserts = { "1.", "2.", "3." };
 std::string value = ReadKey(fd, "block", "varname");
 InsertVar(value, inserts, fd);
 std::cout << value << std::endl;
+std::cout << InsertVar_S(ReadVar(fd, "var"), inserts, fd) << std::endl;
+
 ```
 
 
