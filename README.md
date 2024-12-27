@@ -80,6 +80,9 @@ insert2=insert second variable here: %*1% and first one here: %*0*
     # Run test program
     cmake --preset linux-x64-debug -B./out/linux-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=./cmake/toolchain-linux-x64.cmake -DATRC_BUILD_TESTS=ON && cmake --build ./out/linux-x64-debug/build --config Debug --target run_tests
 
+    # VS
+    cmake --preset VS2022-x64-debug -B./out/VS2022-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DATRC_BUILD_TESTS=ON
+
     # Create release package
     # run in wsl
     sudo apt update

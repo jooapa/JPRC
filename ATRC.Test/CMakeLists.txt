@@ -34,6 +34,21 @@ add_custom_command(
     COMMENT "Copying test.atrc to binary directory"
 )
 
+# For MSVC Debugging
+if (MSVC)
+    message(STATUS "Copying ATRC DLLs and LIBs to binary directory")
+    add_custom_command(
+        TARGET ATRC.Test POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_BINARY_DIR}/ATRC/Debug/ATRC.dll"
+        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.dll"
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_BINARY_DIR}/ATRC/Debug/ATRC.lib"
+        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.lib"
+        COMMENT "Copying ATRC DLLs and LIBs to binary directory"
+    )
+endif()
+
 # Add the custom test targets
 add_custom_target(run_tests
     COMMAND "${CMAKE_BINARY_DIR}/ATRC.Test/ATRC.Test"

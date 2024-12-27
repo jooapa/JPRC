@@ -95,8 +95,13 @@ std::string gen_random(const int len) {
  * function trims line input 
  * **line** will be replaced with the value
 */
-void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const std::unique_ptr<std::vector<Variable>> &variables, const std::string filename) {
-    trim(line);
+
+void _W_ParseLineValueATRCtoSTRING(
+    std::string& line, const int &line_number, 
+    const std::vector<Variable> *variables, 
+    const std::string filename
+){
+trim(line);
     bool _last_is_re_dash = false;
     bool _looking_for_var = false;
     std::string _value = "";
@@ -166,6 +171,10 @@ void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const
     }
 
     line = _value;
+}
+
+void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const std::unique_ptr<std::vector<Variable>> &variables, const std::string filename) {
+    _W_ParseLineValueATRCtoSTRING(line, line_number, variables.get(), filename);
 }
 
 std::pair<std::unique_ptr<std::vector<Variable>>, std::unique_ptr<std::vector<Block>>> 
@@ -313,29 +322,9 @@ void save_final_data(const std::string &filename, const std::string &final_data)
     ofs.close();
 }
 
-/*+++
-std::ifstream file(filedata->Filename, std::ios::app);
-if (!file.is_open()) {
-    errormsg(ERR_INVALID_FILE, 
-        -1, 
-        "Failed opening for saving: " + filedata->Filename, 
-        filedata->Filename
-        );
-    file.close();
-    return;
-}
-while(std::getline(file, line)){
-    //HERE
-    final_data += line + "\n";
-}
-file.close();
----*/
-
-
-
 
 void _W_Save_(
-PATRC_FD filedata,
+ATRCFiledata *filedata,
 const ATRC_SAVE &action, 
 const int &xtra_info,
 const std::string &xtra_info2,
@@ -350,12 +339,12 @@ const std::string &xtra_info4
         
         break;
     case ATRC_SAVE::ADD_BLOCK: {
-        std::ofstream file(filedata->Filename, std::ios::app);
+        std::ofstream file(filedata->GetFilename(), std::ios::app);
         if (!file.is_open()) {
             errormsg(ERR_INVALID_FILE, 
                 -1, 
-                "Failed opening for saving: " + filedata->Filename, 
-                filedata->Filename
+                "Failed opening for saving: " + filedata->GetFilename(), 
+                filedata->GetFilename()
                 );
             file.close();
             return;
@@ -365,12 +354,12 @@ const std::string &xtra_info4
     }
         break;
     case ATRC_SAVE::REMOVE_BLOCK: {
-        std::ifstream file(filedata->Filename, std::ios::out);
+        std::ifstream file(filedata->GetFilename(), std::ios::out);
         if (!file.is_open()) {
             errormsg(ERR_INVALID_FILE, 
                 -1, 
-                "Failed opening for saving: " + filedata->Filename, 
-                filedata->Filename
+                "Failed opening for saving: " + filedata->GetFilename(), 
+                filedata->GetFilename()
                 );
             
             file.close();
@@ -393,7 +382,7 @@ const std::string &xtra_info4
                     final_data += line + "\n";
                     continue;
                 }
-                int check = checkBlock(curr_block, line, -1, filedata->Filename);
+                int check = checkBlock(curr_block, line, -1, filedata->GetFilename());
                 if(check == checkblock_failure){
                     file.close();
                     break;
@@ -412,17 +401,17 @@ const std::string &xtra_info4
             }
         }
         file.close();
-        save_final_data(filedata->Filename, final_data);
+        save_final_data(filedata->GetFilename(), final_data);
         break;
     }
     case ATRC_SAVE::ADD_KEY:
         {
-            std::ifstream file(filedata->Filename);
+            std::ifstream file(filedata->GetFilename());
             if (!file.is_open()) {
                 errormsg(ERR_INVALID_FILE, 
                     -1, 
-                    "Failed opening for saving: " + filedata->Filename, 
-                    filedata->Filename
+                    "Failed opening for saving: " + filedata->GetFilename(), 
+                    filedata->GetFilename()
                 );
                 return;
             }
@@ -438,7 +427,7 @@ const std::string &xtra_info4
                         final_data += line + "\n";
                         continue;
                     }
-                    int check = checkBlock(curr_block, line, -1, filedata->Filename);
+                    int check = checkBlock(curr_block, line, -1, filedata->GetFilename());
                     if(check == checkblock_failure){
                         file.close();
                         break;
@@ -458,17 +447,17 @@ const std::string &xtra_info4
             }
 
             file.close();
-            save_final_data(filedata->Filename, final_data);
+            save_final_data(filedata->GetFilename(), final_data);
             break;
         }
         break;
     case ATRC_SAVE::REMOVE_KEY: {
-            std::ifstream file(filedata->Filename);
+            std::ifstream file(filedata->GetFilename());
             if (!file.is_open()) {
                 errormsg(ERR_INVALID_FILE, 
                     -1, 
-                    "Failed opening for saving: " + filedata->Filename, 
-                    filedata->Filename
+                    "Failed opening for saving: " + filedata->GetFilename(), 
+                    filedata->GetFilename()
                 );
                 return;
             }
@@ -482,7 +471,7 @@ const std::string &xtra_info4
                     final_data += line + "\n";
                 } else {
                     if(block_found){
-                        int equ_pos = line_trim.find_first_of('=');
+                        size_t equ_pos = line_trim.find_first_of('=');
                         std::string key_name = line_trim.substr(0, equ_pos);
                         trim(key_name);
                         if(key_name == xtra_info2){
@@ -497,7 +486,7 @@ const std::string &xtra_info4
                         final_data += line + "\n";
                         continue;
                     }
-                    int check = checkBlock(curr_block, line, -1, filedata->Filename);
+                    int check = checkBlock(curr_block, line, -1, filedata->GetFilename());
                     if(check == checkblock_failure){
                         file.close();
                         break;
@@ -515,16 +504,16 @@ const std::string &xtra_info4
                 }
             }
             file.close();
-            save_final_data(filedata->Filename, final_data);
+            save_final_data(filedata->GetFilename(), final_data);
         }
         break;
     case ATRC_SAVE::MODIFY_KEY: {
-            std::ifstream file(filedata->Filename);
+            std::ifstream file(filedata->GetFilename());
             if (!file.is_open()) {
                 errormsg(ERR_INVALID_FILE, 
                     -1, 
-                    "Failed opening for saving: " + filedata->Filename, 
-                    filedata->Filename
+                    "Failed opening for saving: " + filedata->GetFilename(), 
+                    filedata->GetFilename()
                 );
                 return;
             }
@@ -538,7 +527,7 @@ const std::string &xtra_info4
                     final_data += line + "\n";
                 } else {
                     if(block_found){
-                        int equ_pos = line_trim.find_first_of('=');
+                        size_t equ_pos = line_trim.find_first_of('=');
                         std::string key_name = line_trim.substr(0, equ_pos);
                         trim(key_name);
                         if(key_name == xtra_info2){
@@ -553,7 +542,7 @@ const std::string &xtra_info4
                         final_data += line + "\n";
                         continue;
                     }
-                    int check = checkBlock(curr_block, line, -1, filedata->Filename);
+                    int check = checkBlock(curr_block, line, -1, filedata->GetFilename());
                     if(check == checkblock_failure){
                         file.close();
                         break;
@@ -571,16 +560,16 @@ const std::string &xtra_info4
                 }
             }
             file.close();
-            save_final_data(filedata->Filename, final_data);
+            save_final_data(filedata->GetFilename(), final_data);
         }
         break;
     case ATRC_SAVE::ADD_VAR:{
-        std::ifstream file(filedata->Filename, std::ios::app);
+        std::ifstream file(filedata->GetFilename(), std::ios::app);
         if (!file.is_open()) {
             errormsg(ERR_INVALID_FILE, 
                 -1, 
-                "Failed opening for saving: " + filedata->Filename, 
-                filedata->Filename
+                "Failed opening for saving: " + filedata->GetFilename(), 
+                filedata->GetFilename()
                 );
             file.close();
             return;
@@ -591,17 +580,17 @@ const std::string &xtra_info4
             final_data += line + "\n";
         }
         file.close();
-        save_final_data(filedata->Filename, final_data);
+        save_final_data(filedata->GetFilename(), final_data);
         break;
     }
     case ATRC_SAVE::REMOVE_VAR: {
         int var_line_num = 0;
-        std::ifstream file(filedata->Filename, std::ios::app);
+        std::ifstream file(filedata->GetFilename(), std::ios::app);
         if (!file.is_open()) {
             errormsg(ERR_INVALID_FILE, 
                 -1, 
-                "Failed opening for saving: " + filedata->Filename, 
-                filedata->Filename
+                "Failed opening for saving: " + filedata->GetFilename(), 
+                filedata->GetFilename()
                 );
             file.close();
             return;
@@ -611,10 +600,10 @@ const std::string &xtra_info4
             std::string trim_line = line;
             trim(trim_line);
             if(trim_line[0] == '%'){
-                int equ_pos = trim_line.find_first_of('=');
+                size_t equ_pos = trim_line.find_first_of('=');
                 std::string variable_name = trim_line.substr(0, equ_pos-1);
                 trim(variable_name);
-                ParseLineValueATRCtoSTRING(line, var_line_num, filedata->Variables, filedata->Filename);
+                _W_ParseLineValueATRCtoSTRING(line, var_line_num, filedata->GetVariables(), filedata->GetFilename());
                 if(variable_name == "%" + xtra_info2 + "%"){
                     continue;
                 }
@@ -622,16 +611,16 @@ const std::string &xtra_info4
             final_data += line + "\n";
         }
         file.close();
-        save_final_data(filedata->Filename, final_data);
+        save_final_data(filedata->GetFilename(), final_data);
         break;
     }
     case ATRC_SAVE::MODIFY_VAR: {
-        std::ifstream file(filedata->Filename, std::ios::app);
+        std::ifstream file(filedata->GetFilename(), std::ios::app);
         if (!file.is_open()) {
             errormsg(ERR_INVALID_FILE, 
                 -1, 
-                "Failed opening for saving: " + filedata->Filename, 
-                filedata->Filename
+                "Failed opening for saving: " + filedata->GetFilename(), 
+                filedata->GetFilename()
                 );
             file.close();
             return;
@@ -642,38 +631,20 @@ const std::string &xtra_info4
             std::string trim_line = line;
             trim(trim_line);
             if(trim_line[0] == '%'){
-                int equ_pos = trim_line.find_first_of('=');
+                size_t equ_pos = trim_line.find_first_of('=');
                 std::string variable_name = trim_line.substr(0, equ_pos-1);
                 trim(variable_name);
-                ParseLineValueATRCtoSTRING(line, var_line_num, filedata->Variables, filedata->Filename);
+                _W_ParseLineValueATRCtoSTRING(line, var_line_num, filedata->GetVariables(), filedata->GetFilename());
                 if(variable_name == "%" + xtra_info2 + "%"){
-                    final_data += filedata->Variables->at(xtra_info).Name +"="+ filedata->Variables->at(xtra_info).Value + "\n";
+                    final_data += filedata->GetVariables()->at(xtra_info).Name +"="+ filedata->GetVariables()->at(xtra_info).Value + "\n";
                     continue;
                 }
             }
             final_data += line + "\n";
         }
         file.close();
-        save_final_data(filedata->Filename, final_data);
+        save_final_data(filedata->GetFilename(), final_data);
         break;
     }
     }
-}
-
-/// @brief Save filedata to file
-/// @param filedata filedata
-/// @param action set empty to or -1 to do heavysave, otherwise set macro
-/// @param xtra_info set -2 if not used, send extra info, such as index
-/// @param xtra_info2 set "" if not used, send extra info, such as name
-void Save
-(
-    std::shared_ptr<ATRC_FD> filedata, 
-    const ATRC_SAVE &action, 
-    const int &xtra_info,
-    const std::string &xtra_info2,
-    const std::string &xtra_info3,
-    const std::string &xtra_info4
-)
-{    
-    return _W_Save_(filedata.get(), action, xtra_info, xtra_info2, xtra_info3, xtra_info4);
 }

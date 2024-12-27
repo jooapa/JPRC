@@ -67,10 +67,15 @@ bool ATRCFiledata::Read(){
 }
 
 PATRC_FD ATRCFiledata::ToCStruct(){
-    PATRC_FD filedata;
-    Constructor_Empty(&filedata);
+    PATRC_FD filedata = CreateEmptyFiledata();
+	if (filedata == nullptr) return nullptr;
     filedata->Filename = this->Filename.c_str();
     C_Variable *vars = (C_Variable*)malloc(sizeof(C_Variable) * this->Variables->size());
+    if (vars == nullptr)
+    {
+		DestroyFiledata(&filedata);
+        return nullptr;
+    }
     for(int i = 0; i < this->Variables->size(); i++){
         vars[i].Name = this->Variables->at(i).Name.c_str();
         vars[i].Value = this->Variables->at(i).Value.c_str();
@@ -79,10 +84,21 @@ PATRC_FD ATRCFiledata::ToCStruct(){
     filedata->Variables = vars;
 
     C_Block *blocks = (C_Block*)malloc(sizeof(C_Block) * this->Blocks->size());
+    if (blocks == nullptr) {
+		free(vars);
+		DestroyFiledata(&filedata);
+        return nullptr;
+    }
     for(int i = 0; i < this->Blocks->size(); i++){
         blocks[i].Name = this->Blocks->at(i).Name.c_str();
         blocks[i].KeyCount = this->Blocks->at(i).Keys.size();
         C_Key *keys = (C_Key*)malloc(sizeof(C_Key) * this->Blocks->at(i).Keys.size());
+        if (keys == nullptr) {
+			free(vars);
+			free(blocks);
+			DestroyFiledata(&filedata);
+			return nullptr;
+        }
         for(int j = 0; j < this->Blocks->at(i).Keys.size(); j++){
             keys[j].Name = this->Blocks->at(i).Keys[j].Name.c_str();
             keys[j].Value = this->Blocks->at(i).Keys[j].Value.c_str();
@@ -91,4 +107,21 @@ PATRC_FD ATRCFiledata::ToCStruct(){
     }
     filedata->Blocks = blocks;
     return filedata;
+}
+
+
+std::vector<Variable>* ATRCFiledata::GetVariables(){
+    return this->Variables.get();
+}
+std::vector<Block>* ATRCFiledata::GetBlocks(){
+    return this->Blocks.get();
+}
+std::string ATRCFiledata::GetFilename(){
+    return this->Filename;
+}
+bool ATRCFiledata::GetAutoSave(){
+    return this->AutoSave;
+}
+void ATRCFiledata::SetAutoSave(bool autosave){
+    this->AutoSave = autosave;
 }

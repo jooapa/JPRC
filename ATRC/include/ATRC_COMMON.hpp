@@ -2,39 +2,23 @@
 #ifndef ATRC_COMON_HPP
 #define ATRC_COMON_HPP
 
-#ifdef ATRC_API
-#  undef ATRC_API
-#endif // ATRC_API
-#ifdef _WRAPPER_EXIM_
-#  undef _WRAPPER_EXIM_
-#endif // _WRAPPER_EXIM_
-#if defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
-    #ifdef ATRC_EXPORTS
-        #define ATRC_API __declspec(dllexport)
-        #define _WRAPPER_EXIM_ __declspec(dllexport)
-    #else // ATRC_EXPORTS
-        #define ATRC_API __declspec(dllimport)
-        #define _WRAPPER_EXIM_ __declspec(dllimport)
-    #endif // ATRC_EXPORTS
-#else // _WIN32 || _WIN64
-    #ifdef __GNUC__
-        #if __GNUC__ >= 4
-            #ifdef ATRC_EXPORTS
-                #define ATRC_API __attribute__((visibility("default")))
-                #define _WRAPPER_EXIM_ __attribute__((visibility("default")))
-            #else // ATRC_EXPORTS
-                #define ATRC_API
-                #define _WRAPPER_EXIM_
-            #endif // ATRC_EXPORTS
-        #else // __GNUC__ >= 4
-            #define ATRC_API
-            #define _WRAPPER_EXIM_
-        #endif // __GNUC__ >= 4
-    #else // __GNUC__
-        #define ATRC_API
-        #define _WRAPPER_EXIM_
-    #endif // __GNUC__
-#endif // _WIN32 || _WIN64
+
+#ifdef ATRC_EXPORTS
+#   if defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
+#       define ATRC_API __declspec(dllexport)
+#       define _WRAPPER_EXIM_ __declspec(dllexport)
+#   elif __GNUC__ >= 4
+#       define ATRC_API __attribute__((visibility("default")))
+#       define _WRAPPER_EXIM_ __attribute__((visibility("default")))
+#   endif
+#endif
+
+#ifndef ATRC_API
+#   define ATRC_API 
+#endif
+#ifndef _WRAPPER_EXIM_
+#   define _WRAPPER_EXIM_ 
+#endif
 
 #define FILEHEADER "#!__ATRC__\0"
 

@@ -11,7 +11,7 @@ namespace atrc
 typedef struct Variable {
     std::string Name;
     std::string Value;
-    bool IsPublic;
+    bool IsPublic = true;
 } Variable, *PVariable;
 
 typedef struct Key {
@@ -50,6 +50,11 @@ public:
     void RemoveKey(const std::string& block, const std::string& key);
     void ModifyKey(const std::string& block, const std::string& key, const std::string& value);
     PATRC_FD ToCStruct();
+    std::vector<Variable>* GetVariables();
+    std::vector<Block>* GetBlocks();
+    std::string GetFilename();
+    bool GetAutoSave();
+    void SetAutoSave(bool autosave);
 private:
     void MAINCONSTRUCTOR();
     std::unique_ptr<std::vector<Variable>> Variables;

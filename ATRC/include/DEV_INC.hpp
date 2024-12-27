@@ -4,7 +4,9 @@
 #include <ATRC_C.h>
 #include <ATRC_UTILS.h>
 #include <ATRC.h>
+#ifdef __cplusplus
 using namespace atrc;
+#endif // __cplusplus
 
 // File
 #define ERR_CLASS_FILEHANDLER           100

@@ -34,39 +34,35 @@ typedef struct _ATRCFiledata{
     const char *Filename;
     bool AutoSave;
 
-    #ifdef __cplusplus
-    _ATRCFiledata(){Constructor_Empty(*this);}
-    _ATRCFiledata(const char *path){Constructor(this, path);}
-    ~_ATRCFiledata(){Destructor(this);}
-    #endif // __cplusplus
+    bool (*ReadFiledata)(struct _ATRCFiledata *self);
+    const char* (*ReadVariable)(struct _ATRCFiledata *self, const char* varname);
+    const char* (*ReadKey)(struct _ATRCFiledata *self, const char* block, const char* key);
+    bool (*DoesExistBlock)(struct _ATRCFiledata *self, const char* block);
+    bool (*DoesExistVariable)(struct _ATRCFiledata *self, const char* varname);
+    bool (*DoesExistKey)(struct _ATRCFiledata *self, const char* block, const char* key);
+    bool (*IsPublic)(struct _ATRCFiledata *self, const char* varname);
+    void (*InsertVar)(struct _ATRCFiledata *self, const char* line, const char** args);
+    const char* (*InsertVar_S)(struct _ATRCFiledata *self, const char* line, const char** args);
+    void (*AddBlock)(struct _ATRCFiledata *self, const char* blockname);
+    void (*RemoveBlock)(struct _ATRCFiledata *self, const char* blockname);
+    void (*AddVariable)(struct _ATRCFiledata *self, const char* varname, const char* value);
+    void (*RemoveVariable)(struct _ATRCFiledata *self, const char* varname);
+    void (*ModifyVariable)(struct _ATRCFiledata *self, const char* varname, const char* value);
+    void (*AddKey)(struct _ATRCFiledata *self, const char* block, const char* key, const char* value);
+    void (*RemoveKey)(struct _ATRCFiledata *self, const char* block, const char* key);
+    void (*ModifyKey)(struct _ATRCFiledata *self, const char* block, const char* key, const char* value);
+    void (*Destructor)(struct _ATRCFiledata *self);
 } ATRC_FD, *PATRC_FD;
 
-void Constructor_Empty(PATRC_FD *self);
-bool Constructor(PATRC_FD *self, const char *path);
-const char* ReadVariable(PATRC_FD self, const char* varname);
-const char* ReadKey(PATRC_FD self, const char* block, const char* key);
-bool DoesExistBlock(PATRC_FD self, const char* block);
-bool DoesExistVariable(PATRC_FD self, const char* varname);
-bool DoesExistKey(PATRC_FD self, const char* block, const char* key);
-bool IsPublic(PATRC_FD self, const char* varname);
-void InsertVar(PATRC_FD self, const char* line, const char** args);
-const char* InsertVar_S(PATRC_FD self, const char* line, const char** args);
-void AddBlock(PATRC_FD self, const char* blockname);
-void RemoveBlock(PATRC_FD self, const char* blockname);
-void AddVariable(PATRC_FD self, const char* varname, const char* value);
-void RemoveVariable(PATRC_FD self, const char* varname);
-void ModifyVariable(PATRC_FD self, const char* varname, const char* value);
-void AddKey(PATRC_FD self, const char* block, const char* key, const char* value);
-void RemoveKey(PATRC_FD self, const char* block, const char* key);
-void ModifyKey(PATRC_FD self, const char* block, const char* key, const char* value);
-void Destructor(PATRC_FD self);
+ATRC_API PATRC_FD CreateEmptyFiledata();
+ATRC_API PATRC_FD CreateFiledata(const char *path);
+ATRC_API bool ReadFiledata(PATRC_FD self, const char *path);
+ATRC_API void DestroyFiledata(PATRC_FD *self);
 
-
-
-
-
+ATRC_API int test(void);
 
 _WRAPPER_EXIM_ bool _ATRC_WRAP_READ(PATRC_FD self);
+_WRAPPER_EXIM_ void _ATRC_WRAP_ERRORMSG(int err_num, int line_number, const char *var_name, const char *filename);
 #ifdef __cplusplus
 }
 #endif // __cplusplus
