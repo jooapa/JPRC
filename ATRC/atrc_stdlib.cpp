@@ -39,7 +39,7 @@ std::vector<std::string> atrc::atrc_to_vector(char separator, const std::string 
 
 namespace atrc {
     C_String_Arr atrc_to_list(char separator, const char* value) {
-        // TODO
+        // TODO: Create a C_String_Arr from a string
 		C_String_Arr res;
         return res;
     }

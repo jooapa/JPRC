@@ -65,6 +65,7 @@
         "atrc.h": "c",
         "filer.h": "c",
         "stdlib.h": "c",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "limits.h": "c"
     }
 }

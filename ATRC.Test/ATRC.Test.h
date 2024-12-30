@@ -15,5 +15,3 @@ void cpp_main(void);
 #ifdef __cplusplus
 }
 #endif
-
-// TODO: Reference additional headers your program requires here.

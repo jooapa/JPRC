@@ -12,5 +12,17 @@ void cpp_main(void)
 	}
 	std::cout << "fd" << std::endl;
 	std::string test = fd["test"]["test"];
-	std::cout << test << " " << fd["test"] << " " << fd.ReadKey("test", "test") << std::endl;
+	fd["test"]["test"] = "112233";
+	std::cout << test << "|" << fd["test"] << "|" << fd.ReadKey("test", "test") << std::endl;
+	C_ATRC_FD *c_fd = fd.ToCStruct();
+
+	std::cout << "C Filedata: " << c_fd->Filename << std::endl;
+
+	atrc::ATRC_FD fd2(c_fd);
+	Destroy_ATRC_FD(c_fd);
+	if(!fd2.CheckStatus()){
+		std::cout << "File is empty!" << std::endl;
+		return;
+	}
+	std::cout << fd2["test"]["test"] << std::endl;
 }

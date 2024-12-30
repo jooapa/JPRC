@@ -1,7 +1,7 @@
 #include <ATRC.h>
 #include <filer.h>
 #include <iostream>
-
+#include <cstring>
 
 
 void atrc::ATRC_FD::MAINCONSTRUCTOR(){
@@ -11,22 +11,40 @@ void atrc::ATRC_FD::MAINCONSTRUCTOR(){
     this->Blocks = std::make_unique<std::vector<Block>>();
 
 }
-atrc::ATRC_FD::ATRC_FD(C_PATRC_FD filedata){
-    this->MAINCONSTRUCTOR();
-    std::unique_ptr<std::vector<Variable>> vars = std::make_unique<std::vector<Variable>>();
-    std::unique_ptr<std::vector<Block>> blks = std::make_unique<std::vector<Block>>();
-    this->AutoSave = filedata->AutoSave;
-    this->Filename = filedata->Filename;
 
-    this->Variables = std::move(vars);
-    this->Blocks = std::move(blks);
-}
 atrc::ATRC_FD::ATRC_FD(){this->MAINCONSTRUCTOR();}
 atrc::ATRC_FD::ATRC_FD(const char *path){
     this->MAINCONSTRUCTOR();
     this->Filename = path;
     this->Read();
 }
+
+atrc::ATRC_FD::ATRC_FD(C_PATRC_FD fd){
+    this->MAINCONSTRUCTOR();
+    this->AutoSave = fd->AutoSave;
+    this->Filename = fd->Filename;
+    this->Variables = std::make_unique<std::vector<Variable>>();
+    this->Blocks = std::make_unique<std::vector<Block>>();
+    for(uint64_t i = 0; i < fd->Variables->VariableCount; i++){
+        Variable var;
+        var.Name = fd->Variables->Variables[i].Name;
+        var.Value = fd->Variables->Variables[i].Value;
+        var.IsPublic = fd->Variables->Variables[i].IsPublic;
+        this->Variables->push_back(var);
+    }
+    for(uint64_t i = 0; i < fd->Blocks->BlockCount; i++){
+        Block blk;
+        blk.Name = fd->Blocks->Blocks[i].Name;
+        for(uint64_t j = 0; j < fd->Blocks->Blocks[i].KeyCount; j++){
+            Key key;
+            key.Name = fd->Blocks->Blocks[i].Keys[j].Name;
+            key.Value = fd->Blocks->Blocks[i].Keys[j].Value;
+            blk.Keys.push_back(key);
+        }
+        this->Blocks->push_back(blk);
+    }
+}
+
 atrc::ATRC_FD::~ATRC_FD(){
     this->Variables->clear();
     this->Blocks->clear();
@@ -62,8 +80,12 @@ bool atrc::ATRC_FD::Read(){
 C_PATRC_FD atrc::ATRC_FD::ToCStruct(){
     C_PATRC_FD filedata = Create_Empty_ATRC_FD();
     filedata->AutoSave = this->AutoSave;
-    filedata->Filename = this->Filename.c_str();
-    
+    // Ensure the Filename is null-terminated and safely copied
+    filedata->Filename = new char[this->Filename.size() + 1];
+    std::strcpy(const_cast<char*>(filedata->Filename), this->Filename.c_str());
+
+
+    //TODO: Generate C_PVariable_Arr and C_PBlock_Arr
     
     return filedata;
 }
@@ -392,7 +414,6 @@ atrc::PROXY_ATRC_FD atrc::PROXY_ATRC_FD::operator[](const std::string& subKey) {
 }
 
 atrc::PROXY_ATRC_FD::operator std::string() const {
-	std::cout << key << std::endl;
 	uint64_t x = key.find("]");
     try {
 		if (x == std::string::npos) {
@@ -413,24 +434,15 @@ atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator=(const std::string& value) {
     uint64_t x = key.find("]");
     try {
         if (x == std::string::npos) {
-            if(!fd->DoesExistVariable(key)){
-                fd->AddVariable(key, value);
-            } else {
+            if(fd->DoesExistVariable(key)) {
                 fd->ModifyVariable(key, value);
             }
         }
         else {
             std::string block = key.substr(0, x);
             std::string key_ = key.substr(x + 1, key.size() - x - 1);
-            if(!fd->DoesExistBlock(block)){
-                fd->AddBlock(block);
-                fd->AddKey(block, key_, value);
-            } else {
-                if(!fd->DoesExistKey(block, key_)){
-                    fd->AddKey(block, key_, value);
-                } else {
+            if(fd->DoesExistKey(block, key_)) {
                     fd->ModifyKey(block, key_, value);
-                }
             }
         }
     } catch (std::exception& e) {

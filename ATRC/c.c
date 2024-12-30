@@ -7,6 +7,8 @@
 bool Read(C_PATRC_FD self) {
     return _ATRC_WRAP_READ(self);
 }
+
+// TODO: Add the rest of the functions
 const char* ReadVariable(C_PATRC_FD self, const char* varname) {
     const char* res = "";
     return res;
@@ -62,7 +64,8 @@ C_PATRC_FD Create_Empty_ATRC_FD(void){
 
 void Destroy_ATRC_FD(C_PATRC_FD self) {
     self->AutoSave = false;
-    //TODO
+    //TODO: Destroy blocks, variables and filename
+    free(self->Filename);
     free(self);
 
 }

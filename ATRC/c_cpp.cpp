@@ -15,7 +15,7 @@ bool _ATRC_WRAP_READ(C_PATRC_FD self) {
         std::cerr << "Failed to parse file: " << filename << std::endl;
         return false;
     } else {
-        // TODO
+        // TODO: Assign parsedData to self
     }
     return true;
 }

@@ -116,14 +116,8 @@ static void _W_ParseLineValueATRCtoSTRING(
         }   
         
         if(!_last_is_re_dash && c == '#') { // Comment
-            // TODO FIX BUG:
-            // This is a %*%, and %*% #
-            // ->
-            // 'This is a %*%, and %*% '
-            //
-            // This is a %*%, and %*%& #
-            // ->
-            // 'This is a %*%, and %*%  '
+            _value = _value.substr(0, _value.length() - 1);
+            atrc::trim(_value);
             break; 
         }
         if(!_last_is_re_dash && c == '&') { // Whitespace

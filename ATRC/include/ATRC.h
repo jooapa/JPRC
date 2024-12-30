@@ -1,16 +1,18 @@
 #pragma once
 #ifndef ATRC_H
 #define ATRC_H
+#define __MICROSOFT_CHECK__ defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
+#define __MSVC_CHECK__      (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER) 
 #ifdef ATRC_EXPORTS
-#   if defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
+#   if __MICROSOFT_CHECK__
 #       define ATRC_API __declspec(dllexport)
 #       define _WRAPPER_EXIM_ __declspec(dllexport)
-#   endif
+#   endif // __MICROSOFT_CHECK__
 #else
-#   if defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
+#   if __MICROSOFT_CHECK__
 #       define ATRC_API __declspec(dllimport)
 #       define _WRAPPER_EXIM_ __declspec(dllimport)
-#   endif
+#   endif // __MICROSOFT_CHECK__
 #endif // ATRC_EXPORTS
 
 #ifndef ATRC_API
@@ -24,11 +26,14 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <limits.h>
 #define __atrc__one__of__two__(cpp, c) \
     __atrc__one__of__two_helper__(cpp, c)
 
 #define __nmsp__    namespace atrc {
-#define __nmspe__    }
+#define __nmspe__   }
+
+
 
 #ifdef __cplusplus
     #define __atrc__one__of__two_helper__(cpp, c) cpp
@@ -44,10 +49,10 @@
 #  include <ostream>
 namespace atrc {
 // Disable warning C4251 for std::vector and std::string.
-#  if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER) 
+#  if __MSVC_CHECK__
 #    pragma warning(push)
 #    pragma warning(disable: 4251)
-#  endif // _WIN32 || _WIN64
+#  endif // __MSVC_CHECK__
 #endif // __cplusplus
 
 
@@ -58,6 +63,7 @@ C declarations
 } // namespace atrc
 extern "C" {
 #endif // __cplusplus
+
 
 typedef struct ATRC_API C_Variable {
     const char *Name;
@@ -85,6 +91,7 @@ typedef struct ATRC_API _C_Block_Arr {
     C_Block *Blocks;
     uint64_t BlockCount;
 } C_Block_Arr, *C_PBlock_Arr;
+
 
 
 typedef struct ATRC_API _ATRCFiledata{
@@ -117,8 +124,8 @@ ATRC_API C_PATRC_FD Create_ATRC_FD(const char *filename);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
 ATRC_API void Destroy_ATRC_FD(C_PATRC_FD self);
 
-_WRAPPER_EXIM_ bool _ATRC_WRAP_READ(C_PATRC_FD self);
-_WRAPPER_EXIM_ void _ATRC_WRAP_ERRORMSG(int err_num, int line_number, const char *var_name, const char *filename);
+bool _ATRC_WRAP_READ(C_PATRC_FD self);
+void _ATRC_WRAP_ERRORMSG(int err_num, int line_number, const char *var_name, const char *filename);
 
 #ifdef __cplusplus
 } // extern "C"
@@ -256,9 +263,9 @@ ATRC_API double atrc_to_double(const char* value);
 
 
 #ifdef __cplusplus
-#   if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
+#   if __MSVC_CHECK__
 #       pragma warning(pop)
-#   endif // _WIN32 || _WIN64
+#   endif // __MSVC_CHECK__
     } // extern "C"
 } // namespace atrc
 #endif // __cplusplus
