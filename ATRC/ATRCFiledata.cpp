@@ -138,6 +138,12 @@ bool atrc::ATRC_FD::DoesExistVariable(const std::string& varname){
     }
     return false;
 }
+
+bool atrc::ATRC_FD::CheckStatus() {
+	if (Variables->empty() && Blocks->empty()) return false;
+    return true;
+}
+
 bool atrc::ATRC_FD::DoesExistKey(const std::string& block, const std::string& key){
     for(Block &blk : *this->Blocks){
             if(blk.Name == block){
@@ -377,22 +383,58 @@ void atrc::ATRC_FD::ModifyKey(const std::string& block, const std::string& key, 
 /*+++
 PROXY_ATRC_FD
 ---*/
-
+#include <iostream>
 atrc::PROXY_ATRC_FD::PROXY_ATRC_FD(atrc::ATRC_FD& fd, const std::string& key) : fd(&fd), key(key) {}
 
 atrc::PROXY_ATRC_FD atrc::PROXY_ATRC_FD::operator[](const std::string& subKey) {
-	std::string combined_key = key + "." + subKey;
+	std::string combined_key = key + "]" + subKey;
 	return atrc::PROXY_ATRC_FD(*fd, combined_key);
 }
+
 atrc::PROXY_ATRC_FD::operator std::string() const {
-	return fd->ReadVariable(key);
+	std::cout << key << std::endl;
+	uint64_t x = key.find("]");
+    try {
+		if (x == std::string::npos) {
+			return fd->ReadVariable(key);
+		}
+		else {
+			std::string block = key.substr(0, x);
+			std::string key_ = key.substr(x + 1, key.size() - x - 1);
+			return fd->ReadKey(block, key_);
+		}
+	}
+    catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+    return "";
 }
 atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator=(const std::string& value) {
-	fd->ModifyVariable(key, value);
-	return *this;
-}
-
-std::ostream& atrc::operator<<(std::ostream& os, const atrc::PROXY_ATRC_FD& proxy) {
-    os << static_cast<std::string>(proxy);
-    return os;
+    uint64_t x = key.find("]");
+    try {
+        if (x == std::string::npos) {
+            if(!fd->DoesExistVariable(key)){
+                fd->AddVariable(key, value);
+            } else {
+                fd->ModifyVariable(key, value);
+            }
+        }
+        else {
+            std::string block = key.substr(0, x);
+            std::string key_ = key.substr(x + 1, key.size() - x - 1);
+            if(!fd->DoesExistBlock(block)){
+                fd->AddBlock(block);
+                fd->AddKey(block, key_, value);
+            } else {
+                if(!fd->DoesExistKey(block, key_)){
+                    fd->AddKey(block, key_, value);
+                } else {
+                    fd->ModifyKey(block, key_, value);
+                }
+            }
+        }
+    } catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+    return *this;
 }

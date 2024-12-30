@@ -5,17 +5,11 @@
 #   if defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
 #       define ATRC_API __declspec(dllexport)
 #       define _WRAPPER_EXIM_ __declspec(dllexport)
-#   elif __GNUC__ >= 4
-#       define ATRC_API __attribute__((visibility("default")))
-#       define _WRAPPER_EXIM_ __attribute__((visibility("default")))
 #   endif
 #else
 #   if defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
 #       define ATRC_API __declspec(dllimport)
 #       define _WRAPPER_EXIM_ __declspec(dllimport)
-#   elif __GNUC__ >= 4
-#       define ATRC_API __attribute__((visibility("default")))
-#       define _WRAPPER_EXIM_ __attribute__((visibility("default")))
 #   endif
 #endif // ATRC_EXPORTS
 
@@ -180,6 +174,8 @@ class ATRC_API ATRC_FD {
         void ModifyKey(const std::string& block, const std::string& key, const std::string& value);
         C_PATRC_FD ToCStruct();
 
+        bool CheckStatus();
+
         std::vector<Variable>* GetVariables();
         std::vector<Block>* GetBlocks();
         std::string GetFilename();
@@ -204,13 +200,15 @@ public:
     PROXY_ATRC_FD operator[](const std::string& subKey);
     operator std::string() const;
     PROXY_ATRC_FD& operator=(const std::string& value);
-
-    friend std::ostream& operator<<(std::ostream& os, const PROXY_ATRC_FD& fd); 
+    
+	friend std::ostream& operator<<(std::ostream& os, const PROXY_ATRC_FD& obj) {
+        os << obj.fd->ReadVariable(obj.key);
+		return os;
+	}
 private:
     PATRC_FD fd;
     std::string key;
 };
-std::ostream& operator<<(std::ostream& os, const PROXY_ATRC_FD& fd);
 
 #endif // __cplusplus
 
