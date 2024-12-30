@@ -1,17 +1,21 @@
-#define INCLUDE_ATRC_STDLIB
-#include <DEV_INC.hpp>
 #include <filer.h>
 #include <iostream>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <ATRC.h>
+#include <sstream>
 
-int atrc_stdlib_errval = SUCCESSFULL_ACTION;
+uint64_t atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
 
-std::string str_to_lower(std::string str){
-    for(char &c : str){
-        c = std::tolower(c);
+std::string str_to_lower(const char *str){
+    std::string res = "";
+    for(size_t i = 0; i < strlen(str); i++){
+        res += std::tolower(str[i]);
     }
-    return str;
+    return res;
 }
-std::vector<std::string> atrc_to_list(char separator, const std::string &value){
+std::vector<std::string> atrc::atrc_to_vector(char separator, const std::string &value){
     std::vector<std::string> res;
     if(value.size() == 0){
         return res;
@@ -29,66 +33,85 @@ std::vector<std::string> atrc_to_list(char separator, const std::string &value){
         }
         buf += c;
     }
-    atrc_stdlib_errval = SUCCESSFULL_ACTION;
+    atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
     return res;
 }
 
-bool atrc_to_bool(const std::string &value){
+namespace atrc {
+    C_String_Arr atrc_to_list(char separator, const char* value) {
+        // TODO
+		C_String_Arr res;
+        return res;
+    }
+} // namespace atrc
+
+
+void atrc::atrc_free_list(C_String_Arr *list){
+    for(size_t i = 0; i < list->count; i++){
+        delete[] list->list[i];
+    }
+    delete[] list->list;
+    list->count = 0;
+    atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
+}
+
+
+bool atrc::atrc_to_bool(const char* value){
     std::string temp=str_to_lower(value);
     trim(temp);
     if(temp == "true" || temp == "1") {
-        atrc_stdlib_errval = SUCCESSFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
         return true;
     } else if(temp == "false" || temp == "0"){
-        atrc_stdlib_errval = SUCCESSFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
         return false;
     } else {
-        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
         return false;
     }
 }
 
-uint64_t atrc_to_uint64_t(const std::string &value){
+uint64_t atrc::atrc_to_uint64_t(const char* value){
     uint64_t res = 0;
     try {
         res = std::stoull(value);
-        atrc_stdlib_errval = SUCCESSFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument& e) {
-        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
         std::cerr << e.what() << std::endl;
     } catch (const std::out_of_range& e) {
         std::cerr << e.what() << std::endl;
-        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
     }
     return res;
 }
 
-int64_t atrc_to_int64_t(const std::string &value){
+int64_t atrc::atrc_to_int64_t(const char* value){
     int64_t res = 0;
     try {
         res = std::stoll(value);
-        atrc_stdlib_errval = SUCCESSFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument& e) {
-        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
         std::cerr << e.what() << std::endl;
     } catch (const std::out_of_range& e) {
         std::cerr << e.what() << std::endl;
-        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
     }
     return res;
 }
 
-double atrc_to_double(const std::string &value){
+double atrc::atrc_to_double(const char* value){
     double res = 0;
     try {
         res = std::stod(value);
-        atrc_stdlib_errval = SUCCESSFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument& e) {
-        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
         std::cerr << e.what() << std::endl;
     } catch (const std::out_of_range& e) {
         std::cerr << e.what() << std::endl;
-        atrc_stdlib_errval = UNSUCCESFULL_ACTION;
+        atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
     }
     return res;
 }

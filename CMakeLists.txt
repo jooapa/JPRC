@@ -10,7 +10,7 @@ endif()
 add_subdirectory("ATRC")
 
 # Set manually if argument is not working
-set(ATRC_BUILD_TESTS ON CACHE BOOL "Build tests for ATRC library")
+# set(ATRC_BUILD_TESTS ON CACHE BOOL "Build tests for ATRC library")
 
 if(DEFINED ATRC_BUILD_TESTS)
     add_subdirectory("ATRC.Test")

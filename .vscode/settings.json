@@ -57,6 +57,14 @@
         "atrc.test.h": "c",
         "string.h": "c",
         "stdbool.h": "c",
-        "dev_inc.hpp": "c"
+        "dev_inc.hpp": "c",
+        "stdio.h": "c",
+        "atrc_common.hpp": "c",
+        "atrc_cpp.hpp": "c",
+        "atrc_c.h": "c",
+        "atrc.h": "c",
+        "filer.h": "c",
+        "stdlib.h": "c",
+        "sstream": "cpp"
     }
 }

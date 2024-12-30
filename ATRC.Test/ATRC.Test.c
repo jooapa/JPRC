@@ -1,13 +1,9 @@
 ﻿#include "ATRC.Test.h"
-#include <ATRC.h>
 #include <stdio.h>
 
-int main()
+int main(void)
 {    
-	printf("Hello, World!\n");
-	printf("Test: %d\n", test());
-    PATRC_FD fd = CreateEmptyFiledata();
-    if(fd == NULL) return 1;
-    DestroyFiledata(&fd);
+	printf("Hello from C!\n");
+	cpp_main();
     return 0;
 }

@@ -1,6 +1,7 @@
 ﻿# Add executable for testing
 add_executable(ATRC.Test 
     "ATRC.Test.c"
+    "ATRC.Test.cpp"
     "ATRC.Test.h"
 )
 
@@ -15,12 +16,6 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
     set_property(TARGET ATRC.Test PROPERTY CXX_STANDARD 20)
 endif()
 
-# Optional RPATH settings for UNIX-based systems
-if (UNIX)
-    set(CMAKE_BUILD_RPATH "${PROJECT_SOURCE_DIR}/ATRC/libs")
-    set(CMAKE_INSTALL_RPATH "${PROJECT_SOURCE_DIR}/ATRC/libs")
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif()
 
 # Enable testing
 enable_testing()
@@ -52,9 +47,9 @@ endif()
 # Add the custom test targets
 add_custom_target(run_tests
     COMMAND "${CMAKE_BINARY_DIR}/ATRC.Test/ATRC.Test"
-    DEPENDS ATRC.Test ATRC
+    DEPENDS "ATRC.Test" "ATRC"
     COMMENT "Running tests for ATRC"
 )
 
 # If you want the test target to be built by default when invoking `make`, set it as a default target
-add_dependencies(run_tests "ATRC.Test" "ATRC")
+add_dependencies(run_tests ATRC.Test ATRC)

@@ -42,7 +42,7 @@ int main()
 ## Example resource file
 
 ```ini
-#!__ATRC__
+#__ATRC__
 %var_name%=value_1
 <%priv_var>=value_2
 [block_name]
