@@ -2,6 +2,8 @@
 #include <filer.h>
 #include <iostream>
 
+
+
 void atrc::ATRC_FD::MAINCONSTRUCTOR(){
     this->AutoSave = false;
     this->Filename = "";
@@ -32,15 +34,14 @@ atrc::ATRC_FD::~ATRC_FD(){
     this->Blocks.reset();
 }
 
-int& atrc::ATRC_FD::operator[](size_t index) {
-    std::cout << index << std::endl;
-    return *new int;
+atrc::PROXY_ATRC_FD atrc::ATRC_FD::operator[](const std::string& key) {
+    return atrc::PROXY_ATRC_FD(*this, key);
 }
 
-const int& atrc::ATRC_FD::operator[](size_t index) const {
-    std::cout << index << std::endl;
-    return *new int;
+atrc::PROXY_ATRC_FD atrc::ATRC_FD::operator[](const std::string& key) const {
+    return atrc::PROXY_ATRC_FD(const_cast<atrc::ATRC_FD&>(*this), key);
 }
+
 
 
 bool atrc::ATRC_FD::Read(){
@@ -371,3 +372,27 @@ void atrc::ATRC_FD::ModifyKey(const std::string& block, const std::string& key, 
 }
 
 
+
+
+/*+++
+PROXY_ATRC_FD
+---*/
+
+atrc::PROXY_ATRC_FD::PROXY_ATRC_FD(atrc::ATRC_FD& fd, const std::string& key) : fd(&fd), key(key) {}
+
+atrc::PROXY_ATRC_FD atrc::PROXY_ATRC_FD::operator[](const std::string& subKey) {
+	std::string combined_key = key + "." + subKey;
+	return atrc::PROXY_ATRC_FD(*fd, combined_key);
+}
+atrc::PROXY_ATRC_FD::operator std::string() const {
+	return fd->ReadVariable(key);
+}
+atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator=(const std::string& value) {
+	fd->ModifyVariable(key, value);
+	return *this;
+}
+
+std::ostream& atrc::operator<<(std::ostream& os, const atrc::PROXY_ATRC_FD& proxy) {
+    os << static_cast<std::string>(proxy);
+    return os;
+}

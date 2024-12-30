@@ -22,20 +22,7 @@ target_link_libraries(${project_name} PRIVATE ${ATRC})
 
 int main()
 {
-    std::string filename = "test.atrc";
-    std::shared_ptr<ATRC_FD> fd = Read(filename, "utf-8");
-    fd->AutoSave = true;
-    if (fd) {
-        AddBlock(fd, "block_name");
-        AddKey(fd, "block_name", "key_name", "value");
-        AddKey(fd, "block_name", "key_name2", "value");
-        RemoveKey(fd, "block_name", "key_name2");
-        ModifyKey(fd, "block_name", "key_name2", "new_value");
-    } else {
-        std::cerr << "Failed to read filedata." << std::endl;
-    }
 
-    return 0;
 }
 ```
 
@@ -81,7 +68,7 @@ insert2=insert second variable here: %*1% and first one here: %*0*
     cmake --preset linux-x64-debug -B./out/linux-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=./cmake/toolchain-linux-x64.cmake -DATRC_BUILD_TESTS=ON && cmake --build ./out/linux-x64-debug/build --config Debug --target run_tests
 
     # VS
-    cmake --preset VS2022-x64-debug -B./out/VS2022-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DATRC_BUILD_TESTS=ON
+    cmake --preset VS2022-x64-debug -B./out/VS2022-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DATRC_BUILD_TESTS=ON & .\out\VS2022-x64-debug\build\ATRC.sln
 
     # Create release package
     # run in wsl

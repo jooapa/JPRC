@@ -47,6 +47,7 @@
 #  include <vector>
 #  include <string>
 #  include <memory>
+#  include <ostream>
 namespace atrc {
 // Disable warning C4251 for std::vector and std::string.
 #  if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER) 
@@ -64,35 +65,35 @@ C declarations
 extern "C" {
 #endif // __cplusplus
 
-typedef struct C_Variable {
+typedef struct ATRC_API C_Variable {
     const char *Name;
     const char *Value;
     bool IsPublic;
 } C_Variable, *C_PVariable;
 
-typedef struct _C_Variable_Arr {
+typedef struct ATRC_API _C_Variable_Arr {
     C_Variable *Variables;
     uint64_t VariableCount;
 } C_Variable_Arr, *C_PVariable_Arr;
 
-typedef struct C_Key {
+typedef struct ATRC_API C_Key {
     const char *Name;
     const char *Value;
 } C_Key, *C_PKey;
 
-typedef struct _C_Block {
+typedef struct ATRC_API _C_Block {
     const char *Name;
     C_Key *Keys;
     uint64_t KeyCount;
 } C_Block, *C_PBlock;
 
-typedef struct _C_Block_Arr {
+typedef struct ATRC_API _C_Block_Arr {
     C_Block *Blocks;
     uint64_t BlockCount;
 } C_Block_Arr, *C_PBlock_Arr;
 
 
-typedef struct _ATRCFiledata{
+typedef struct ATRC_API _ATRCFiledata{
     C_PVariable_Arr Variables;
     C_PBlock_Arr Blocks;
     const char *Filename;
@@ -135,24 +136,26 @@ namespace atrc {
 C++ only declarations
 ---*/
 #ifdef __cplusplus
-typedef struct Variable {
+typedef struct ATRC_API Variable {
     std::string Name;
     std::string Value;
     bool IsPublic = true;
 } Variable, * PVariable;
 
-typedef struct Key {
+typedef struct ATRC_API Key {
     std::string Name;
     std::string Value;
 } Key, * PKey;
 
 
-typedef struct _Block {
+typedef struct ATRC_API _Block {
     std::string Name;
     std::vector<Key> Keys;
 } Block, * PBlock;
 
-class ATRC_FD {
+class ATRC_API PROXY_ATRC_FD;
+
+class ATRC_API ATRC_FD {
     public:
         ATRC_FD();
         ATRC_FD(const char* path);
@@ -182,17 +185,33 @@ class ATRC_FD {
         std::string GetFilename();
         bool GetAutoSave() const;
         void SetAutoSave(bool autosave);
+
+        PROXY_ATRC_FD operator[](const std::string& key);
+        PROXY_ATRC_FD operator[](const std::string& key) const;
+
     private:
         void MAINCONSTRUCTOR();
         bool AutoSave;
         std::unique_ptr<std::vector<Variable>> Variables;
         std::unique_ptr<std::vector<Block>> Blocks;
         std::string Filename;
-
-        int& operator[](size_t index);
-
-        const int& operator[](size_t index) const;
     };
+typedef ATRC_FD* PATRC_FD;
+
+class ATRC_API PROXY_ATRC_FD {
+public:
+    PROXY_ATRC_FD(ATRC_FD& fd, const std::string& key);
+    PROXY_ATRC_FD operator[](const std::string& subKey);
+    operator std::string() const;
+    PROXY_ATRC_FD& operator=(const std::string& value);
+
+    friend std::ostream& operator<<(std::ostream& os, const PROXY_ATRC_FD& fd); 
+private:
+    PATRC_FD fd;
+    std::string key;
+};
+std::ostream& operator<<(std::ostream& os, const PROXY_ATRC_FD& fd);
+
 #endif // __cplusplus
 
 
@@ -220,7 +239,7 @@ ATRC_API std::vector<std::string> atrc_to_vector(char separator, const std::stri
 extern "C" {
 #endif // __cplusplus
 
-typedef struct _C_String_Arr {
+typedef struct ATRC_API _C_String_Arr {
     char **list;
     uint64_t count;
 } C_String_Arr, *C_PString_Arr;
