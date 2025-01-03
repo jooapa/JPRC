@@ -6,7 +6,9 @@
 /*+++
 Wrap around functions from C++ to c
 ---*/
-bool _ATRC_WRAP_READ(C_PATRC_FD self) {
+
+/*_ATRC_WRAP_READ*/
+bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self) {
     std::string filename = self->Filename;
     std::string encoding = "UTF-8";
     std::string extension = "atrc";
@@ -15,11 +17,37 @@ bool _ATRC_WRAP_READ(C_PATRC_FD self) {
         std::cerr << "Failed to parse file: " << filename << std::endl;
         return false;
     } else {
-        // TODO: Assign parsedData to self
+        for(atrc::Variable &var : *parsedData.first){
+            self->Variables->Variables[self->Variables->VariableCount].Name = new char[var.Name.size() + 1];
+            std::strcpy(self->Variables->Variables[self->Variables->VariableCount].Name, var.Name.c_str());
+            self->Variables->Variables[self->Variables->VariableCount].Value = new char[var.Value.size() + 1];
+            std::strcpy(self->Variables->Variables[self->Variables->VariableCount].Value, var.Value.c_str());
+            self->Variables->Variables[self->Variables->VariableCount].IsPublic = var.IsPublic;
+            self->Variables->VariableCount++;
+        }
+        for(atrc::Block &block : *parsedData.second){
+            self->Blocks->Blocks[self->Blocks->BlockCount].Name = new char[block.Name.size() + 1];
+            std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Name, block.Name.c_str());
+            for(atrc::Key &key : block.Keys){
+                self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name = new char[key.Name.size() + 1];
+                std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name, key.Name.c_str());
+                self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value = new char[key.Value.size() + 1];
+                std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value, key.Value.c_str());
+                self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount++;
+            }
+            self->Blocks->BlockCount++;
+        }
     }
     return true;
 }
 
-void _ATRC_WRAP_ERRORMSG(int err_num, int line_number, const char *var_name, const char *filename){
+/*_ATRC_WRAP_ERRORMSG*/
+void _ATRC_WRAP_FUNC_2(int err_num, int line_number, const char *var_name, const char *filename){
     atrc::errormsg(err_num, line_number, var_name, filename);
+}
+
+/*_ATRC_WRAP__W_SAVE*/
+void _ATRC_WRAP_FUNC_3(C_PATRC_FD self, const int &action, const int &xtra_info, const char *varname){
+    atrc::ATRC_FD fd(self);
+    atrc::_W_Save_(&fd, (atrc::ATRC_SAVE)action, xtra_info, varname);
 }

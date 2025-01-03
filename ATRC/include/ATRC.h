@@ -1,19 +1,18 @@
 #pragma once
 #ifndef ATRC_H
 #define ATRC_H
-#define __MICROSOFT_CHECK__ defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
-#define __MSVC_CHECK__      (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER) 
-#ifdef ATRC_EXPORTS
-#   if __MICROSOFT_CHECK__
+#define __MICROSOFT_CHECK__     defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
+#define __MSVC_CHECK__          (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER) 
+
+#if __MICROSOFT_CHECK__
+#   ifdef ATRC_EXPORTS
 #       define ATRC_API __declspec(dllexport)
 #       define _WRAPPER_EXIM_ __declspec(dllexport)
-#   endif // __MICROSOFT_CHECK__
-#else
-#   if __MICROSOFT_CHECK__
+#   else // ATRC_EXPORTS
 #       define ATRC_API __declspec(dllimport)
 #       define _WRAPPER_EXIM_ __declspec(dllimport)
-#   endif // __MICROSOFT_CHECK__
-#endif // ATRC_EXPORTS
+#   endif // ATRC_EXPORTS
+#endif // __MICROSOFT_CHECK__
 
 #ifndef ATRC_API
 #   define ATRC_API 
@@ -23,18 +22,10 @@
 #endif // _WRAPPER_EXIM_
 
 #define FILEHEADER "#__ATRC__\0"
-
-#include <stdint.h>
-#include <stdbool.h>
-#include <limits.h>
 #define __atrc__one__of__two__(cpp, c) \
     __atrc__one__of__two_helper__(cpp, c)
-
 #define __nmsp__    namespace atrc {
 #define __nmspe__   }
-
-
-
 #ifdef __cplusplus
     #define __atrc__one__of__two_helper__(cpp, c) cpp
 #else
@@ -42,11 +33,14 @@
 #endif
 
 
+#include <stdint.h>
+#include <stdbool.h>
+#include <limits.h>
 #ifdef __cplusplus
 #  include <vector>
 #  include <string>
 #  include <memory>
-#  include <ostream>
+#  include <iostream>
 namespace atrc {
 // Disable warning C4251 for std::vector and std::string.
 #  if __MSVC_CHECK__
@@ -65,39 +59,39 @@ extern "C" {
 #endif // __cplusplus
 
 
-typedef struct ATRC_API C_Variable {
-    const char *Name;
-    const char *Value;
+typedef struct C_Variable {
+    char *Name;
+    char *Value;
     bool IsPublic;
 } C_Variable, *C_PVariable;
 
-typedef struct ATRC_API _C_Variable_Arr {
+typedef struct _C_Variable_Arr {
     C_Variable *Variables;
     uint64_t VariableCount;
 } C_Variable_Arr, *C_PVariable_Arr;
 
-typedef struct ATRC_API C_Key {
-    const char *Name;
-    const char *Value;
+typedef struct C_Key {
+    char *Name;
+    char *Value;
 } C_Key, *C_PKey;
 
-typedef struct ATRC_API _C_Block {
-    const char *Name;
+typedef struct _C_Block {
+    char *Name;
     C_Key *Keys;
     uint64_t KeyCount;
 } C_Block, *C_PBlock;
 
-typedef struct ATRC_API _C_Block_Arr {
+typedef struct _C_Block_Arr {
     C_Block *Blocks;
     uint64_t BlockCount;
 } C_Block_Arr, *C_PBlock_Arr;
 
 
 
-typedef struct ATRC_API _ATRCFiledata{
+typedef struct _ATRCFiledata{
     C_PVariable_Arr Variables;
     C_PBlock_Arr Blocks;
-    const char *Filename;
+    char *Filename;
     bool AutoSave;
 } C_ATRC_FD, *C_PATRC_FD;
 
@@ -120,12 +114,13 @@ ATRC_API void RemoveKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API void ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
 
 
-ATRC_API C_PATRC_FD Create_ATRC_FD(const char *filename);
+ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
 ATRC_API void Destroy_ATRC_FD(C_PATRC_FD self);
 
-bool _ATRC_WRAP_READ(C_PATRC_FD self);
-void _ATRC_WRAP_ERRORMSG(int err_num, int line_number, const char *var_name, const char *filename);
+bool _ATRC_WRAP_FUNC_1(C_PATRC_FD a);
+void _ATRC_WRAP_FUNC_2(int a, int b, const char *c, const char *d);
+void _ATRC_WRAP_FUNC_3(C_PATRC_FD a, const int &b, const int &c, const char *d);
 
 #ifdef __cplusplus
 } // extern "C"
@@ -171,14 +166,14 @@ class ATRC_API ATRC_FD {
         bool IsPublic(const std::string& varname);
         void InsertVar(std::string& line, std::vector<std::string>& args);
         std::string InsertVar_S(const std::string& line, std::vector<std::string>& args);
-        void AddBlock(const std::string& blockname);
-        void RemoveBlock(const std::string& blockname);
-        void AddVariable(const std::string& varname, const std::string& value);
-        void RemoveVariable(const std::string& varname);
-        void ModifyVariable(const std::string& varname, const std::string& value);
-        void AddKey(const std::string& block, const std::string& key, const std::string& value);
-        void RemoveKey(const std::string& block, const std::string& key);
-        void ModifyKey(const std::string& block, const std::string& key, const std::string& value);
+        bool AddBlock(const std::string& blockname);
+        bool RemoveBlock(const std::string& blockname);
+        bool AddVariable(const std::string& varname, const std::string& value);
+        bool RemoveVariable(const std::string& varname);
+        bool ModifyVariable(const std::string& varname, const std::string& value);
+        bool AddKey(const std::string& block, const std::string& key, const std::string& value);
+        bool RemoveKey(const std::string& block, const std::string& key);
+        bool ModifyKey(const std::string& block, const std::string& key, const std::string& value);
         C_PATRC_FD ToCStruct();
 
         bool CheckStatus();
@@ -206,10 +201,18 @@ public:
     PROXY_ATRC_FD(ATRC_FD& fd, const std::string& key);
     PROXY_ATRC_FD operator[](const std::string& subKey);
     operator std::string() const;
-    PROXY_ATRC_FD& operator=(const std::string& value);
-    
-	friend std::ostream& operator<<(std::ostream& os, const PROXY_ATRC_FD& obj) {
-        os << obj.fd->ReadVariable(obj.key);
+    PROXY_ATRC_FD& operator=(const std::string& value);    
+    PROXY_ATRC_FD& operator>>(const std::string& value);
+    PROXY_ATRC_FD& operator>>(const char* value);
+
+	inline friend std::ostream& operator<<(std::ostream& os, const PROXY_ATRC_FD& obj) {
+        uint64_t x = obj.key.find("]");
+        if(x == std::string::npos) os << obj.fd->ReadVariable(obj.key);
+        else {
+            std::string block = obj.key.substr(0, x);
+            std::string key_ = obj.key.substr(x + 1, obj.key.size() - x - 1);
+            os << obj.fd->ReadKey(block, key_);
+        }
 		return os;
 	}
 private:
@@ -244,7 +247,7 @@ ATRC_API std::vector<std::string> atrc_to_vector(char separator, const std::stri
 extern "C" {
 #endif // __cplusplus
 
-typedef struct ATRC_API _C_String_Arr {
+typedef struct _C_String_Arr {
     char **list;
     uint64_t count;
 } C_String_Arr, *C_PString_Arr;

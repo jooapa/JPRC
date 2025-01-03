@@ -14,6 +14,9 @@ void cpp_main(void)
 	std::string test = fd["test"]["test"];
 	fd["test"]["test"] = "112233";
 	std::cout << test << "|" << fd["test"] << "|" << fd.ReadKey("test", "test") << std::endl;
+	fd["test"]["test"] >> "test 189";
+	std::cout << fd["test"]["test"] << std::endl;
+
 	C_ATRC_FD *c_fd = fd.ToCStruct();
 
 	std::cout << "C Filedata: " << c_fd->Filename << std::endl;

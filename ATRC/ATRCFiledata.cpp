@@ -80,7 +80,6 @@ bool atrc::ATRC_FD::Read(){
 C_PATRC_FD atrc::ATRC_FD::ToCStruct(){
     C_PATRC_FD filedata = Create_Empty_ATRC_FD();
     filedata->AutoSave = this->AutoSave;
-    // Ensure the Filename is null-terminated and safely copied
     filedata->Filename = new char[this->Filename.size() + 1];
     std::strcpy(const_cast<char*>(filedata->Filename), this->Filename.c_str());
 
@@ -233,10 +232,10 @@ void atrc::ATRC_FD::InsertVar(std::string &line, std::vector<std::string> &args)
     }
     line = _result;
 }
-void atrc::ATRC_FD::AddBlock(const std::string& blockname){
+bool atrc::ATRC_FD::AddBlock(const std::string& blockname){
     if(DoesExistBlock(blockname)){
         errormsg(ERR_BLOCK_EXISTS, -1, blockname, this->Filename);
-        return;
+        return false;
     }
     Block blk;
     blk.Name = blockname;
@@ -244,14 +243,14 @@ void atrc::ATRC_FD::AddBlock(const std::string& blockname){
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::ADD_BLOCK, -1, blockname);
     }
-    
+    return true;
 }
-void atrc::ATRC_FD::RemoveBlock(const std::string& blockname){
+bool atrc::ATRC_FD::RemoveBlock(const std::string& blockname){
     Block block;
     block.Name = blockname;
     if(!BlockContainsBlock(this->Blocks, block)) {
         errormsg(ERR_BLOCK_NOT_FOUND, -1, blockname, this->Filename);
-        return;
+        return false;
     }
 
     int i = 0;
@@ -263,26 +262,28 @@ void atrc::ATRC_FD::RemoveBlock(const std::string& blockname){
     if(this->AutoSave) {
         atrc::_W_Save_(this, atrc::ATRC_SAVE::REMOVE_BLOCK, i, blockname);
     }
+    return true;
 }
-void atrc::ATRC_FD::AddVariable(const std::string& varname, const std::string& value){
+bool atrc::ATRC_FD::AddVariable(const std::string& varname, const std::string& value){
     Variable var;
     var.Name = varname;
     if(DoesExistVariable(varname)){
         errormsg(ERR_VAR_EXISTS, -1, var.Name, this->Filename);
-        return;
+        return false;
     }
     var.Value = value;
     this->Variables->push_back(var);
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::ADD_VAR, -1, "%"+var.Name+"%="+atrc::ParseLineSTRINGtoATRC(var.Value));
     }
+    return true;
 }
-void atrc::ATRC_FD::RemoveVariable(const std::string& varname){
+bool atrc::ATRC_FD::RemoveVariable(const std::string& varname){
     Variable var;
     var.Name = varname;
     if(!DoesExistVariable(varname)){
         errormsg(ERR_VAR_NOT_FOUND, -1, var.Name, this->Filename);
-        return;
+        return false;
     }
 
     int i = 0;    
@@ -297,13 +298,14 @@ void atrc::ATRC_FD::RemoveVariable(const std::string& varname){
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::REMOVE_VAR, i, varname);
     }
+    return true;
 }
-void atrc::ATRC_FD::ModifyVariable(const std::string& varname, const std::string& value){
-Variable var;
+bool atrc::ATRC_FD::ModifyVariable(const std::string& varname, const std::string& value){
+    Variable var;
     var.Name = varname;
     if(!DoesExistVariable(varname)){
         errormsg(ERR_VAR_NOT_FOUND, -1, var.Name, this->Filename);
-        return;
+        return false;
     }
     int i = 0;    
     for(Variable &var : *this->Variables){
@@ -315,16 +317,17 @@ Variable var;
     this->Variables->at((size_t)i).Value = value;
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::MODIFY_VAR, i, atrc::ParseLineSTRINGtoATRC(value)); // Values taken from filedata->Variables->at(xtra_info).[type]
-    }
+    } 
+    return true;
 }
-void atrc::ATRC_FD::AddKey(const std::string& block, const std::string& key, const std::string& value){
+bool atrc::ATRC_FD::AddKey(const std::string& block, const std::string& key, const std::string& value){
     if(!DoesExistBlock(block)) {
         errormsg(ERR_BLOCK_NOT_FOUND, -1, block, this->Filename);
-        return;
+        return false;
     }
     if(DoesExistKey(block, key)){
         errormsg(ERR_KEY_EXISTS, -1, key, this->Filename);
-        return;
+        return false;
     }
 
     Key _key;
@@ -339,15 +342,16 @@ void atrc::ATRC_FD::AddKey(const std::string& block, const std::string& key, con
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::ADD_KEY, -1, key, value, block);
     }
+    return true;
 }
-void atrc::ATRC_FD::RemoveKey(const std::string& block, const std::string& key){
+bool atrc::ATRC_FD::RemoveKey(const std::string& block, const std::string& key){
     if(!DoesExistBlock(block)) {
         errormsg(ERR_BLOCK_NOT_FOUND, -1, block, this->Filename);
-        return;
+        return false;
     }
     if(!DoesExistKey(block, key)){
         errormsg(ERR_KEY_NOT_FOUND, -1, key, this->Filename);
-        return;
+        return false;
     }
     int i = 0;
     for (Block &_block : *this->Blocks) {
@@ -369,15 +373,16 @@ void atrc::ATRC_FD::RemoveKey(const std::string& block, const std::string& key){
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::REMOVE_KEY, i, key, "", block);
     }
+    return true;
 }
-void atrc::ATRC_FD::ModifyKey(const std::string& block, const std::string& key, const std::string& value){
+bool atrc::ATRC_FD::ModifyKey(const std::string& block, const std::string& key, const std::string& value){
     if(!DoesExistBlock(block)) {
         errormsg(ERR_BLOCK_NOT_FOUND, -1, block, this->Filename);
-        return;
+        return false;
     }
     if(!DoesExistKey(block, key)){
         errormsg(ERR_KEY_NOT_FOUND, -1, key, this->Filename);
-        return;
+        return false;
     }
 
     int i = 0;
@@ -397,6 +402,7 @@ void atrc::ATRC_FD::ModifyKey(const std::string& block, const std::string& key, 
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::MODIFY_KEY, i, key, value, block);
     }
+    return true;
 }
 
 
@@ -449,4 +455,23 @@ atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator=(const std::string& value) {
         std::cerr << e.what() << std::endl;
     }
     return *this;
+}
+
+
+atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator>>(const std::string& value) {
+    uint64_t x = key.find("]");
+    if (x == std::string::npos) {
+        std::string existing = fd->ReadVariable(key);
+        fd->ModifyVariable(key, existing + value);
+    } else {
+        std::string block = key.substr(0, x);
+        std::string key_ = key.substr(x + 1, key.size() - x - 1);
+        std::string existing = fd->ReadKey(block, key_);
+        fd->ModifyKey(block, key_, existing + value);
+    }
+    return *this;
+}
+
+atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator>>(const char* value) {
+    return operator>>(std::string(value));
 }
