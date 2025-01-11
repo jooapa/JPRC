@@ -21,7 +21,7 @@
 #   define _WRAPPER_EXIM_ 
 #endif // _WRAPPER_EXIM_
 
-#define FILEHEADER "#__ATRC__\0"
+#define FILEHEADER "#!ATRC\0"
 #define __atrc__one__of__two__(cpp, c) \
     __atrc__one__of__two_helper__(cpp, c)
 #define __nmsp__    namespace atrc {
@@ -117,10 +117,6 @@ ATRC_API void ModifyKey(C_PATRC_FD self, const char* block, const char* key, con
 ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
 ATRC_API void Destroy_ATRC_FD(C_PATRC_FD self);
-
-bool _ATRC_WRAP_FUNC_1(C_PATRC_FD a);
-void _ATRC_WRAP_FUNC_2(int a, int b, const char *c, const char *d);
-void _ATRC_WRAP_FUNC_3(C_PATRC_FD a, const int &b, const int &c, const char *d);
 
 #ifdef __cplusplus
 } // extern "C"
@@ -252,9 +248,9 @@ typedef struct _C_String_Arr {
     uint64_t count;
 } C_String_Arr, *C_PString_Arr;
 
-ATRC_API C_String_Arr atrc_to_list(char separator, const char* value);
+ATRC_API C_PString_Arr atrc_to_list(const char separator, const char* value);
 
-ATRC_API void atrc_free_list(C_String_Arr *list);
+ATRC_API void atrc_free_list(C_PString_Arr list);
 
 ATRC_API bool atrc_to_bool(const char* value);
 

@@ -46,6 +46,45 @@
 #define ERR_MEMORY_ALLOCATION_FAILED    502
 
 #ifdef __cplusplus
+enum class
+ATRC_SAVE{
+    FULL_SAVE = -1, 
+    ADD_BLOCK = 0, 
+    REMOVE_BLOCK,
+    ADD_KEY,
+    REMOVE_KEY,
+    MODIFY_KEY,
+    ADD_VAR,
+    REMOVE_VAR,
+    MODIFY_VAR,
+};
+#else 
+typedef enum {
+    FULL_SAVE = -1, 
+    ADD_BLOCK = 0, 
+    REMOVE_BLOCK,
+    ADD_KEY,
+    REMOVE_KEY,
+    MODIFY_KEY,
+    ADD_VAR,
+    REMOVE_VAR,
+    MODIFY_VAR,
+} ATRC_SAVE;
+#endif // __cplusplus
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+bool _ATRC_WRAP_FUNC_1(C_PATRC_FD a);
+void _ATRC_WRAP_FUNC_2(int a, int b, const char *c, const char *d);
+void _ATRC_WRAP_FUNC_3(C_PATRC_FD a, const int b, const int c, const char *d);
+void _ATRC_WRAP_FUNC_4(C_PATRC_FD a, const char* b, const char** v);
+const char* _ATRC_WRAP_FUNC_5(C_PATRC_FD a, const char* b, const char** c);
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
+
+#ifdef __cplusplus
 #include <string>
 #include <iostream>
 #include <memory>
@@ -58,17 +97,7 @@ bool BlockContainsBlock(std::unique_ptr<std::vector<Block>>& blocks,const Block&
 bool VariableContainsVariable(std::unique_ptr<std::vector<Variable>>& variables, const Variable& variable);
 std::string ParseLineSTRINGtoATRC(const std::string &line);
 
-enum class ATRC_SAVE{
-    FULL_SAVE = -1, 
-    ADD_BLOCK = 0, 
-    REMOVE_BLOCK,
-    ADD_KEY,
-    REMOVE_KEY,
-    MODIFY_KEY,
-    ADD_VAR,
-    REMOVE_VAR,
-    MODIFY_VAR,
-};
+
 
 ATRC_API void _W_Save_(
 ATRC_FD *filedata = nullptr,

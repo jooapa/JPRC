@@ -77,17 +77,101 @@ bool atrc::ATRC_FD::Read(){
     return true;
 }
 
-C_PATRC_FD atrc::ATRC_FD::ToCStruct(){
-    C_PATRC_FD filedata = Create_Empty_ATRC_FD();
-    filedata->AutoSave = this->AutoSave;
-    filedata->Filename = new char[this->Filename.size() + 1];
-    std::strcpy(const_cast<char*>(filedata->Filename), this->Filename.c_str());
+C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
+    C_PATRC_FD self = Create_Empty_ATRC_FD();
+    if (!self) return NULL;
 
+    self->AutoSave = this->AutoSave;
 
-    //TODO: Generate C_PVariable_Arr and C_PBlock_Arr
-    
-    return filedata;
+    // Allocate and copy Filename
+    self->Filename = new char[this->Filename.size() + 1];
+    if (!self->Filename) {
+        Destroy_ATRC_FD(self);
+        return NULL;
+    }
+    std::strcpy(self->Filename, this->Filename.c_str());
+
+    // Allocate memory for Variables
+    self->Variables->VariableCount = 0;
+    self->Variables->Variables = (C_Variable*)malloc(this->Variables->size() * sizeof(C_Variable));
+    if (!self->Variables->Variables) {
+        Destroy_ATRC_FD(self);
+        return NULL;
+    }
+
+    for (const atrc::Variable& var : *this->Variables) {
+        // Allocate Name
+        self->Variables->Variables[self->Variables->VariableCount].Name = new char[var.Name.size() + 1];
+        if (!self->Variables->Variables[self->Variables->VariableCount].Name) {
+            Destroy_ATRC_FD(self);
+            return NULL;
+        }
+        std::strcpy(self->Variables->Variables[self->Variables->VariableCount].Name, var.Name.c_str());
+
+        // Allocate Value
+        self->Variables->Variables[self->Variables->VariableCount].Value = new char[var.Value.size() + 1];
+        if (!self->Variables->Variables[self->Variables->VariableCount].Value) {
+            Destroy_ATRC_FD(self);
+            return NULL;
+        }
+        std::strcpy(self->Variables->Variables[self->Variables->VariableCount].Value, var.Value.c_str());
+
+        // Copy IsPublic
+        self->Variables->Variables[self->Variables->VariableCount].IsPublic = var.IsPublic;
+        self->Variables->VariableCount++;
+    }
+
+    // Allocate memory for Blocks
+    self->Blocks->BlockCount = 0;
+    self->Blocks->Blocks = (C_Block*)malloc(this->Blocks->size() * sizeof(C_Block));
+    if (!self->Blocks->Blocks) {
+        Destroy_ATRC_FD(self);
+        return NULL;
+    }
+
+    for (const atrc::Block& block : *this->Blocks) {
+        // Allocate Block Name
+        self->Blocks->Blocks[self->Blocks->BlockCount].Name = new char[block.Name.size() + 1];
+        if (!self->Blocks->Blocks[self->Blocks->BlockCount].Name) {
+            Destroy_ATRC_FD(self);
+            return NULL;
+        }
+        std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Name, block.Name.c_str());
+
+        // Allocate Keys
+        self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount = 0;
+        self->Blocks->Blocks[self->Blocks->BlockCount].Keys = (C_Key*)malloc(block.Keys.size() * sizeof(C_Key));
+        if (!self->Blocks->Blocks[self->Blocks->BlockCount].Keys) {
+            Destroy_ATRC_FD(self);
+            return NULL;
+        }
+
+        for (const atrc::Key& key : block.Keys) {
+            // Allocate Key Name
+            self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name = new char[key.Name.size() + 1];
+            if (!self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name) {
+                Destroy_ATRC_FD(self);
+                return NULL;
+            }
+            std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name, key.Name.c_str());
+
+            // Allocate Key Value
+            self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value = new char[key.Value.size() + 1];
+            if (!self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value) {
+                Destroy_ATRC_FD(self);
+                return NULL;
+            }
+            std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value, key.Value.c_str());
+
+            self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount++;
+        }
+
+        self->Blocks->BlockCount++;
+    }
+
+    return self;
 }
+
 
 std::vector<atrc::Variable>* atrc::ATRC_FD::GetVariables(){
     return this->Variables.get();

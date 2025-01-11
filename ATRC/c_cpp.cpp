@@ -47,7 +47,30 @@ void _ATRC_WRAP_FUNC_2(int err_num, int line_number, const char *var_name, const
 }
 
 /*_ATRC_WRAP__W_SAVE*/
-void _ATRC_WRAP_FUNC_3(C_PATRC_FD self, const int &action, const int &xtra_info, const char *varname){
+void _ATRC_WRAP_FUNC_3(C_PATRC_FD self, const int action, const int xtra_info, const char *varname){
     atrc::ATRC_FD fd(self);
     atrc::_W_Save_(&fd, (atrc::ATRC_SAVE)action, xtra_info, varname);
+}
+
+/* INSERT_VAR */
+void _ATRC_WRAP_FUNC_4(C_PATRC_FD self, const char* line, const char** args){
+    atrc::ATRC_FD fd = atrc::ATRC_FD();
+    std::vector<std::string> args_v;
+    for(uint64_t i = 0; args[i] != NULL; i++){
+        args_v.push_back(args[i]);
+    }
+    std::string line_s = line;
+    fd.InsertVar(line_s, args_v);
+}
+
+/* INSERT_VAR_S */
+const char* _ATRC_WRAP_FUNC_5(C_PATRC_FD self, const char* line, const char** args){
+    atrc::ATRC_FD fd = atrc::ATRC_FD();
+    std::vector<std::string> args_v;
+    for(uint64_t i = 0; args[i] != NULL; i++){
+        args_v.push_back(args[i]);
+    }
+    std::string line_s = line;
+    std::string res = fd.InsertVar_S(line_s, args_v);
+    return res.c_str();
 }

@@ -16,6 +16,7 @@ std::string str_to_lower(const char *str){
     return res;
 }
 std::vector<std::string> atrc::atrc_to_vector(char separator, const std::string &value){
+    atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
     std::vector<std::string> res;
     if(value.size() == 0){
         return res;
@@ -38,22 +39,63 @@ std::vector<std::string> atrc::atrc_to_vector(char separator, const std::string 
 }
 
 namespace atrc {
-    C_String_Arr atrc_to_list(char separator, const char* value) {
-        // TODO: Create a C_String_Arr from a string
-		C_String_Arr res;
-        return res;
+
+C_PString_Arr atrc_to_list(const char separator, const char* value) {
+    if (value == NULL) return NULL;
+
+    atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
+
+    C_PString_Arr res = (C_PString_Arr)malloc(sizeof(C_String_Arr));
+    if (res == NULL) return NULL;
+
+    std::vector<std::string> temp = atrc::atrc_to_vector(separator, value);
+    if (temp.empty()) {
+        free(res);
+        return NULL;
     }
-} // namespace atrc
+
+    res->list = (char**)malloc(temp.size() * sizeof(char*));
+    if (res->list == NULL) {
+        free(res);
+        return NULL;
+    }
+
+    res->count = temp.size();
+    for (size_t i = 0; i < temp.size(); i++) {
+        res->list[i] = (char*)malloc(temp[i].size() + 1);
+        if (res->list[i] == NULL) {
+            // Cleanup previously allocated memory
+            for (size_t j = 0; j < i; j++) {
+                free(res->list[j]);
+            }
+            free(res->list);
+            free(res);
+            return NULL;
+        }
+        std::strcpy(res->list[i], temp[i].c_str());
+    }
+
+    atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
+    return res;
+}
 
 
-void atrc::atrc_free_list(C_String_Arr *list){
-    for(size_t i = 0; i < list->count; i++){
-        delete[] list->list[i];
+void atrc_free_list(C_PString_Arr list) {
+    atrc::atrc_stdlib_errval = atrc::_ATRC_UNSUCCESSFULL_ACTION;
+    if (list == NULL){ 
+        return;
     }
-    delete[] list->list;
-    list->count = 0;
+
+    for (size_t i = 0; i < list->count; i++) {
+        free(list->list[i]);
+    }
+    free(list->list);
+    free(list);
+    list->count = 0; // Reset count
     atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
 }
+
+} // namespace atrc
 
 
 bool atrc::atrc_to_bool(const char* value){
