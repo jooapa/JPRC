@@ -115,6 +115,12 @@
                     <a href="#data-structures">Data Structures</a>
                     <ul>
                         <li>
+                            Global declarations
+                            <ul>
+                                <li><a href="#ReadMode">ReadMode</a></li>
+                            </ul>
+                        </li>
+                        <li>
                             C Declarations
                             <ul>
                                 <li><a href="#C_Variable">C_Variable</a></li>
@@ -387,6 +393,30 @@ key=value</code></pre>
 
         <section id="data-structures">
             <h2>Data Structures</h2>
+
+            <h3>Global declarations</h3>
+            <ul>
+                <li id="ReadMode">
+                    <h4>ReadMode</h4>
+                    <p>
+                        Enumeration for read modes.
+                    </p>
+<pre><code>typedef enum ReadMode {
+    ATRC_READ_ONLY,
+    ATRC_CREATE_READ,
+    ATRC_FORCE_READ,
+} ReadMode;</code></pre>
+                <ul>
+                    <li><code>ATRC_READ_ONLY</code>: Read only mode.</li>
+                    <li><code>ATRC_CREATE_READ</code>: Create if not exists and read mode.</li>
+                    <li><code>ATRC_FORCE_READ</code>: Delete if exists and read mode.</li>
+                </li>
+                <h5>Remarks</h5>
+                <p>
+                    <a href="#FILEHEADER">FILEHEADER</a> is appended to the start of the file in all modes.
+                </p>
+            </ul>
+
             <h3>C Declarations</h3>
             <ul>
                 <li id="C_Variable">
@@ -633,11 +663,13 @@ private:
                 <li id="C_Read">
                     <h4>Read</h4>
                     <p>Reads contents from a file</p>
-                    <pre><code>bool Read(C_PATRC_FD filedata, const char *filepath);</code></pre>
+                    <pre><code>ATRC_API bool Read(C_PATRC_FD self, const char* path, ReadMode readMode = ATRC_READ_ONLY);
+                    </code></pre>
                     <h5>Arguments</h5>
                     <ul>
                         <li><code>filedata</code>: ATRC file data pointer.</li>
                         <li><code>filepath</code>: File path.</li>
+                        <li><code>readMode</code>: Read mode.</li>
                     </ul>
                     <h5>Returns</h5>
                     <ul>
@@ -647,6 +679,7 @@ private:
                     <p>
                         Reads the contents of a file into an ATRC file data structure.
                         If the function fails, the file data structure is cleared. and the function returns <code>false</code>, new data structure needs to be created.
+                        See <a href="#ReadMode">ReadMode</a> for more information on read modes.
                     </p>
                 </li>
 
@@ -987,10 +1020,11 @@ free(res);</code></pre>
                     <p>
                         Creates an ATRC file data structure from a file.
                     </p>
-                    <pre><code>ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename);</code></pre>
+                    <pre><code>ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode = ATRC_READ_ONLY);</code></pre>
                     <h5>Arguments</h5>
                     <ul>
                         <li><code>filename</code>: File name.</li>
+                        <li><code>readMode</code>: Read mode.</li>
                     </ul>
                     <h5>Returns</h5>
                     <ul>
@@ -1000,6 +1034,7 @@ free(res);</code></pre>
                     <p>
                         Creates an ATRC file data structure from a file.
                         Free memory with <a href="#C_Destroy_ATRC_FD">Destroy_ATRC_FD</a>.
+                        See <a href="#ReadMode">ReadMode</a> for more information on read modes.
                     </p>
                 </li>
                 <li id="C_Create_Empty_ATRC_FD">
@@ -1085,14 +1120,16 @@ free(res);</code></pre>
                     <p>
                         Constructor with file path.
                     </p>
-                    <pre><code>ATRC_FD(const char* path);</code></pre>
+                    <pre><code>ATRC_FD(const char* path, ReadMode mode = ATRC_READ_ONLY);</code></pre>
                     <h4>Arguments</h4>
                     <ul>
                         <li><code>path</code>: File path.</li>
+                        <li><code>mode</code>: Read mode.</li>
                     </ul>
                     <h4>Remarks</h4>
                     <p>
                         Initializes an ATRC file data structure and reads the file.
+                        See <a href="#ReadMode">ReadMode</a> for more information on read modes.
                     </p>
                 </li>
                 <li id="ATRC_FD_Constructor3">
@@ -1127,7 +1164,11 @@ free(res);</code></pre>
                     <p>
                         Reads a file.
                     </p>
-                    <pre><code>bool Read();</code></pre>
+                    <pre><code>bool Read(ReadMode mode = ATRC_READ_ONLY);</code></pre>
+                    <h4>Arguments</h4>
+                    <ul>
+                        <li><code>mode</code>: Read mode.</li>
+                    </ul>
                     <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
@@ -1135,6 +1176,7 @@ free(res);</code></pre>
                     <h4>Remarks</h4>
                     <p>
                         Reads a file into an ATRC file data structure.
+                        See <a href="#ReadMode">ReadMode</a> for more information on read modes.
                     </p>
                 </li>
                 <li id="ATRC_FD_ReadVariable">

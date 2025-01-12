@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool Read(C_PATRC_FD self, const char* path) {
-    return _ATRC_WRAP_FUNC_1(self, path);
+bool Read(C_PATRC_FD self, const char* path, ReadMode mode) {
+    return _ATRC_WRAP_FUNC_1(self, path, mode);
 }
 
 const char* ReadVariable(C_PATRC_FD self, const char* varname) {
@@ -463,11 +463,11 @@ bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* 
     return true;
 }
 
-C_PATRC_FD Create_ATRC_FD(char *filename){
+C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode mode){
     C_PATRC_FD res = Create_Empty_ATRC_FD();
     if(res == NULL) return NULL;
     strcpy(res->Filename, filename);
-    if(!Read(res, filename)) return NULL;
+    if(!Read(res, filename, mode)) return NULL;
     return res;
 }
 C_PATRC_FD Create_Empty_ATRC_FD(void){

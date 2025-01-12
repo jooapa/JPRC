@@ -4,15 +4,37 @@
 #include <cstring>
 #include <vector>
 #include <filer.h>
+#include <fstream>
 /*+++
 Wrap around functions from C++ to c
 ---*/
 
 /*_ATRC_WRAP_READ*/
-bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path) {
+bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
     std::string filename = path;
     std::string encoding = "UTF-8";
     std::string extension = "atrc";
+        if (readMode == ATRC_FORCE_READ) {
+        // Delete previous file and create a new one
+        std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
+        if (ofs.is_open()) {
+            ofs << FILEHEADER;
+        } else {
+            atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
+            return false;
+        }
+    } else if (readMode == ATRC_CREATE_READ) {
+        std::ifstream ifs(filename);
+        if (!ifs.good()) {
+            std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
+            if (ofs.is_open()) {
+                ofs << FILEHEADER;
+            } else {
+                atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
+                return false;
+            }
+        }
+    }
     auto parsedData = atrc::ParseFile(filename, encoding, extension);
 #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
     self->Filename = _strdup(filename.c_str());

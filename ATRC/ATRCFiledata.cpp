@@ -3,7 +3,7 @@
 #include <filer.h>
 #include <iostream>
 #include <cstring>
-
+#include <fstream>
 
 void atrc::ATRC_FD::MAINCONSTRUCTOR(){
     this->AutoSave = false;
@@ -14,10 +14,10 @@ void atrc::ATRC_FD::MAINCONSTRUCTOR(){
 }
 
 atrc::ATRC_FD::ATRC_FD(){this->MAINCONSTRUCTOR();}
-atrc::ATRC_FD::ATRC_FD(const char *path){
+atrc::ATRC_FD::ATRC_FD(const char *path, ReadMode mode){
     this->MAINCONSTRUCTOR();
     this->Filename = path;
-    this->Read();
+    this->Read(mode);
 }
 
 atrc::ATRC_FD::ATRC_FD(C_PATRC_FD fd){
@@ -63,10 +63,32 @@ atrc::PROXY_ATRC_FD atrc::ATRC_FD::operator[](const std::string& key) const {
 
 
 
-bool atrc::ATRC_FD::Read(){
+bool atrc::ATRC_FD::Read(ReadMode mode){
     std::string filename = this->Filename;
     std::string encoding = "UTF-8";
     std::string extension = "atrc";
+    if (mode == ATRC_FORCE_READ) {
+        // Delete previous file and create a new one
+        std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
+        if (ofs.is_open()) {
+            ofs << FILEHEADER;
+        } else {
+            atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
+            return false;
+        }
+    } else if (mode == ATRC_CREATE_READ) {
+        std::ifstream ifs(filename);
+        if (!ifs.good()) {
+            std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
+            if (ofs.is_open()) {
+                ofs << FILEHEADER;
+            } else {
+                atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
+                return false;
+            }
+        }
+    }
+
     auto parsedData = atrc::ParseFile(filename, encoding, extension);
     if (parsedData.first->empty() && parsedData.second->empty()) {
         std::cerr << "Failed to parse file: " << filename << std::endl;

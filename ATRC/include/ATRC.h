@@ -55,6 +55,12 @@ C declarations
 extern "C" {
 #endif // __cplusplus
 
+typedef enum ReadMode {
+    ATRC_READ_ONLY,
+    ATRC_CREATE_READ,
+    ATRC_FORCE_READ,
+} ReadMode;
+
 
 typedef struct C_Variable {
     char *Name;
@@ -92,7 +98,7 @@ typedef struct _ATRCFiledata{
     bool AutoSave;
 } C_ATRC_FD, *C_PATRC_FD;
 
-ATRC_API bool Read(C_PATRC_FD self, const char* path);
+ATRC_API bool Read(C_PATRC_FD self, const char* path, ReadMode readMode = ATRC_READ_ONLY);
 ATRC_API const char* ReadVariable(C_PATRC_FD self, const char* varname);
 ATRC_API const char* ReadKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool DoesExistBlock(C_PATRC_FD self, const char* block);
@@ -110,7 +116,7 @@ ATRC_API bool RemoveKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
 
 
-ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename);
+ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode = ATRC_READ_ONLY);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
 ATRC_API void Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self);
 ATRC_API void Destroy_ATRC_FD_Variables(C_PATRC_FD self);
@@ -148,10 +154,10 @@ class ATRC_API PROXY_ATRC_FD;
 class ATRC_API ATRC_FD {
     public:
         ATRC_FD();
-        ATRC_FD(const char* path);
+        ATRC_FD(const char* path, ReadMode mode = ATRC_READ_ONLY);
         ATRC_FD(C_PATRC_FD filedata);
         ~ATRC_FD();
-        bool Read();
+        bool Read(ReadMode mode = ATRC_READ_ONLY);
         std::string ReadVariable(const std::string& varname);
         std::string ReadKey(const std::string& block, const std::string& key);
         bool DoesExistBlock(const std::string& block);

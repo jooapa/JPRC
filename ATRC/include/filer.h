@@ -14,6 +14,7 @@
 #define ERR_REREFERENCED_KEY            107
 #define ERR_INSERT_VAR                  108  
 #define ERR_INVALID_FILE                109
+#define FILE_MODE_ERR                   110
 
 
 // File
@@ -78,7 +79,7 @@ typedef enum {
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-bool _ATRC_WRAP_FUNC_1(C_PATRC_FD a, const char* b);
+bool _ATRC_WRAP_FUNC_1(C_PATRC_FD a, const char* b, ReadMode mode);
 void _ATRC_WRAP_FUNC_2(int a, int b, const char *c, const char *d);
 void _ATRC_WRAP_FUNC_3(
     C_PATRC_FD self, 
@@ -168,6 +169,10 @@ inline void errormsg(int err_num=-1,
             break;
         case ERR_NO_VAR_VECTOR:
             msg = "No variable vector found";
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case FILE_MODE_ERR:
+            msg = "Error with file mode";
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_REREFERENCED_VAR:

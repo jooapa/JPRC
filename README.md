@@ -33,7 +33,7 @@ int main()
     ATRC_FD fd = ATRC_FD("file.atrc");
     if (!fd.CheckStatus()) {
 		std::cout << "File parsed unsuccesfully!" << std::endl;
-		return;
+		return 1;
 	}
     std::cout << fd["var_name"] << std::endl;
 
@@ -44,7 +44,7 @@ int main()
     char* res = InsertVar_S(line, args);
     std::cout << "After: " << res << std::endl;
     delete[] res;
-    return 1;
+    return 0;
 }
 ```
 

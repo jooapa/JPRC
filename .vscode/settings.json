@@ -67,6 +67,11 @@
         "stdlib.h": "c",
         "sstream": "cpp",
         "limits.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "chrono": "cpp",
+        "filesystem": "cpp",
+        "forward_list": "cpp",
+        "iomanip": "cpp",
+        "ratio": "cpp"
     }
 }
