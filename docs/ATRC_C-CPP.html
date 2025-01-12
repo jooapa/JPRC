@@ -1020,7 +1020,7 @@ free(res);</code></pre>
                     <p>
                         Creates an ATRC file data structure from a file.
                     </p>
-                    <pre><code>ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode = ATRC_READ_ONLY);</code></pre>
+                    <pre><code>ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode);</code></pre>
                     <h5>Arguments</h5>
                     <ul>
                         <li><code>filename</code>: File name.</li>
@@ -1164,7 +1164,7 @@ free(res);</code></pre>
                     <p>
                         Reads a file.
                     </p>
-                    <pre><code>bool Read(ReadMode mode = ATRC_READ_ONLY);</code></pre>
+                    <pre><code>bool Read(ReadMode mode);</code></pre>
                     <h4>Arguments</h4>
                     <ul>
                         <li><code>mode</code>: Read mode.</li>

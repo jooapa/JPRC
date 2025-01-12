@@ -98,7 +98,7 @@ typedef struct _ATRCFiledata{
     bool AutoSave;
 } C_ATRC_FD, *C_PATRC_FD;
 
-ATRC_API bool Read(C_PATRC_FD self, const char* path, ReadMode readMode = ATRC_READ_ONLY);
+ATRC_API bool Read(C_PATRC_FD self, const char* path, ReadMode readMode);
 ATRC_API const char* ReadVariable(C_PATRC_FD self, const char* varname);
 ATRC_API const char* ReadKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool DoesExistBlock(C_PATRC_FD self, const char* block);
@@ -116,7 +116,7 @@ ATRC_API bool RemoveKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
 
 
-ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode = ATRC_READ_ONLY);
+ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
 ATRC_API void Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self);
 ATRC_API void Destroy_ATRC_FD_Variables(C_PATRC_FD self);
