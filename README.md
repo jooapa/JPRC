@@ -92,10 +92,6 @@ insert2=insert second variable here: %*1% and first one here: %*0*
     cmake --preset VS2022-x64-debug -B./out/VS2022-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DATRC_BUILD_TESTS=ON & .\out\VS2022-x64-debug\build\ATRC.sln
 
     # Create release package
-    # run in wsl
-    sudo apt update
-    sudo apt install cmake clang ninja-build lld mingw-w64 7zip gcc-multilib g++-multilib libc6-dev-i386
-    # windows binaries: https://strawberryperl.com/
-    chmod +x ./loop.sh
-    ./loop.sh
+    # Requires: debian wsl,7z,strawberry perl,wkhtmltopdf
+    .\scripts\fullbuild.bat
 ```
