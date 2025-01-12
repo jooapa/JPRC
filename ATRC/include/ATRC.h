@@ -195,6 +195,7 @@ public:
     PROXY_ATRC_FD(ATRC_FD& fd, const std::string& key);
     PROXY_ATRC_FD operator[](const std::string& subKey);
     operator std::string() const;
+    operator const char*() const;
     PROXY_ATRC_FD& operator=(const std::string& value);    
     PROXY_ATRC_FD& operator>>(const std::string& value);
     PROXY_ATRC_FD& operator>>(const char* value);

@@ -207,6 +207,7 @@
                                         <li><a href="#PROXY_ATRC_FD_Constructor">Constructor</a></li>
                                         <li><a href="#PROXY_ATRC_FD_operator_arr">operator[]</a></li>
                                         <li><a href="#PROXY_ATRC_FD_operator_str">operator std::string</a></li>
+                                        <li><a href="#PROXY_ATRC_FD_operator_char">operator const char*</li>
                                         <li><a href="#PROXY_ATRC_FD_operator_assign">operator=</a></li>
                                         <li><a href="#PROXY_ATRC_FD_operator_rshift1">operator>></a></li>
                                         <li><a href="#PROXY_ATRC_FD_operator_rshift2">operator>></a></li>
@@ -1664,6 +1665,22 @@ free(res);</code></pre>
                         Converts the value to a string.
                     </p>
                 </li>
+                 <li id="PROXY_ATRC_FD_operator_char">
+                    <h4>operator const char*</h4>
+                    <p>
+                        Converts the value to a C string.
+                    </p>
+                    <pre><code>operator const char*() const;</code></pre>
+                    <h4>Returns</h4>
+                    <ul>
+                        <li>Value as a C string.</li>
+                    </ul>
+                    <h4>Remarks</h4>
+                    <p>
+                        Converts the value to a C string.
+                    </p>
+
+                 </li>
                 <li id="PROXY_ATRC_FD_operator_assign">
                     <h4>operator=</h4>
                     <p>

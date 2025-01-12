@@ -504,6 +504,24 @@ atrc::PROXY_ATRC_FD atrc::PROXY_ATRC_FD::operator[](const std::string& subKey) {
 	return atrc::PROXY_ATRC_FD(*fd, combined_key);
 }
 
+atrc::PROXY_ATRC_FD::operator const char*() const {
+    uint64_t x = key.find("]");
+    try {
+        if (x == std::string::npos) {
+            return fd->ReadVariable(key).c_str();
+        }
+        else {
+            std::string block = key.substr(0, x);
+            std::string key_ = key.substr(x + 1, key.size() - x - 1);
+            return fd->ReadKey(block, key_).c_str();
+        }
+    }
+    catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+    return "";
+}
+
 atrc::PROXY_ATRC_FD::operator std::string() const {
 	uint64_t x = key.find("]");
     try {
