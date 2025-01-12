@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(MyProject)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/ATRC_2.0.0/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/ATRC_2.0.1/cmake")
 
 # Include the FindATRC script
 include(FindATRC)
@@ -19,7 +19,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE ${ATRC})
 
 # Include ATRC headers
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/ATRC_2.0.0/include")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/ATRC_2.0.1/include")
 ```
 
 ## Example program
