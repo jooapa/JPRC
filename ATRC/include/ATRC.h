@@ -1,10 +1,7 @@
 #pragma once
 #ifndef ATRC_H
 #define ATRC_H
-#define __MICROSOFT_CHECK__     defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
-#define __MSVC_CHECK__          (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER) 
-
-#if __MICROSOFT_CHECK__ || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
 #   ifdef ATRC_EXPORTS
 #       define ATRC_API __declspec(dllexport)
 #       define _WRAPPER_EXIM_ __declspec(dllexport)
@@ -12,7 +9,7 @@
 #       define ATRC_API __declspec(dllimport)
 #       define _WRAPPER_EXIM_ __declspec(dllimport)
 #   endif // ATRC_EXPORTS
-#endif // __MICROSOFT_CHECK__
+#endif // defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
 
 #ifndef ATRC_API
 #   define ATRC_API 
@@ -43,10 +40,10 @@
 #  include <iostream>
 namespace atrc {
 // Disable warning C4251 for std::vector and std::string.
-#  if __MSVC_CHECK__
+#  if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
 #    pragma warning(push)
 #    pragma warning(disable: 4251)
-#  endif // __MSVC_CHECK__
+#  endif // (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
 #endif // __cplusplus
 
 
@@ -263,9 +260,9 @@ ATRC_API double atrc_to_double(const char* value);
 
 
 #ifdef __cplusplus
-#   if __MSVC_CHECK__
+#   if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
 #       pragma warning(pop)
-#   endif // __MSVC_CHECK__
+#   endif // (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
     } // extern "C"
 } // namespace atrc
 #endif // __cplusplus

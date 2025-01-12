@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Define the root of your project
+cd ..
 PROJECT_ROOT=$(pwd)
 
 VERSION="2.0.0"
@@ -149,8 +150,3 @@ done
 mkdir -p "$OUTPUT_DIR/docs"
 mkdir -p "$OUTPUT_DIR/include"
 
-
-# Copy stuff
-cp -r "${PROJECT_ROOT}/ATRC/include/ATRC.hpp" "${OUTPUT_DIR}/include/ATRC.hpp"
-cp -r "${PROJECT_ROOT}/docs/*" "${OUTPUT_DIR}/docs/"
-cp -r "${PROJECT_ROOT}/LICENSE.txt" "${OUTPUT_DIR}/LICENSE.txt"
