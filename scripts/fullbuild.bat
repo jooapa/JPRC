@@ -13,6 +13,7 @@ copy ..\ATRC\include\ATRC.h ..\%FOLDER%\include
 
 mkdir ..\%FOLDER%\cmake
 copy ..\cmake\FindATRC.cmake ..\%FOLDER%\cmake
+copy ..\README.md ..\%FOLDER%
 
 set "PATH=%PATH%;C:\Program Files\7-Zip;"
 7z a -tzip ..\%FOLDER%.zip ..\%FOLDER%
