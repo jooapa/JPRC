@@ -41,7 +41,7 @@ int main()
     const char* line = fd["block_name"]["key"];
     const char* args[] = {"Hello everyone", nullptr};
     std::cout << "Before: " << line << std::endl;
-    char* res = InsertVar_S(line.c_str(), args);
+    char* res = InsertVar_S(line, args);
     std::cout << "After: " << res << std::endl;
     delete[] res;
     return 1;
