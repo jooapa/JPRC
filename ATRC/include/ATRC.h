@@ -4,7 +4,7 @@
 #define __MICROSOFT_CHECK__     defined(_WIN32) || defined(_WIN64) || defined(WINDOWS_EXPORT_ALL_SYMBOLS)
 #define __MSVC_CHECK__          (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER) 
 
-#if __MICROSOFT_CHECK__
+#if __MICROSOFT_CHECK__ || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_WIN32) || defined(_WIN64)
 #   ifdef ATRC_EXPORTS
 #       define ATRC_API __declspec(dllexport)
 #       define _WRAPPER_EXIM_ __declspec(dllexport)
@@ -95,15 +95,14 @@ typedef struct _ATRCFiledata{
     bool AutoSave;
 } C_ATRC_FD, *C_PATRC_FD;
 
-ATRC_API bool Read(C_PATRC_FD self);
+ATRC_API bool Read(C_PATRC_FD self, const char* path);
 ATRC_API const char* ReadVariable(C_PATRC_FD self, const char* varname);
 ATRC_API const char* ReadKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool DoesExistBlock(C_PATRC_FD self, const char* block);
 ATRC_API bool DoesExistVariable(C_PATRC_FD self, const char* varname);
 ATRC_API bool DoesExistKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool IsPublic(C_PATRC_FD self, const char* varname);
-ATRC_API void InsertVar(C_PATRC_FD self, const char* line, const char** args);
-ATRC_API const char* InsertVar_S(C_PATRC_FD self, const char* line, const char** args);
+ATRC_API const char* InsertVar_S(const char* line, const char** args);
 ATRC_API bool AddBlock(C_PATRC_FD self, const char* blockname);
 ATRC_API bool RemoveBlock(C_PATRC_FD self, const char* blockname);
 ATRC_API bool AddVariable(C_PATRC_FD self, const char* varname, const char* value);
@@ -116,6 +115,8 @@ ATRC_API bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, con
 
 ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
+ATRC_API void Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self);
+ATRC_API void Destroy_ATRC_FD_Variables(C_PATRC_FD self);
 ATRC_API void Destroy_ATRC_FD(C_PATRC_FD self);
 
 #ifdef __cplusplus

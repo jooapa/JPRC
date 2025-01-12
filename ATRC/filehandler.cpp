@@ -287,7 +287,11 @@ atrc::ParseFile
         atrc::Key _key;
         _key.Name = _key_name;
         _key.Value = _key_value;
-        if(atrc::BlockContainsKey(blocks->back().Keys,_key)) {
+        if (blocks.get()->size() == 0) {
+			atrc::errormsg(ERR_INVALID_VAR_DECL, line_number, _key.Name, filename);
+			continue;
+        }
+        if(atrc::BlockContainsKey(blocks.get()->back().Keys, _key)) {
             atrc::errormsg(ERR_REREFERENCED_KEY, line_number, _key.Name, filename);
             continue;
         }

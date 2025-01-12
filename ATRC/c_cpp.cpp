@@ -9,36 +9,75 @@ Wrap around functions from C++ to c
 ---*/
 
 /*_ATRC_WRAP_READ*/
-bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self) {
-    std::string filename = self->Filename;
+bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path) {
+    std::string filename = path;
     std::string encoding = "UTF-8";
     std::string extension = "atrc";
     auto parsedData = atrc::ParseFile(filename, encoding, extension);
+    self->AutoSave;
+    self->Filename = _strdup(filename.c_str());
     if (parsedData.first->empty() && parsedData.second->empty()) {
         std::cerr << "Failed to parse file: " << filename << std::endl;
         return false;
-    } else {
-        for(atrc::Variable &var : *parsedData.first){
-            self->Variables->Variables[self->Variables->VariableCount].Name = new char[var.Name.size() + 1];
-            std::strcpy(self->Variables->Variables[self->Variables->VariableCount].Name, var.Name.c_str());
-            self->Variables->Variables[self->Variables->VariableCount].Value = new char[var.Value.size() + 1];
-            std::strcpy(self->Variables->Variables[self->Variables->VariableCount].Value, var.Value.c_str());
-            self->Variables->Variables[self->Variables->VariableCount].IsPublic = var.IsPublic;
-            self->Variables->VariableCount++;
+    }
+
+    // Cleanup existing data
+    Destroy_ATRC_FD_Blocks_And_Keys(self);
+    Destroy_ATRC_FD_Variables(self);
+
+    // Allocate main structures
+    self->Variables = (C_PVariable_Arr)malloc(sizeof(C_Variable_Arr));
+    self->Blocks = (C_PBlock_Arr)malloc(sizeof(C_Block_Arr));
+    if (!self->Variables || !self->Blocks) {
+        Destroy_ATRC_FD(self);
+        return false;
+    }
+    self->Variables->Variables = nullptr;
+    self->Blocks->Blocks = nullptr;
+    self->Variables->VariableCount = 0;
+    self->Blocks->BlockCount = 0;
+
+    // Process variables
+    self->Variables->VariableCount = parsedData.first->size();
+    self->Variables->Variables = (C_PVariable)malloc(self->Variables->VariableCount * sizeof(C_Variable));
+    if (!self->Variables->Variables) {
+        Destroy_ATRC_FD(self);
+        return false;
+    }
+
+    for (size_t i = 0; i < parsedData.first->size(); i++) {
+        const atrc::Variable &var = parsedData.first->at(i);
+        self->Variables->Variables[i].Name = _strdup(var.Name.c_str());
+        self->Variables->Variables[i].Value = _strdup(var.Value.c_str());
+        self->Variables->Variables[i].IsPublic = var.IsPublic;
+    }
+
+    // Process blocks
+    self->Blocks->BlockCount = parsedData.second->size();
+    self->Blocks->Blocks = (C_PBlock)malloc(self->Blocks->BlockCount * sizeof(C_Block));
+    if (!self->Blocks->Blocks) {
+        Destroy_ATRC_FD(self);
+        return false;
+    }
+
+    for (size_t i = 0; i < parsedData.second->size(); i++) {
+        const atrc::Block &block = parsedData.second->at(i);
+        self->Blocks->Blocks[i].Name = _strdup(block.Name.c_str());
+        self->Blocks->Blocks[i].KeyCount = block.Keys.size();
+        self->Blocks->Blocks[i].Keys = (C_PKey)malloc(self->Blocks->Blocks[i].KeyCount * sizeof(C_Key));
+
+        if (!self->Blocks->Blocks[i].Keys) {
+            Destroy_ATRC_FD(self);
+            return false;
         }
-        for(atrc::Block &block : *parsedData.second){
-            self->Blocks->Blocks[self->Blocks->BlockCount].Name = new char[block.Name.size() + 1];
-            std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Name, block.Name.c_str());
-            for(atrc::Key &key : block.Keys){
-                self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name = new char[key.Name.size() + 1];
-                std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name, key.Name.c_str());
-                self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value = new char[key.Value.size() + 1];
-                std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value, key.Value.c_str());
-                self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount++;
-            }
-            self->Blocks->BlockCount++;
+
+        for (size_t j = 0; j < block.Keys.size(); j++) {
+            const atrc::Key &key = block.Keys[j];
+            self->Blocks->Blocks[i].Keys[j].Name = _strdup(key.Name.c_str());
+            self->Blocks->Blocks[i].Keys[j].Value = _strdup(key.Value.c_str());
         }
     }
+
     return true;
 }
 
@@ -73,24 +112,39 @@ void _ATRC_WRAP_FUNC_3(
 }
 
 /* INSERT_VAR */
-void _ATRC_WRAP_FUNC_4(C_PATRC_FD self, const char* line, const char** args){
+void _ATRC_WRAP_FUNC_4(char* line, const char** args){
     atrc::ATRC_FD fd = atrc::ATRC_FD();
     std::vector<std::string> args_v;
     for(uint64_t i = 0; args[i] != NULL; i++){
         args_v.push_back(args[i]);
     }
     std::string line_s = line;
+    std::cout << line_s << std::endl;
+    for (const auto& s : args_v) {
+        std::cout << s << "\n";
+    }
     fd.InsertVar(line_s, args_v);
+    size_t line_size = strlen(line);
+    strncpy(line, line_s.c_str(), line_size - 1);
+    line[line_size - 1] = '\0';
 }
 
 /* INSERT_VAR_S */
-const char* _ATRC_WRAP_FUNC_5(C_PATRC_FD self, const char* line, const char** args){
+const char* _ATRC_WRAP_FUNC_5(const char* line, const char** args) {
     atrc::ATRC_FD fd = atrc::ATRC_FD();
     std::vector<std::string> args_v;
-    for(uint64_t i = 0; args[i] != NULL; i++){
+    for (uint64_t i = 0; args[i] != NULL; i++) {
         args_v.push_back(args[i]);
     }
     std::string line_s = line;
     std::string res = fd.InsertVar_S(line_s, args_v);
-    return res.c_str();
+
+    if (res.empty()) {
+        return nullptr;
+    }
+
+    char* cstr = new char[res.length() + 1];
+    strcpy(cstr, res.c_str());
+
+    return cstr;
 }

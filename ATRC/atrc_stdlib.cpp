@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_DEPRECATE
 #include <filer.h>
 #include <iostream>
 #include <string>
@@ -90,8 +91,8 @@ void atrc_free_list(C_PString_Arr list) {
         free(list->list[i]);
     }
     free(list->list);
-    free(list);
     list->count = 0; // Reset count
+    if(list != NULL) free(list);
     atrc::atrc_stdlib_errval = atrc::_ATRC_SUCCESSFULL_ACTION;
 }
 

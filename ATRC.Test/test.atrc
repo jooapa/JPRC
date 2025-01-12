@@ -1,6 +1,7 @@
 #!ATRC
 %ScreenRatio%=4:3
-%test%=100
+%test%=100, %*%, %*%
+%test_variable2%=a
 [block]
 key=TruE
 [hello]

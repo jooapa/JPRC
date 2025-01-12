@@ -1,6 +1,7 @@
 #ifndef FILER_H
 #define FILER_H
 #include <ATRC.h>
+
 // File
 #define ERR_CLASS_FILEHANDLER           100
 // Error types
@@ -77,7 +78,7 @@ typedef enum {
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-bool _ATRC_WRAP_FUNC_1(C_PATRC_FD a);
+bool _ATRC_WRAP_FUNC_1(C_PATRC_FD a, const char* b);
 void _ATRC_WRAP_FUNC_2(int a, int b, const char *c, const char *d);
 void _ATRC_WRAP_FUNC_3(
     C_PATRC_FD self, 
@@ -87,8 +88,8 @@ void _ATRC_WRAP_FUNC_3(
     const char *xtra_info4,
     const char *xtra_info5
 );
-void _ATRC_WRAP_FUNC_4(C_PATRC_FD a, const char* b, const char** v);
-const char* _ATRC_WRAP_FUNC_5(C_PATRC_FD a, const char* b, const char** c);
+void _ATRC_WRAP_FUNC_4(char* b, const char** v);
+const char* _ATRC_WRAP_FUNC_5(const char* b, const char** c);
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
