@@ -18,7 +18,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
         // Delete previous file and create a new one
         std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
         if (ofs.is_open()) {
-            ofs << FILEHEADER;
+            ofs << FILEHEADER << "\n";
         } else {
             atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
             return false;
@@ -28,7 +28,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
         if (!ifs.good()) {
             std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
             if (ofs.is_open()) {
-                ofs << FILEHEADER;
+                ofs << FILEHEADER << "\n";
             } else {
                 atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
                 return false;

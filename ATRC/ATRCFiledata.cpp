@@ -71,7 +71,7 @@ bool atrc::ATRC_FD::Read(ReadMode mode){
         // Delete previous file and create a new one
         std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
         if (ofs.is_open()) {
-            ofs << FILEHEADER;
+            ofs << FILEHEADER << "\n";
         } else {
             atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
             return false;
@@ -81,7 +81,7 @@ bool atrc::ATRC_FD::Read(ReadMode mode){
         if (!ifs.good()) {
             std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
             if (ofs.is_open()) {
-                ofs << FILEHEADER;
+                ofs << FILEHEADER << "\n";
             } else {
                 atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
                 return false;
