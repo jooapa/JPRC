@@ -5,7 +5,7 @@ cd ..\docs
 call create_compiled_html.bat
 cd ..\scripts
 SET "PATH=%PATH%;C:\Strawberry\c\bin;"
-set "FOLDER=ATRC_2.0.1"
+set "FOLDER=ATRC_2.0.2"
 call debian run "./loop.sh" 
 copy ..\docs\* ..\%FOLDER%\docs 
 del ..\%FOLDER%\docs\*.bat
