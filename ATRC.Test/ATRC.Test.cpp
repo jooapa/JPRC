@@ -4,28 +4,18 @@
 using namespace atrc;
 void cpp_main(void)
 {
-    std::cout << "Hello from C++!" << std::endl;
-	atrc::ATRC_FD fd("test.atrc");
-	if (!fd.CheckStatus()) {
-		std::cout << "File is empty!" << std::endl;
+	ATRC_FD fd = ATRC_FD("file.atrc");
+    if (!fd.CheckStatus()) {
+		std::cout << "File parsed unsuccesfully!" << std::endl;
 		return;
 	}
-	std::cout << "fd" << std::endl;
-	std::string test = fd["test"]["test"];
-	fd["test"]["test"] = "112233";
-	std::cout << test << "|" << fd["test"] << "|" << fd.ReadKey("test", "test") << std::endl;
-	fd["test"]["test"] >> "test 189";
-	std::cout << fd["test"]["test"] << std::endl;
+    std::cout << fd["var_name"] << std::endl;
 
-	C_ATRC_FD *c_fd = fd.ToCStruct();
-
-	std::cout << "C Filedata: " << c_fd->Filename << std::endl;
-
-	atrc::ATRC_FD fd2(c_fd);
-	Destroy_ATRC_FD(c_fd);
-	if(!fd2.CheckStatus()){
-		std::cout << "File is empty!" << std::endl;
-		return;
-	}
-	std::cout << fd2["test"]["test"] << std::endl;
+    C_PATRC_FD c_fd = fd.ToCStruct();
+    std::string line = fd["block_name"]["key"];
+    const char* args[] = {"Hello everyone", nullptr};
+    std::cout << "Before: " << line << std::endl;
+    char* res = InsertVar_S(line.c_str(), args);
+    std::cout << "After: " << res << std::endl;
+    delete[] res;
 }
