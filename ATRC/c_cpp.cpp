@@ -1,6 +1,7 @@
 #include <ATRC.h>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <filer.h>
 /*+++
@@ -47,9 +48,28 @@ void _ATRC_WRAP_FUNC_2(int err_num, int line_number, const char *var_name, const
 }
 
 /*_ATRC_WRAP__W_SAVE*/
-void _ATRC_WRAP_FUNC_3(C_PATRC_FD self, const int action, const int xtra_info, const char *varname){
+void _ATRC_WRAP_FUNC_3(
+    C_PATRC_FD self, 
+    const int action, 
+    const int xtra_info, 
+    const char *varname, 
+    const char *xtra_info4,
+    const char *xtra_info5
+){
     atrc::ATRC_FD fd(self);
-    atrc::_W_Save_(&fd, (atrc::ATRC_SAVE)action, xtra_info, varname);
+
+    if((atrc::ATRC_SAVE)action == atrc::ATRC_SAVE::ADD_VAR){
+        std::string temp1 = varname;
+        std::string temp2 = xtra_info4;
+        atrc::_W_Save_(&fd, (atrc::ATRC_SAVE)action, xtra_info, "%"+temp1+"%="+atrc::ParseLineSTRINGtoATRC(temp2));
+    } 
+    else if((atrc::ATRC_SAVE)action == atrc::ATRC_SAVE::MODIFY_VAR){
+        std::string temp1 = varname;
+        atrc::_W_Save_(&fd, (atrc::ATRC_SAVE)action, xtra_info, atrc::ParseLineSTRINGtoATRC(varname));
+    }
+    else {
+        atrc::_W_Save_(&fd, (atrc::ATRC_SAVE)action, xtra_info, varname, xtra_info4, xtra_info5);
+    }
 }
 
 /* INSERT_VAR */

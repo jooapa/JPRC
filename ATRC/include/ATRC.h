@@ -104,14 +104,14 @@ ATRC_API bool DoesExistKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool IsPublic(C_PATRC_FD self, const char* varname);
 ATRC_API void InsertVar(C_PATRC_FD self, const char* line, const char** args);
 ATRC_API const char* InsertVar_S(C_PATRC_FD self, const char* line, const char** args);
-ATRC_API void AddBlock(C_PATRC_FD self, const char* blockname);
-ATRC_API void RemoveBlock(C_PATRC_FD self, const char* blockname);
-ATRC_API void AddVariable(C_PATRC_FD self, const char* varname, const char* value);
-ATRC_API void RemoveVariable(C_PATRC_FD self, const char* varname);
-ATRC_API void ModifyVariable(C_PATRC_FD self, const char* varname, const char* value);
-ATRC_API void AddKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
-ATRC_API void RemoveKey(C_PATRC_FD self, const char* block, const char* key);
-ATRC_API void ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
+ATRC_API bool AddBlock(C_PATRC_FD self, const char* blockname);
+ATRC_API bool RemoveBlock(C_PATRC_FD self, const char* blockname);
+ATRC_API bool AddVariable(C_PATRC_FD self, const char* varname, const char* value);
+ATRC_API bool RemoveVariable(C_PATRC_FD self, const char* varname);
+ATRC_API bool ModifyVariable(C_PATRC_FD self, const char* varname, const char* value);
+ATRC_API bool AddKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
+ATRC_API bool RemoveKey(C_PATRC_FD self, const char* block, const char* key);
+ATRC_API bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
 
 
 ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename);
