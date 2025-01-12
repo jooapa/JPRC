@@ -817,7 +817,7 @@ private:
                     <h5>Remarks</h5>
                     <p>
                         Inserts values into a string containing inject markings.
-                        Return value needs to be freed.
+                        Return value needs to be freed with.
                         Insert array must be null terminated.
                     </p>
                     <h5>Example</h5>
@@ -828,7 +828,7 @@ if (res == NULL) {
     printf("InsertVar_S: Failed to insert variables\n");
     return;
 }
-printf("InsertVar_S: '%s'\n", res); // Output: 'test test'</code></pre>
+printf("InsertVar_S: '%s'\n", res); // Output: 'test test'
 free(res);</code></pre>
                 </li>
                 <li id="C_AddBlock">
@@ -1850,7 +1850,7 @@ fd["block"]["key"] = "value";</code></pre>
                     <code>operator&gt;&gt;</code>
                     <h4>Remarks</h4>
                     <p>
-                        Assigns a value to a variable or key.
+                        Appends a value to a variable or key.
                     </p>
                     <h4>Example</h4>
 <pre><code>ATRC_FD fd("file.atrc");
