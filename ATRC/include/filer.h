@@ -89,7 +89,7 @@ void _ATRC_WRAP_FUNC_3(
     const char *xtra_info5
 );
 void _ATRC_WRAP_FUNC_4(char* b, const char** v);
-const char* _ATRC_WRAP_FUNC_5(const char* b, const char** c);
+char* _ATRC_WRAP_FUNC_5(const char* b, const char** c);
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

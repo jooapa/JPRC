@@ -76,7 +76,7 @@ bool IsPublic(C_PATRC_FD self, const char* varname) {
 void InsertVar(char* line, const char** args) {
     _ATRC_WRAP_FUNC_4(line, args);
 }
-const char* InsertVar_S(const char* line, const char** args) {
+char* InsertVar_S(const char* line, const char** args) {
     return _ATRC_WRAP_FUNC_5(line, args);
 }
 bool AddBlock(C_PATRC_FD self, const char* blockname) {

@@ -1,7 +1,7 @@
 #include "ATRC.Test.h"
 #include <iostream>
 #include <ATRC.h>
-
+using namespace atrc;
 void cpp_main(void)
 {
     std::cout << "Hello from C++!" << std::endl;

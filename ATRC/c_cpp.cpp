@@ -14,7 +14,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path) {
     std::string encoding = "UTF-8";
     std::string extension = "atrc";
     auto parsedData = atrc::ParseFile(filename, encoding, extension);
-#ifdef defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER))
+#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
     self->Filename = _strdup(filename.c_str());
 #else
     self->Filename = strdup(filename.c_str());
@@ -50,7 +50,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path) {
 
     for (size_t i = 0; i < parsedData.first->size(); i++) {
         const atrc::Variable &var = parsedData.first->at(i);
-        #ifdef defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER))
+        #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
         self->Variables->Variables[i].Name = _strdup(var.Name.c_str());
         self->Variables->Variables[i].Value = _strdup(var.Value.c_str());
         #else
@@ -70,7 +70,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path) {
 
     for (size_t i = 0; i < parsedData.second->size(); i++) {
         const atrc::Block &block = parsedData.second->at(i);
-        #ifdef defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER))
+        #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
         self->Blocks->Blocks[i].Name = _strdup(block.Name.c_str());
         #else
         self->Blocks->Blocks[i].Name = strdup(block.Name.c_str());
@@ -85,7 +85,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path) {
 
         for (size_t j = 0; j < block.Keys.size(); j++) {
             const atrc::Key &key = block.Keys[j];
-            #ifdef defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER))
+            #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
             self->Blocks->Blocks[i].Keys[j].Name = _strdup(key.Name.c_str());
             self->Blocks->Blocks[i].Keys[j].Value = _strdup(key.Value.c_str());
             #else
@@ -147,7 +147,7 @@ void _ATRC_WRAP_FUNC_4(char* line, const char** args){
 }
 
 /* INSERT_VAR_S */
-const char* _ATRC_WRAP_FUNC_5(const char* line, const char** args) {
+char* _ATRC_WRAP_FUNC_5(const char* line, const char** args) {
     atrc::ATRC_FD fd = atrc::ATRC_FD();
     std::vector<std::string> args_v;
     for (uint64_t i = 0; args[i] != NULL; i++) {

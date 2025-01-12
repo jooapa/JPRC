@@ -11,6 +11,9 @@ copy ..\docs\* ..\%FOLDER%\docs
 del ..\%FOLDER%\docs\*.bat
 copy ..\ATRC\include\ATRC.h ..\%FOLDER%\include
 
+mkdir ..\%FOLDER%\cmake
+copy ..\cmake\FindATRC.cmake ..\%FOLDER%\cmake
+
 set "PATH=%PATH%;C:\Program Files\7-Zip;"
 7z a -tzip ..\%FOLDER%.zip ..\%FOLDER%
 7z a -ttar ..\%FOLDER%.tar ..\%FOLDER%

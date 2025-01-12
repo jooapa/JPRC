@@ -3,33 +3,55 @@
 ## Use with CMake
 
 ```
-if (WIN32)
-    set(ATRC_DIR "${PROJECT_SOURCE_DIR}/ATRC/libs/win")
-elseif (UNIX)
-    set(ATRC_DIR "${PROJECT_SOURCE_DIR}/ATRC/libs/linux")
-endif()
+cmake_minimum_required(VERSION 3.15)
+project(MyProject)
 
-find_library(ATRC NAMES ATRC REQUIRED PATHS ${ATRC_DIR})
-include_directories("${PROJECT_SOURCE_DIR}/atrc/include")
-target_link_libraries(${project_name} PRIVATE ${ATRC})
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/ATRC_2.0.0/cmake")
+
+# Include the FindATRC script
+include(FindATRC)
+
+add_executable(${PROJECT_NAME}
+    src/main.cpp
+)
+
+# Link the ATRC library
+target_link_libraries(${PROJECT_NAME} PRIVATE ${ATRC})
+
+# Include ATRC headers
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/ATRC_2.0.0/include")
 ```
 
-## Example program in C++
-
+## Example program
 
 ```cpp
-#include <ATRC.hpp>
+#include <ATRC.h>
 
+using namespace atrc;
 int main()
 {
+    ATRC_FD fd = ATRC_FD("file.atrc");
+    if (!fd.CheckStatus()) {
+		std::cout << "File parsed unsuccesfully!" << std::endl;
+		return;
+	}
+    std::cout << fd["var_name"] << std::endl;
 
+    C_PATRC_FD c_fd = fd.ToCStruct();
+    const char* line = fd["block_name"]["key"];
+    const char* args[] = {"Hello everyone", nullptr};
+    std::cout << "Before: " << line << std::endl;
+    char* res = InsertVar_S(line.c_str(), args);
+    std::cout << "After: " << res << std::endl;
+    delete[] res;
+    return 1;
 }
 ```
 
 ## Example resource file
 
 ```ini
-#__ATRC__
+#ATRC
 %var_name%=value_1
 <%priv_var>=value_2
 [block_name]

@@ -13,6 +13,7 @@ ATRC-c_cpp/ATRC.Test/libs/*.h
 *.pdf
 *.7z
 *.zip
+*.tar
 *.tar.gz
 
 ## Ignore Visual Studio temporary files, build results, and

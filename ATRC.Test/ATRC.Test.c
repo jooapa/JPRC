@@ -117,7 +117,7 @@ void test_insert(C_PATRC_FD fd) {
     
 	const char* line2 = ReadVariable(fd, "test");
 	const char* args2[] = { "test", "test", NULL };
-	const char* res = InsertVar_S(line2, args2);
+	char* res = InsertVar_S(line2, args2);
     if (res == NULL) {
 		printf("InsertVar_S: Failed to insert variables\n");
 		return;

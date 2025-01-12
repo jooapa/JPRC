@@ -107,8 +107,6 @@
                 <li>
                     <a href="#macros-and-constants">Macros and Constants</a>
                     <ul>
-                        <li><a href="#__MICROSOFT_CHECK__">__MICROSOFT_CHECK__</a></li>
-                        <li><a href="#__MSVC_CHECK__">__MSVC_CHECK__</a></li>
                         <li><a href="#ATRC_API">ATRC_API</a></li>
                         <li><a href="#FILEHEADER">FILEHEADER</a></li>
                     </ul>
@@ -151,7 +149,7 @@
                                 <li><a href="#C_DoesExistVariable">DoesExistVariable</a></li>
                                 <li><a href="#C_DoesExistKey">DoesExistKey</a></li>
                                 <li><a href="#C_IsPublic">IsPublic</a></li>
-                                <li><a href="#C_InsertVar_S">InsertVar</a></li>
+                                <li><a href="#C_InsertVar_S">InsertVar_S</a></li>
                                 <li><a href="#C_AddBlock">AddBlock</a></li>
                                 <li><a href="#C_RemoveBlock">RemoveBlock</a></li>
                                 <li><a href="#C_AddVariable">AddVariable</a></li>
@@ -195,6 +193,7 @@
                                         <li><a href="#ATRC_FD_RemoveKey">RemoveKey</a></li>
                                         <li><a href="#ATRC_FD_ModifyKey">ModifyKey</a></li>
                                         <li><a href="#ATRC_FD_ToCStruct">ToCStruct</a></li>
+                                        <li><a href="#ATRC_FD_CheckStatus">CheckStatus</a></li>
                                         <li><a href="#ATRC_FD_GetVariables">GetVariables</a></li>
                                         <li><a href="#ATRC_FD_GetBlocks">GetBlocks</a></li>
                                         <li><a href="#ATRC_FD_GetFilename">GetFilename</a></li>
@@ -256,7 +255,8 @@
             <p>No names can contain 
                 <code>[</code>,
                 <code>]</code>,
-                <code>#</code>
+                <code>#</code>,
+                <code>*</code>
             </p>
             <ul>
                 <li id="syntax_Header">
@@ -344,10 +344,13 @@ key=&hello&
                         Variables are defined as <code>%name%=value</code>.
                         The name cannot contain <code>*</code>.
                         All variables are constants.
+                        Reference variables in values with <code>%name%</code>.
                     </p>
                     <h4>Example</h4>
 <pre><code>#!ATRC
-%name%=value</code></pre>
+%name%=value
+[block]
+key=Reference to name: %name%</code></pre>
                 </li>
                 <li id="syntax_Blocks">
                     <h3>Blocks</h3>
@@ -376,8 +379,6 @@ key=value</code></pre>
         <section id="macros-and-constants">
             <h2>Macros and Constants</h2>
             <ul>
-                <li id="__MICROSOFT_CHECK__"><code>__MICROSOFT_CHECK__</code>: Defined for Windows platforms.</li>
-                <li id="__MSVC_CHECK__"><code>__MSVC_CHECK__</code>: Defined for Microsoft Visual C++ on Windows.</li>
                 <li id="ATRC_API"><code>ATRC_API</code>: Export/import macro for DLLs on Windows.</li>
                 <li id="FILEHEADER"><code>FILEHEADER</code>: File header constant (<code>"#!ATRC\0"</code>).</li>
             </ul>
@@ -769,7 +770,7 @@ private:
                     <p>
                         Inserts a value into a string containing inject markings. See <a href="#syntax_Insert">Insert/Inject marking</a> for syntax.
                     </p>
-                    <pre><code>ATRC_API const char* InsertVar_S(const char* line, const char** args)</code></pre>
+                    <pre><code>ATRC_API char* InsertVar_S(const char* line, const char** args)</code></pre>
                     <h5>Arguments</h5>
                     <ul>
                         <li><code>line</code>: String containing inject markings.</li>
@@ -786,15 +787,15 @@ private:
                         Insert array must be null terminated.
                     </p>
                     <h5>Example</h5>
-                    <pre><code>const char* line = ReadVariable(fd, "test"); // "%*% %*%"
-                        const char* args[] = { "test", "test", NULL };
-                        const char* res = InsertVar_S(line, args);
-                        if (res == NULL) {
-                            printf("InsertVar_S: Failed to insert variables\n");
-                            return;
-                        }
-                        printf("InsertVar_S: '%s'\n", res); // Output: 'test test'</code></pre>
-                        free(res);</code></pre>
+<pre><code>const char* line = ReadVariable(fd, "test"); // "%*% %*%"
+const char* args[] = { "test", "test", NULL };
+char* res = InsertVar_S(line, args);
+if (res == NULL) {
+    printf("InsertVar_S: Failed to insert variables\n");
+    return;
+}
+printf("InsertVar_S: '%s'\n", res); // Output: 'test test'</code></pre>
+free(res);</code></pre>
                 </li>
                 <li id="C_AddBlock">
                     <h4>AddBlock</h4>
@@ -1064,92 +1065,92 @@ private:
             </ul>
 
 
-            <h3 id="CPP_functions">C++ Member Functions</h3>
-            <h4 id="CPP_ATRC_FD">ATRC_FD</h4>
+            <h2 id="CPP_functions">C++ Member Functions</h3>
+            <h3 id="CPP_ATRC_FD">ATRC_FD</h4>
             <ul>
                 <li id="ATRC_FD_Constructor1">
-                    <h5>ATRC_FD</h5>
+                    <h4>ATRC_FD</h4>
                     <p>
                         Default constructor.
                     </p>
                     <pre><code>ATRC_FD();</code></pre>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Initializes an ATRC file data structure.
                     </p>
                 </li>
                 <li id="ATRC_FD_Constructor2">
-                    <h5>ATRC_FD</h5>
+                    <h4>ATRC_FD</h4>
                     <p>
                         Constructor with file path.
                     </p>
                     <pre><code>ATRC_FD(const char* path);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>path</code>: File path.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Initializes an ATRC file data structure and reads the file.
                     </p>
                 </li>
                 <li id="ATRC_FD_Constructor3">
-                    <h5>ATRC_FD</h5>
+                    <h4>ATRC_FD</h4>
                     <p>
                         Constructor with C structure.
                     </p>
                     <pre><code>ATRC_FD(C_PATRC_FD filedata);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>filedata</code>: C structure pointer.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Initializes an ATRC file data structure from a C structure.
                         C structure needs to be freed manually.
                     </p>
                 </li>
                 <li id="ATRC_FD_Destructor">
-                    <h5>~ATRC_FD</h5>
+                    <h4>~ATRC_FD</h4>
                     <p>
                         Destructor.
                     </p>
                     <pre><code>~ATRC_FD();</code></pre>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Frees an ATRC file data structure.
                     </p>
                 </li>
                 <li id="ATRC_FD_Read">
-                    <h5>Read</h5>
+                    <h4>Read</h4>
                     <p>
                         Reads a file.
                     </p>
                     <pre><code>bool Read();</code></pre>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Reads a file into an ATRC file data structure.
                     </p>
                 </li>
                 <li id="ATRC_FD_ReadVariable">
-                    <h5>ReadVariable</h5>
+                    <h4>ReadVariable</h4>
                     <p>
                         Reads a variable from a file.
                     </p>
                     <pre><code>std::string ReadVariable(const std::string& varname);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>varname</code>: Variable name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Variable value.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Reads the value of a variable from a file.
                         Doesn't check if the variable is public or if it exists beforehand.
@@ -1158,21 +1159,21 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_ReadKey">
-                    <h5>ReadKey</h5>
+                    <h4>ReadKey</h4>
                     <p>
                         Reads a key from a file.
                     </p>
                     <pre><code>std::string ReadKey(const std::string& block, const std::string& key);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>block</code>: Block name.</li>
                         <li><code>key</code>: Key name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Key value.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Reads the value of a key from a file.
                         Doesn't check if the key or block exists beforehand.
@@ -1180,131 +1181,131 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_DoesExistBlock">
-                    <h5>DoesExistBlock</h5>
+                    <h4>DoesExistBlock</h4>
                     <p>
                         Checks if a block exists in a file.
                     </p>
                     <pre><code>bool DoesExistBlock(const std::string& block);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>block</code>: Block name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if the block exists, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Checks if a block exists in a file.
                     </p>
                 </li>
                 <li id="ATRC_FD_DoesExistVariable">
-                    <h5>DoesExistVariable</h5>
+                    <h4>DoesExistVariable</h4>
                     <p>
                         Checks if a variable exists in a file.
                     </p>
                     <pre><code>bool DoesExistVariable(const std::string& varname);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>varname</code>: Variable name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if the variable exists, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Checks if a variable exists in a file.
                     </p>
                 </li>
                 <li id="ATRC_FD_DoesExistKey">
-                    <h5>DoesExistKey</h5>
+                    <h4>DoesExistKey</h4>
                     <p>
                         Checks if a key exists in a file.
                     </p>
                     <pre><code>bool DoesExistKey(const std::string& block, const std::string& key);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>block</code>: Block name.</li>
                         <li><code>key</code>: Key name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if the key exists, <code>false</code> otherwise.</li>
                         <li><code>false</code> if the block does not exist.</li>
                     </ul>
                 </li>
                 <li id="ATRC_FD_IsPublic">
-                    <h5>IsPublic</h5>
+                    <h4>IsPublic</h4>
                     <p>
                         Checks if a variable is public.
                     </p>
                     <pre><code>bool IsPublic(const std::string& varname);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>varname</code>: Variable name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if the variable is public, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Checks if a variable is public.
                     </p>
                 </li>
                 <li id="ATRC_FD_InsertVar">
-                    <h5>InsertVar</h5>
+                    <h4>InsertVar</h4>
                     <p>
                         Inserts a value into a string containing inject markings. See <a href="#syntax_Insert">Insert/Inject marking</a> for syntax.
                     </p>
                     <pre><code>void InsertVar(std::string& line, std::vector<std::string>& args);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>line</code>: String containing inject markings.</li>
                         <li><code>args</code>: Vector of arguments.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Inserts values into a string containing inject markings.
                         Result is stored in <code>line</code>.
                     </p>
                 </li>
                 <li id="ATRC_FD_InsertVar_S">
-                    <h5>InsertVar_S</h5>
+                    <h4>InsertVar_S</h4>
                     <p>
                         Inserts a value into a string containing inject markings. See <a href="#syntax_Insert">Insert/Inject marking</a> for syntax.
                     </p>
                     <pre><code>std::string InsertVar_S(const std::string& line, std::vector<std::string>& args);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>line</code>: String containing inject markings.</li>
                         <li><code>args</code>: Vector of arguments.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>String with injected values.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Inserts values into a string containing inject markings.
                     </p>
                 </li>
                 <li id="ATRC_FD_AddBlock">
-                    <h5>AddBlock</h5>
+                    <h4>AddBlock</h4>
                     <p>
                         Adds a block to a file.
                     </p>
                     <pre><code>bool AddBlock(const std::string& blockname);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>blockname</code>: Block name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Adds a block to a file.
                         Checks if the block already exists before creating.
@@ -1312,20 +1313,20 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_RemoveBlock">
-                    <h5>RemoveBlock</h5>
+                    <h4>RemoveBlock</h4>
                     <p>
                         Removes a block from a file.
                     </p>
                     <pre><code>bool RemoveBlock(const std::string& blockname);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>blockname</code>: Block name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Removes a block from a file.
                         Checks if the block exists before removing.
@@ -1333,21 +1334,21 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_AddVariable">
-                    <h5>AddVariable</h5>
+                    <h4>AddVariable</h4>
                     <p>
                         Adds a variable to a file.
                     </p>
                     <pre><code>bool AddVariable(const std::string& varname, const std::string& value);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>varname</code>: Variable name.</li>
                         <li><code>value</code>: Variable value.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Adds a variable to a file.
                         Checks if the variable already exists before creating.
@@ -1355,20 +1356,20 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_RemoveVariable">
-                    <h5>RemoveVariable</h5>
+                    <h4>RemoveVariable</h4>
                     <p>
                         Removes a variable from a file.
                     </p>
                     <pre><code>bool RemoveVariable(const std::string& varname);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>varname</code>: Variable name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Removes a variable from a file.
                         Checks if the variable exists before removing.
@@ -1376,21 +1377,21 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_ModifyVariable">
-                    <h5>ModifyVariable</h5>
+                    <h4>ModifyVariable</h4>
                     <p>
                         Modifies a variable in a file.
                     </p>
                     <pre><code>bool ModifyVariable(const std::string& varname, const std::string& value);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>varname</code>: Variable name.</li>
                         <li><code>value</code>: Variable value.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Modifies a variable in a file.
                         Checks if the variable exists before modifying.
@@ -1398,22 +1399,22 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_AddKey">
-                    <h5>AddKey</h5>
+                    <h4>AddKey</h4>
                     <p>
                         Adds a key to a block in a file.
                     </p>
                     <pre><code>bool AddKey(const std::string& block, const std::string& key, const std::string& value);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>block</code>: Block name.</li>
                         <li><code>key</code>: Key name.</li>
                         <li><code>value</code>: Key value.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Adds a key to a block in a file.
                         Checks if the block exists before adding the key.
@@ -1422,21 +1423,21 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_RemoveKey">
-                    <h5>RemoveKey</h5>
+                    <h4>RemoveKey</h4>
                     <p>
                         Removes a key from a block in a file.
                     </p>
                     <pre><code>bool RemoveKey(const std::string& block, const std::string& key);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>block</code>: Block name.</li>
                         <li><code>key</code>: Key name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Removes a key from a block in a file.
                         Checks if the block and key exist before removing.
@@ -1444,22 +1445,22 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_ModifyKey">
-                    <h5>ModifyKey</h5>
+                    <h4>ModifyKey</h4>
                     <p>
                         Modifies a key in a block in a file.
                     </p>
                     <pre><code>bool ModifyKey(const std::string& block, const std::string& key, const std::string& value);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>block</code>: Block name.</li>
                         <li><code>key</code>: Key name.</li>
                         <li><code>value</code>: Key value.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if successful, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Modifies a key in a block in a file.
                         Checks if the block and key exist before modifying.
@@ -1467,246 +1468,261 @@ private:
                     </p>
                 </li>
                 <li id="ATRC_FD_ToCStruct">
-                    <h5>ToCStruct</h5>
+                    <h4>ToCStruct</h4>
                     <p>
                         Converts an ATRC file data structure to a C structure.
                     </p>
                     <pre><code>C_PATRC_FD ToCStruct();</code></pre>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>C structure pointer.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Converts an ATRC file data structure to a C structure.
                         C structure needs to be freed manually.
                     </p>
                 </li>
+                <li id="ATRC_FD_CheckStatus">
+                    <h4>CheckStatus</h4>
+                    <p>
+                        Checks the status of the ATRC file data class instance.
+                    </p>
+                    <pre><code>bool CheckStatus();</code></pre>
+                    <h4>Returns</h4>
+                    <ul>
+                        <li><code>true</code> if the file is parsed succesfully, <code>false</code> otherwise.</li>
+                    </ul>
+                    <h4>Remarks</h4>
+                    <p>
+                        Checks the status of the ATRC_FD class instance.
+                    </p>
+                </li>
                 <li id="ATRC_FD_GetVariables">
-                    <h5>GetVariables</h5>
+                    <h4>GetVariables</h4>
                     <p>
                         Gets a list of variables in a file.
                     </p>
                     <pre><code>std::vector<std::string> GetVariables();</code></pre>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Vector of variable names.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Gets a list of variables in a file.
                     </p>
                 </li>
                 <li id="ATRC_FD_GetBlocks">
-                    <h5>GetBlocks</h5>
+                    <h4>GetBlocks</h4>
                     <p>
                         Gets a list of blocks in a file.
                     </p>
                     <pre><code>std::vector<std::string> GetBlocks();</code></pre>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Vector of block names.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Gets a list of blocks in a file.
                     </p>
                 </li>
                 <li id="ATRC_FD_GetFilename">
-                    <h5>GetFilename</h5>
+                    <h4>GetFilename</h4>
                     <p>
                         Gets the file name.
                     </p>
                     <pre><code>std::string GetFilename();</code></pre>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>File name.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Gets the file name.
                     </p>
                 </li>
                 <li id="ATRC_FD_GetAutoSave">
-                    <h5>GetAutoSave</h5>
+                    <h4>GetAutoSave</h4>
                     <p>
                         Gets the AutoSave setting.
                     </p>
                     <pre><code>bool GetAutoSave();</code></pre>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li><code>true</code> if AutoSave is enabled, <code>false</code> otherwise.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Gets the AutoSave setting.
                     </p>
                 </li>
                 <li id="ATRC_FD_SetAutoSave">
-                    <h5>SetAutoSave</h5>
+                    <h4>SetAutoSave</h4>
                     <p>
                         Sets the AutoSave setting.
                     </p>
                     <pre><code>void SetAutoSave(bool autosave);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>autosave</code>: AutoSave setting.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Sets the AutoSave setting.
                     </p>
                 </li>
                 <li id="ATRC_FD_operator_arr1">
-                    <h5>operator[]</h5>
+                    <h4>operator[]</h4>
                     <p>
                         Gets a variable or key value.
                     </p>
                     <pre><code>PROXY_ATRC_FD operator[](const std::string& key);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>key</code>: Key name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Variable or key value.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Gets a variable or key value.
                     </p>
                 </li>
                 <li id="ATRC_FD_operator_arr2">
-                    <h5>operator[]</h5>
+                    <h4>operator[]</h4>
                     <p>
                         Gets a block. 
                     </p>
                     <pre><code>PROXY_ATRC_FD operator[](const std::string& key) const;</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>key</code>: Block name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Block.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Gets a block.
                     </p>
                 </li>
             </ul>
-            <h4>PROXY_ATRC_FD</h4>
+            <h3>PROXY_ATRC_FD</h3>
             <ul>
                 <li id="PROXY_ATRC_FD_Default_constructor">
-                    <h5>PROXY_ATRC_FD</h5>
+                    <h4>PROXY_ATRC_FD</h4>
                     <p>
                         Default constructor.
                     </p>
                     <pre><code>PROXY_ATRC_FD(ATRC_FD& fd, const std::string& key);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>fd</code>: ATRC file data structure.</li>
                         <li><code>key</code>: Key name.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Initializes a proxy ATRC file data structure.
                     </p>
                 </li>
                 <li id="PROXY_ATRC_FD_operator_arr">
-                    <h5>operator[]</h5>
+                    <h4>operator[]</h4>
                     <p>
                         Gets a variable or key value.
                     </p>
                     <pre><code>PROXY_ATRC_FD operator[](const std::string& subKey);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>subKey</code>: Key name.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Variable or key value.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Gets a variable or key value.
                     </p>
                 </li>
                 <li id="PROXY_ATRC_FD_operator_str">
-                    <h5>operator std::string</h5>
+                    <h4>operator std::string</h4>
                     <p>
                         Converts the value to a string.
                     </p>
                     <pre><code>operator std::string() const;</code></pre>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Value as a string.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Converts the value to a string.
                     </p>
                 </li>
                 <li id="PROXY_ATRC_FD_operator_assign">
-                    <h5>operator=</h5>
+                    <h4>operator=</h4>
                     <p>
                         Assigns a value to a variable or key.
                     </p>
                     <pre><code>PROXY_ATRC_FD& operator=(const std::string& value);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>value</code>: Value to assign.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Reference to the proxy ATRC file data structure.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Assigns a value to a variable or key.
                     </p>
                 </li>
                 <li id="PROXY_ATRC_FD_operator_rshift1">
-                    <h5>operator&gt;&gt;</h5>
+                    <h4>operator&gt;&gt;</h4>
                     <p>
                         Assigns a value to a variable or key.
                     </p>
                     <pre><code>PROXY_ATRC_FD& operator>>(const std::string& value);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>value</code>: Value to assign.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Reference to the proxy ATRC file data structure.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Assigns a value to a variable or key.
                     </p>
                 </li>
                 <li id="PROXY_ATRC_FD_operator_rshift2">
-                    <h5>operator&gt;&gt;</h5>
+                    <h4>operator&gt;&gt;</h4>
                     <p>
                         Assigns a value to a variable or key.
                     </p>
                     <pre><code>PROXY_ATRC_FD& operator>>(const char* value);</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>value</code>: Value to assign.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Reference to the proxy ATRC file data structure.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Assigns a value to a variable or key.
                     </p>
                 </li>
                 <li id="PROXY_ATRC_FD_operator_insertion">
-                    <h5>operator&lt;&lt;</h5>
+                    <h4>operator&lt;&lt;</h4>
                     <p>
                         Outputs a variable or key value.
                     </p>
@@ -1720,16 +1736,16 @@ private:
     }
     return os;
 }</code></pre>
-                    <h5>Arguments</h5>
+                    <h4>Arguments</h4>
                     <ul>
                         <li><code>os</code>: Output stream.</li>
                         <li><code>obj</code>: Proxy ATRC file data structure.</li>
                     </ul>
-                    <h5>Returns</h5>
+                    <h4>Returns</h4>
                     <ul>
                         <li>Output stream.</li>
                     </ul>
-                    <h5>Remarks</h5>
+                    <h4>Remarks</h4>
                     <p>
                         Outputs a variable or key value.
                     </p>
@@ -1835,6 +1851,7 @@ std::cout &lt;&lt; fd["block"]["key"] &lt;&lt; std::endl;</code></pre>
                     <h5>Remarks</h5>
                     <p>
                         Global error value, used to store the last error code for stdlib functions.
+                        Every stdlib function sets this value, _ATRC_SUCCESSFULL_ACTION if succesfull, _ATRC_UNSUCCESSFULL_ACTION otherwise.
                     </p>
                 </li>
                 <li id="stdlib__C_String_Arr">
@@ -1882,7 +1899,6 @@ std::cout &lt;&lt; fd["block"]["key"] &lt;&lt; std::endl;</code></pre>
                     </p>
                 </li>
                 <li id="stdlib_functions_atrc_to_list">
-                    <!-- ATRC_API C_PString_Arr atrc_to_list(const char separator, const char* value); -->
                     <h4>atrc_to_list</h4>
                     <p>
                         Converts a string to a list of strings.
@@ -1919,7 +1935,6 @@ std::cout &lt;&lt; fd["block"]["key"] &lt;&lt; std::endl;</code></pre>
                     </p>
                 </li>
                 <li id="stdlib_functions_atrc_to_bool">
-                    <!-- ATRC_API bool atrc_to_bool(const char* value); -->
                     <h4>atrc_to_bool</h4>
                     <p>
                         Converts a string to a boolean.
@@ -1959,7 +1974,6 @@ std::cout &lt;&lt; fd["block"]["key"] &lt;&lt; std::endl;</code></pre>
                     </p>
                 </li>
                 <li id="stdlib_functions_atrc_to_int64_t">
-                    <!-- ATRC_API int64_t atrc_to_int64_t(const char* value); -->
                     <h4>atrc_to_int64_t</h4>
                     <p>
                         Converts a string to a signed 64-bit integer.

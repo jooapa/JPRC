@@ -99,7 +99,7 @@ ATRC_API bool DoesExistBlock(C_PATRC_FD self, const char* block);
 ATRC_API bool DoesExistVariable(C_PATRC_FD self, const char* varname);
 ATRC_API bool DoesExistKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool IsPublic(C_PATRC_FD self, const char* varname);
-ATRC_API const char* InsertVar_S(const char* line, const char** args);
+ATRC_API char* InsertVar_S(const char* line, const char** args);
 ATRC_API bool AddBlock(C_PATRC_FD self, const char* blockname);
 ATRC_API bool RemoveBlock(C_PATRC_FD self, const char* blockname);
 ATRC_API bool AddVariable(C_PATRC_FD self, const char* varname, const char* value);
