@@ -15,7 +15,7 @@
 #define ERR_INSERT_VAR                  108  
 #define ERR_INVALID_FILE                109
 #define FILE_MODE_ERR                   110
-
+#define ERR_WRITECHECK                  111
 
 // File
 #define ERR_CLASS_READER                200
@@ -161,6 +161,10 @@ inline void errormsg(int err_num=-1,
             break;
         case ERR_INVALID_BLOCK_DECL:
             msg = "Invalid block declaration at line " + std::to_string(line_number) + ". Stopping parsing";
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_WRITECHECK:
+            msg = "Writecheck creation failed: '" + var_name + "'";
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_KEY_DECL:

@@ -137,11 +137,12 @@ int main(void) {
     printf("[PASS] Create_Empty_ATRC_FD: Successfully created ATRC_FD\n");
 
     // Test file reading
-    if (Read(fd, "test.atrc")) {
+    if (Read(fd, "test.atrc", ATRC_READ_ONLY)) {
         printf("[PASS] Read: Successfully read file 'test.atrc'\n");
     }
     else {
         printf("[FAIL] Read: Failed to read file 'test.atrc'\n");
+        Destroy_ATRC_FD(fd);
 		return 1;
     }
 
@@ -167,5 +168,53 @@ int main(void) {
     printf("Tests completed.\n");
 
 	cpp_main();
+
+
+
+
+
+
+
+
+    C_PATRC_FD filedata = Create_Empty_ATRC_FD();
+    if (filedata == NULL) {
+        printf("[FAIL] Create_Empty_ATRC_FD: Failed to create ATRC_FD\n");
+        return 1;
+    }
+
+    if (!Read(filedata, "test.atrc", ATRC_READ_ONLY)) {
+        printf("[FAIL] Read: Failed to read file 'test.atrc'\n");
+        Destroy_ATRC_FD(filedata);
+        return 1;
+    }
+
+    const char* varname = "test_variable";
+    const char* value = ReadVariable(filedata, varname);
+    if(value == NULL){
+        printf("[FAIL] ReadVariable: Failed to read variable '%s'\n", varname);
+    } else {
+        printf("[PASS] ReadVariable: Value of '%s' is '%s'\n", varname, value);
+    }
+
+    const char* blockname = "test_block";
+    if (AddBlock(filedata, blockname)) {
+        printf("[PASS] AddBlock: Block '%s' added successfully\n", blockname);
+    } else {
+        printf("[FAIL] AddBlock: Failed to add block '%s'\n", blockname);
+    }
+
+    if (DoesExistBlock(filedata, blockname)) {
+        printf("[PASS] DoesExistBlock: Block '%s' exists\n", blockname);
+    } else {
+        printf("[FAIL] DoesExistBlock: Block '%s' does not exist\n", blockname);
+    }
+
+    if (RemoveBlock(filedata, blockname)) {
+        printf("[PASS] RemoveBlock: Block '%s' removed successfully\n", blockname);
+    } else {
+        printf("[FAIL] RemoveBlock: Failed to remove block '%s'\n", blockname);
+    }
+
+    Destroy_ATRC_FD(filedata);
     return 0;
 }

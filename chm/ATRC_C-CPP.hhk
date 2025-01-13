@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+   <meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.74.8702.0">
+</HEAD>
+<BODY>
+   <UL>
+      <LI> <OBJECT type="text/sitemap">
+               <param name="Name" value="Introduction">
+               <param name="Local" value="..\docs\index.htm">
+           </OBJECT>
+      </LI>
+      <LI> <OBJECT type="text/sitemap">
+               <param name="Name" value="Setting Up">
+               <param name="Local" value="..\docs\installation_guide.htm">
+           </OBJECT>
+      </LI>
+      <LI> <OBJECT type="text/sitemap">
+               <param name="Name" value="API Reference">
+               <param name="Local" value="..\docs\api_reference.htm">
+           </OBJECT>
+      </LI>
+   </UL>
+</BODY>
+</HTML>

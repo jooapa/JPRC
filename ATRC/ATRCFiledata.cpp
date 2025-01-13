@@ -7,6 +7,7 @@
 
 void atrc::ATRC_FD::MAINCONSTRUCTOR(){
     this->AutoSave = false;
+    this->Writecheck = false;
     this->Filename = "";
     this->Variables = std::make_unique<std::vector<Variable>>(); 
     this->Blocks = std::make_unique<std::vector<Block>>();
@@ -212,6 +213,13 @@ void atrc::ATRC_FD::SetAutoSave(bool autosave){
     this->AutoSave = autosave;
 }
 
+bool atrc::ATRC_FD::GetWriteCheck() const {
+    return this->Writecheck;
+}
+void atrc::ATRC_FD::SetWriteCheck(bool writecheck) {
+    this->Writecheck = writecheck;
+}
+
 std::string atrc::ATRC_FD::ReadVariable(const std::string& varname){
     std::string res = "";
     for(Variable var : *this->Variables){
@@ -411,8 +419,14 @@ bool atrc::ATRC_FD::ModifyVariable(const std::string& varname, const std::string
     Variable var;
     var.Name = varname;
     if(!DoesExistVariable(varname)){
-        errormsg(ERR_VAR_NOT_FOUND, -1, var.Name, this->Filename);
-        return false;
+        if(!this->Writecheck) {
+            errormsg(ERR_VAR_NOT_FOUND, -1, var.Name, this->Filename);
+            return false;
+        }
+        if(!this->AddVariable(varname, value)){
+            errormsg(ERR_WRITECHECK, -1, var.Name, this->Filename);
+            return false;
+        }
     }
     int i = 0;    
     for(Variable &var : *this->Variables){
@@ -484,12 +498,26 @@ bool atrc::ATRC_FD::RemoveKey(const std::string& block, const std::string& key){
 }
 bool atrc::ATRC_FD::ModifyKey(const std::string& block, const std::string& key, const std::string& value){
     if(!DoesExistBlock(block)) {
-        errormsg(ERR_BLOCK_NOT_FOUND, -1, block, this->Filename);
-        return false;
+        if(!this->Writecheck){
+            errormsg(ERR_BLOCK_NOT_FOUND, -1, block, this->Filename);
+            return false;
+        } else {
+            if(!this->AddBlock(block)){
+                errormsg(ERR_WRITECHECK, -1, block, this->Filename);
+                return false;
+            }
+        }
     }
     if(!DoesExistKey(block, key)){
-        errormsg(ERR_KEY_NOT_FOUND, -1, key, this->Filename);
-        return false;
+        if(!this->Writecheck){
+            errormsg(ERR_KEY_NOT_FOUND, -1, key, this->Filename);
+            return false;
+        } else {
+            if(!this->AddKey(block, key, value)){
+                errormsg(ERR_WRITECHECK, -1, key, this->Filename);
+                return false;
+            }
+        }
     }
 
     int i = 0;
@@ -565,14 +593,14 @@ atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator=(const std::string& value) {
     uint64_t x = key.find("]");
     try {
         if (x == std::string::npos) {
-            if(fd->DoesExistVariable(key)) {
+            if(fd->GetWriteCheck() || fd->DoesExistVariable(key)) {
                 fd->ModifyVariable(key, value);
             }
         }
         else {
             std::string block = key.substr(0, x);
             std::string key_ = key.substr(x + 1, key.size() - x - 1);
-            if(fd->DoesExistKey(block, key_)) {
+            if(fd->GetWriteCheck() || fd->DoesExistKey(block, key_)) {
                     fd->ModifyKey(block, key_, value);
             }
         }

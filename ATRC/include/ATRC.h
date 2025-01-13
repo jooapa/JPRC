@@ -32,7 +32,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <limits.h>
 #ifdef __cplusplus
 #  include <vector>
 #  include <string>
@@ -96,6 +95,7 @@ typedef struct _ATRCFiledata{
     C_PBlock_Arr Blocks;
     char *Filename;
     bool AutoSave;
+    bool Writecheck;
 } C_ATRC_FD, *C_PATRC_FD;
 
 ATRC_API bool Read(C_PATRC_FD self, const char* path, ReadMode readMode);
@@ -183,13 +183,16 @@ class ATRC_API ATRC_FD {
         std::string GetFilename();
         bool GetAutoSave() const;
         void SetAutoSave(bool autosave);
-
+        bool GetWriteCheck() const;
+        void SetWriteCheck(bool writecheck);
+        
         PROXY_ATRC_FD operator[](const std::string& key);
         PROXY_ATRC_FD operator[](const std::string& key) const;
 
     private:
         void MAINCONSTRUCTOR();
         bool AutoSave;
+        bool Writecheck;
         std::unique_ptr<std::vector<Variable>> Variables;
         std::unique_ptr<std::vector<Block>> Blocks;
         std::string Filename;

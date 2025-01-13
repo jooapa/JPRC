@@ -3,88 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ATRC C-CPP Documentation">
     <title>ATRC Header File Documentation</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #1b7ada;
-            padding: 1em 0;
-            text-align: center;
-        }
-        main {
-            padding: 2em;
-        }
-        section {
-            margin-bottom: 2em;
-        }
-        h1, h2, h3, h4, h5 {
-            color: #0056b3;
-        }
-        header h1 {
-            color: white;
-        }
-        code {
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            padding: 2px 4px;
-        }
-        pre {
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            padding: 1em;
-            overflow-x: auto;
-        }
-        a {
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        p {
-            width: 80%;
-        }
-        footer {
-            background-color: #1b7ada;
-            color: white;
-            text-align: center;
-            padding: 1em 0;
-            bottom: 0;
-            width: 100%;
-        }
-        #back_to_top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #1b7ada;
-            color: rgb(255, 255, 255);
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            border: 1px solid #0056b3;
-        }
-        #back_to_top:hover {
-            background-color: #0056b3;
-        }
-        #back_to_top a{
-            color: white;
-        }
+    <link rel="stylesheet" href="styles.css">
     </style>
 </head>
 <body>
     <header id="header">
-        <h1>ATRC Header File Documentation, version 2.0.2</h1>
+        <h1>ATRC Header File Documentation, version 2.1.0</h1>
     </header>
+    <nav>
+        <ul>
+            <li><a href="index.htm">Home</a></li>
+            <li><a href="installation_guide.htm">Installation guide</a></li>
+            <li><a href="api_reference.htm">API reference</a></li>
+            <li><a href="https://github.com/Antonako1/ATRC" target="_blank">GitHub Project</a></li>
+        </ul>
+    </nav>
     <main>
-        <section>
+        <section id="overview">
             <h2>Overview</h2>
             <p>This document provides an overview of the <code>ATRC</code> header file, detailing the constants, macros, data structures, functions, and the ATRC standard library. Both C and C++ declarations are supported.</p>
         </section>
@@ -102,6 +39,7 @@
                         <li><a href="#syntax_Variables">Variables</a></li>
                         <li><a href="#syntax_Blocks">Blocks</a></li>
                         <li><a href="#syntax_Keys">Keys</a></li>
+                        <li><a href="#syntax_preprocessor">Preprocessor directives</a></li>
                     </ul>
                 </li>
                 <li>
@@ -205,6 +143,8 @@
                                         <li><a href="#ATRC_FD_GetFilename">GetFilename</a></li>
                                         <li><a href="#ATRC_FD_GetAutoSave">GetAutoSave</a></li>
                                         <li><a href="#ATRC_FD_SetAutoSave">SetAutoSave</a></li>
+                                        <li><a href="#ATRC_FD_GetWriteCheck">GetWriteCheck</a></li>
+                                        <li><a href="#ATRC_FD_SetWriteCheck">SetWriteCheck</a></li>
                                         <li><a href="#ATRC_FD_operator_arr1">operator[]</a></li>
                                         <li><a href="#ATRC_FD_operator_arr2">operator[]</a></li>
                                     </ul>
@@ -269,7 +209,7 @@
                 <li id="syntax_Header">
                     <h3>Header</h3>
                     <p>
-                        First row of the ATRC file must be <code>#!ATRC</code>
+                        First row of the ATRC file must be <code>#!ATRC</code>, thus denoting the file as an ATRC file and the extension can be freely choosed.
                     </p>
                 </li>
                 <li id="syntax_Insert">
@@ -301,6 +241,13 @@ key=Hello%*% %*%%*%
 key2=Hello%*1% %*0%%*2%
 # After injection, output is "Hello, World!"</code></pre>
 </code></pre>
+                <h4>Remarks</h4>
+                <p>
+                    See more: <a href="#C_InsertVar_S">C: InsertVar_S</a>,
+                    <a href="#ATRC_FD_InsertVar">C++: InsertVar</a>
+                    <a href="#ATRC_FD_InsertVar_S">C++: InsertVar_S</a>
+
+                </p>
                 </li>
                 <li id="syntax_Reserved">
                     <h3>Reserved characters</h3>
@@ -381,6 +328,13 @@ key=value</code></pre>
 [block]
 key=value</code></pre>
                 </li>
+                <li id="syntax_preprocessor">
+                    <h3>Preprocessor directives</h3>
+                    <p>
+                        Preprocessor directives are currently under development.
+                    </p>
+
+                </li>
             </ul>
         </section>
         <section id="macros-and-constants">
@@ -407,13 +361,13 @@ key=value</code></pre>
     ATRC_FORCE_READ,
 } ReadMode;</code></pre>
                 <ul>
-                    <li><code>ATRC_READ_ONLY</code>: Read only mode.</li>
-                    <li><code>ATRC_CREATE_READ</code>: Create if not exists and read mode.</li>
-                    <li><code>ATRC_FORCE_READ</code>: Delete if exists and read mode.</li>
+                    <li><code>ATRC_READ_ONLY</code>: Read from file.</li>
+                    <li><code>ATRC_CREATE_READ</code>: Create file if it doesn't exist and read it.</li>
+                    <li><code>ATRC_FORCE_READ</code>: Delete file if it exists, create it and read it.</li>
                 </li>
                 <h5>Remarks</h5>
                 <p>
-                    <a href="#FILEHEADER">FILEHEADER</a> is appended to the start of the file in all modes.
+                    <a href="#FILEHEADER">FILEHEADER</a> is appended to the start of the file in <code>ATRC_CREATE_READ</code> and <code>ATRC_FORCE_READ</code>.
                 </p>
             </ul>
 
@@ -505,12 +459,14 @@ uint64_t VariableCount;
     C_PBlock_Arr Blocks;
     char *Filename;
     bool AutoSave;
+    bool Writecheck;
 } C_ATRC_FD, *C_PATRC_FD;</code></pre>
                 <ul>
                     <li><code>Variables</code>: Array of variables.</li>
                     <li><code>Blocks</code>: Array of blocks.</li>
                     <li><code>Filename</code>: File name.</li>
-                    <li><code>AutoSave</code>: Auto-save flag.</li>
+                    <li><code>AutoSave</code>: Auto-save flag. Default: <code>false</code>.</li>
+                    <li><code>Writecheck</code>: If status is <code>true</code>, creates new keys, blocks or variables when modifying a value. Default: <code>false</code></li>
                 </ul>
                 </li>
             </ul>
@@ -531,6 +487,7 @@ uint64_t VariableCount;
                     <li><code>Name</code>: Variable name.</li>
                     <li><code>Value</code>: Variable value.</li>
                     <li><code>IsPublic</code>: Visibility flag.</li>
+                </ul>
                 </li>
                 <li id="Key">
                     <h4>Key</h4>
@@ -597,6 +554,8 @@ uint64_t VariableCount;
         std::string GetFilename();
         bool GetAutoSave() const;
         void SetAutoSave(bool autosave);
+        bool GetWriteCheck() const;
+        void SetWriteCheck(bool writecheck);
 
         PROXY_ATRC_FD operator[](const std::string& key);
         PROXY_ATRC_FD operator[](const std::string& key) const;
@@ -604,6 +563,7 @@ uint64_t VariableCount;
     private:
         void MAINCONSTRUCTOR();
         bool AutoSave;
+        bool Writecheck;
         std::unique_ptr<std::vector<Variable>> Variables;
         std::unique_ptr<std::vector<Block>> Blocks;
         std::string Filename;
@@ -611,7 +571,8 @@ uint64_t VariableCount;
 typedef ATRC_FD* PATRC_FD;</code></pre>
                 <p>More on functions in the <a href="#CPP_functions">C++ Member Functions</a> section.</p>
                 <ul>
-                    <li><code>AutoSave</code>: Auto-save flag.</li>
+                    <li><code>AutoSave</code>: Auto-save flag. Default: <code>false</code>.</li>
+                    <li><code>Writecheck</code>: If status is <code>true</code>, creates new keys, blocks or variables when modifying a value. Default: <code>false</code></li>
                     <li><code>Variables</code>: Vector of variables.</li>
                     <li><code>Blocks</code>: Vector of blocks.</li>
                     <li><code>Filename</code>: File name.</li>
@@ -700,8 +661,8 @@ private:
                     <p>
                         Reads the value of a variable from a file.
                         Doesn't check if the variable is public or if it exists beforehand.
-                        If the variable does not exist, the function returns <code>""</code>.
-                        If unauthorized access is attempted, the function returns <code>""</code> and logs an error.
+                        If the variable does not exist, the function returns <code>NULL</code>.
+                        If unauthorized access is attempted, the function returns <code>NULL</code> and logs an error.
                     </p>
                 </li>
                 <li id="C_ReadKey">
@@ -722,7 +683,7 @@ private:
                     <p>
                         Reads the value of a key from a file.
                         Doesn't check if the key or block exists beforehand.
-                        If the key does not exist, the function returns <code>""</code>.
+                        If the key does not exist, the function returns <code>NULL</code>.
                     </p>
                 </li>
                 <li id="C_DoesExistBlock">
@@ -1615,6 +1576,35 @@ free(res);</code></pre>
                     <p>
                         Sets the AutoSave setting.
                     </p>
+                </li>
+                <li id="ATRC_FD_GetWriteCheck">
+                    <h4>GetWriteCheck</h4>
+                    <p>
+                        Gets the WriteCheck setting.
+                    </p>
+                    <pre><code>bool GetWriteCheck() const;</code></pre>
+                    <h4>Returns</h4>
+                    <ul>
+                        <li>Status of <code>Writecheck</code>.</li>
+                    </ul>
+                    <h4>Remarks</h4>
+                    <p>
+                        Gets the WriteCheck setting.
+                        See <a href="#ATRC_FD">ATRC_FD</a> for more information.
+                    </p>
+                </li>
+                <li id="ATRC_FD_SetWriteCheck">
+                    <h4>SetWriteCheck</h4>
+                    <p>
+                        Sets the WriteCheck setting.
+                    </p>
+                    <pre><code>void SetWriteCheck(bool writecheck);</code></pre>
+                    <h4>Remarks</h4>
+                    <p>
+                        Sets the WriteCheck setting.
+                        See <a href="#ATRC_FD">ATRC_FD</a> for more information.
+                    </p>
+
                 </li>
                 <li id="ATRC_FD_operator_arr1">
                     <h4>operator[]</h4>

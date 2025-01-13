@@ -12,14 +12,14 @@ bool Read(C_PATRC_FD self, const char* path, ReadMode mode) {
 const char* ReadVariable(C_PATRC_FD self, const char* varname) {
     const char* res = "";
     for(uint64_t i = 0; i < self->Variables->VariableCount; i++){
-        if (self->Variables->Variables[i].Name == NULL) return "";
+        if (self->Variables->Variables[i].Name == NULL) return NULL;
         if(strcmp(varname, self->Variables->Variables[i].Name) == 0){
             if(self->Variables->Variables[i].IsPublic) {
-				if (self->Variables->Variables[i].Value == NULL) return "";
+				if (self->Variables->Variables[i].Value == NULL) return NULL;
                 res = self->Variables->Variables[i].Value;
             } else {
                 _ATRC_WRAP_FUNC_2(ERR_UNAUTHORIZED_ACCESS_TO_VAR, -1, varname, self->Filename);
-                res = "";
+                res = NULL;
             }
         }
     }
@@ -37,6 +37,7 @@ const char* ReadKey(C_PATRC_FD self, const char* block, const char* key) {
             }
         }
     }
+    if(strcmp(res, "") == 0) return NULL;
     return res;
 }
 bool DoesExistBlock(C_PATRC_FD self, const char* block) {
@@ -272,8 +273,15 @@ bool RemoveVariable(C_PATRC_FD self, const char* varname) {
 
 bool ModifyVariable(C_PATRC_FD self, const char* varname, const char* value) {
     if (!DoesExistVariable(self, varname)) {
-        _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, varname, self->Filename);
-        return false;
+        if(!self->Writecheck){
+            _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, varname, self->Filename);
+            return false;
+        } else {
+            if(!AddVariable(self, varname, value)){
+                _ATRC_WRAP_FUNC_2(ERR_WRITECHECK, -1, varname, self->Filename);
+                return false;
+            }
+        }
     }
 
     // Find the variable
@@ -422,12 +430,26 @@ bool RemoveKey(C_PATRC_FD self, const char* block, const char* key) {
 
 bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value) {
     if (!DoesExistBlock(self, block)) {
-        _ATRC_WRAP_FUNC_2(ERR_BLOCK_NOT_FOUND, -1, block, self->Filename);
-        return false;
+        if(!self->Writecheck){
+            _ATRC_WRAP_FUNC_2(ERR_BLOCK_NOT_FOUND, -1, block, self->Filename);
+            return false;
+        } else {
+            if(!AddBlock(self, block)){
+                _ATRC_WRAP_FUNC_2(ERR_WRITECHECK, -1, block, self->Filename);
+                return false;
+            }
+        }
     }
     if (!DoesExistKey(self, block, key)) {
-        _ATRC_WRAP_FUNC_2(ERR_KEY_NOT_FOUND, -1, key, self->Filename);
-        return false;
+        if(!self->Writecheck){
+            _ATRC_WRAP_FUNC_2(ERR_KEY_NOT_FOUND, -1, key, self->Filename);
+            return false;
+        } else {
+            if(!AddKey(self, block, key, value)){
+                _ATRC_WRAP_FUNC_2(ERR_WRITECHECK, -1, key, self->Filename);
+                return false;
+            }
+        }
     }
 
     size_t blockIndex = -1, keyIndex = -1;
@@ -474,6 +496,7 @@ C_PATRC_FD Create_Empty_ATRC_FD(void){
     C_PATRC_FD res = (C_PATRC_FD)malloc(sizeof(C_ATRC_FD));
     if(res == NULL) return NULL;
     res->AutoSave = false;
+    res->Writecheck = false;
     res->Variables = (C_PVariable_Arr)malloc(sizeof(C_Variable_Arr));
 	if (res->Variables == NULL) {
 		free(res);

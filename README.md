@@ -1,12 +1,16 @@
 # ATRC resource file library made
 
+## Documentation
+
+See [.\docs\index.htm](https://antonako1.github.io/ATRC/docs/index.htm)
+
 ## Use with CMake
 
 ```
 cmake_minimum_required(VERSION 3.15)
 project(MyProject)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/ATRC_2.0.2/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/ATRC_2.1.0/cmake")
 
 # Include the FindATRC script
 include(FindATRC)
@@ -19,7 +23,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE ${ATRC})
 
 # Include ATRC headers
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/ATRC_2.0.2/include")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/ATRC_2.1.0/include")
 ```
 
 ## Example program
@@ -92,6 +96,6 @@ insert2=insert second variable here: %*1% and first one here: %*0*
     cmake --preset VS2022-x64-debug -B./out/VS2022-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DATRC_BUILD_TESTS=ON & .\out\VS2022-x64-debug\build\ATRC.sln
 
     # Create release package
-    # Requires: debian wsl,7z,strawberry perl,wkhtmltopdf
+    # Requires: debian wsl,7z,strawberry perl,wkhtmltopdf,html tools
     .\scripts\fullbuild.bat
 ```
