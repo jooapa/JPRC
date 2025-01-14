@@ -1,8 +1,10 @@
-# ATRC resource file library made
+# ATRC resource/configuration file library for C/C++
 
 ## Documentation
 
 See [.\docs\index.htm](https://antonako1.github.io/ATRC/docs/index.htm)
+
+Uses C++17 standards
 
 ## Use with CMake
 
