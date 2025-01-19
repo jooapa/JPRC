@@ -558,12 +558,18 @@ atrc::PROXY_ATRC_FD::operator const char*() const {
     uint64_t x = key.find("]");
     try {
         if (x == std::string::npos) {
-            return fd->ReadVariable(key).c_str();
+            std::string res_str = fd->ReadVariable(key);
+            const char *res = new char[res_str.size() + 1];
+            std::strcpy(const_cast<char*>(res), res_str.c_str());
+            return res;
         }
         else {
             std::string block = key.substr(0, x);
             std::string key_ = key.substr(x + 1, key.size() - x - 1);
-            return fd->ReadKey(block, key_).c_str();
+            std::string res_str = fd->ReadKey(block, key_);
+            const char *res = new char[res_str.size() + 1];
+            std::strcpy(const_cast<char*>(res), res_str.c_str());
+            return res;
         }
     }
     catch (std::exception& e) {

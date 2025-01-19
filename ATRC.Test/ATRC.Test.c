@@ -146,6 +146,9 @@ int main(void) {
 		return 1;
     }
 
+    Destroy_ATRC_FD(fd);
+    return 0;
+    
     // Test Variable Operations
     test_variable_operations(fd);
 

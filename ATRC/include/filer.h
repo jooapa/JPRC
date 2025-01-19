@@ -16,6 +16,7 @@
 #define ERR_INVALID_FILE                109
 #define FILE_MODE_ERR                   110
 #define ERR_WRITECHECK                  111
+#define ERR_INVALID_PREPROCESSOR_FLAG   112
 
 // File
 #define ERR_CLASS_READER                200
@@ -46,7 +47,6 @@
 
 // Error types
 #define ERR_MEMORY_ALLOCATION_FAILED    502
-
 #ifdef __cplusplus
 namespace atrc {
 enum class
@@ -138,6 +138,10 @@ inline void trim(std::string &s) {
     rtrim(s);
     ltrim(s);
 }
+// Remove newlines from string
+inline void remove_newlines(std::string &s) {
+    s.erase(std::remove(s.begin(), s.end(), '\n'), s.end());
+}
 
 inline void errormsg(int err_num=-1, 
                     int line_number=-1, const 
@@ -165,6 +169,10 @@ inline void errormsg(int err_num=-1,
             break;
         case ERR_WRITECHECK:
             msg = "Writecheck creation failed: '" + var_name + "'";
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_INVALID_PREPROCESSOR_FLAG:
+            msg = "Invalid preprocessor flag: '" + var_name + "'";
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_KEY_DECL:
@@ -231,7 +239,7 @@ inline void errormsg(int err_num=-1,
             msg = "Unknown error at line " + std::to_string(line_number);
             break;
     }
-    std::cerr << "ATRC Error<" << err_class << "?" << err_num << ">"<< "<" << filename << ">" <<": " << msg << std::endl;
+    std::cerr << "~ATRC~Error<" << err_class << "?" << err_num << ">"<< "<" << filename << ">" <<": " << msg << std::endl;
 }
 
 ATRC_API 

@@ -4,7 +4,99 @@
 #include <fstream>
 #include <utility>
 #include <string>
+static void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const std::unique_ptr<std::vector<atrc::Variable>> &variables, const std::string filename);
+const std::string PREPROCESSOR_FLAGS[] = {
+    ".IF",
+    ".ELSEIF",
+    ".ELSE",
+    ".ENDIF",
+    ".DEFINE",
+    ".UNDEF",
+    ".ERROR",
+};
 
+
+void check_variable_add(const std::string &trim_line, std::unique_ptr<std::vector<atrc::Variable>> &variables, const int &line_number, const std::string &filename){
+    bool _is_public = false;
+    if(trim_line[0] == '%') _is_public = true;
+    // parse name
+    size_t _equ_pos = trim_line.find('=');
+    if(_equ_pos == std::string::npos){
+        atrc::errormsg(ERR_INVALID_VAR_DECL, line_number, "", filename);
+        return;
+    }
+
+    atrc::Variable _variable;
+    // from %var% = value
+    // to %var%
+    // to var
+    std::string _name = trim_line.substr(0, _equ_pos);
+    atrc::trim(_name);
+    _variable.IsPublic = _is_public;
+    // true = 1, false = 0
+    _variable.Name = _name.substr(2- (size_t)_is_public, _name.length() - (3 - (size_t)_is_public));
+
+    if (_variable.Name.empty() || _variable.Name == "*") {
+        atrc::errormsg(ERR_INVALID_VAR_DECL, line_number, _variable.Name, filename);
+        return;
+    }
+    if(atrc::VariableContainsVariable(variables, _variable)) {
+        atrc::errormsg(ERR_REREFERENCED_VAR, line_number, _variable.Name, filename);
+        return;
+    }
+    std::string _value = trim_line.substr(_equ_pos + 1);
+    ParseLineValueATRCtoSTRING(_value, line_number, variables, filename);
+    _variable.Value = _value;
+    variables->push_back(_variable);
+}
+
+void check_key_add(
+const std::string &_line_trim,
+const int &line_number,
+std::unique_ptr<std::vector<atrc::Block>> &blocks,
+std::unique_ptr<std::vector<atrc::Variable>> &variables,
+const std::string &filename
+)
+{
+    std::string _key_name = "";
+    std::string _key_value = "";
+    size_t _equ_pos = _line_trim.find('=');
+    if(_equ_pos == std::string::npos) {
+        atrc::errormsg(ERR_INVALID_KEY_DECL, line_number, "", filename);
+        return;
+    }
+    _key_name = _line_trim.substr(0, _equ_pos);
+    atrc::trim(_key_name);
+    _key_value = _line_trim.substr(_equ_pos + 1);
+    ParseLineValueATRCtoSTRING(_key_value, line_number, variables, filename);
+    atrc::Key _key;
+    _key.Name = _key_name;
+    _key.Value = _key_value;
+    if (blocks.get()->size() == 0) {
+        atrc::errormsg(ERR_INVALID_VAR_DECL, line_number, _key.Name, filename);
+        return;
+    }
+    if(atrc::BlockContainsKey(blocks.get()->back().Keys, _key)) {
+        atrc::errormsg(ERR_REREFERENCED_KEY, line_number, _key.Name, filename);
+        return;
+    }
+    blocks->back().Keys.push_back(_key);
+}
+
+void check_block_add(
+    const std::string &_curr_block,
+    std::unique_ptr<std::vector<atrc::Block>> &blocks,
+    const int &line_number,
+    const std::string &filename
+){
+    atrc::Block block;
+    block.Name = _curr_block;
+    if(atrc::BlockContainsBlock(blocks,block)) {
+        atrc::errormsg(ERR_REREFERENCED_BLOCK, line_number, block.Name, filename);
+        return;
+    }
+    blocks->push_back(block);
+}
 #define checkblock_success  1
 #define checkblock_failure  0
 #define checkblock_fatal    2
@@ -169,6 +261,32 @@ static void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number
     _W_ParseLineValueATRCtoSTRING(line, line_number, variables.get(), filename);
 }
 
+typedef struct _preprocessor_block {
+    std::string flag;
+    std::vector<std::string> flag_contents;
+    std::vector<std::string> lines;
+} preprocessor_block;
+
+void parse_preprocessor_flag(std::string &line, preprocessor_block &_block){
+    std::cout << "Parsing preprocessor flag: " << line << " for: " << _block.flag << std::endl;
+    if(_block.flag != ""){
+        _block.lines.push_back(line);
+        return;
+    }
+    for(const std::string &flag : PREPROCESSOR_FLAGS){
+        if(line.find(flag) == 0){
+            _block.flag = flag;
+            break;
+        }
+    }
+    atrc::trim(_block.flag);
+    if(_block.flag == ".IF" || _block.flag == ".ELSEIF" || _block.flag == ".ELSE"){
+        std::string _flag_contents = line.substr(_block.flag.length());
+        atrc::trim(_flag_contents);
+        _block.flag_contents.push_back(_flag_contents);
+    }
+}
+
 std::pair<
     std::unique_ptr<std::vector<atrc::Variable>>, 
     std::unique_ptr<std::vector<atrc::Block>>
@@ -193,6 +311,12 @@ atrc::ParseFile
     std::string line;
     int line_number = 0;
     std::string _curr_block = "";
+    
+    bool _continue_on_second_line_preprocessor = false;
+    int _preprocessor_block_level = 0;
+    std::vector<preprocessor_block> _preprocessor;
+    bool _inside_preprocessor_block = false;
+
     while (std::getline(file, line)) {
         if(line_number++ == 0){
             std::string CUR_HEADER = line;
@@ -211,49 +335,54 @@ atrc::ParseFile
 
         // Skip empty lines and comments
         if (_line_trim == "") continue;
-        if (_line_trim[0] == '#') continue;
-        
+        if (_line_trim[0] == '#' 
+        || _continue_on_second_line_preprocessor
+        || _inside_preprocessor_block) 
+        {
+            std::cout << _line_trim << "\n";
+            // Start of preprocessor block
+            if(_line_trim[0] == '#' && _line_trim[1] == '.') {
+                _inside_preprocessor_block = false;
+                _line_trim = _line_trim.substr(1);
+                std::cout << "Preprocessor block: " << _line_trim << std::endl;
+                // Check if the line extends to the next line
+                if(_line_trim[_line_trim.length() - 1] == '\\') {
+                    _continue_on_second_line_preprocessor = true;
+                    _line_trim = _line_trim.substr(0, _line_trim.length() - 1);
+                }
+                // If extends, add the line to the preprocessor block
+                if(_continue_on_second_line_preprocessor) {
+                    parse_preprocessor_flag(_line_trim, _preprocessor.back());
+                    _continue_on_second_line_preprocessor = false;
+                    continue;
+                } else { // Else create a new preprocessor block
+                    _inside_preprocessor_block = true;
+                    preprocessor_block _block;
+                    parse_preprocessor_flag(_line_trim, _block);
+                    if(_block.flag == ".IF" || _block.flag == ".ELSE" || _block.flag == ".ELSEIF"){
+                        _preprocessor_block_level++;
+                        continue;
+                    } else if (_block.flag == ".ENDIF"){
+                        // Parse the preprocessor blocks
+
+                    } else {
+                        errormsg(ERR_INVALID_PREPROCESSOR_FLAG, line_number, _line_trim, filename);
+                        file.close();
+                        return std::make_pair(std::move(variables), std::move(blocks));
+                    }
+                }
+            }
+            else if(_inside_preprocessor_block){
+                _preprocessor.back().lines.push_back(_line_trim);
+                continue;
+            }
+            // If the line is a comment, skip it
+            continue;
+        }
 
         // Check if line is a variable
         if(_line_trim[0] == '%' || _line_trim.substr(0, 2) == "<%"){
-            bool _is_public = false;
-            if(_line_trim[0] == '%') _is_public = true;
-            // parse name
-            size_t _equ_pos = _line_trim.find('=');
-            if(_equ_pos == std::string::npos){
-                atrc::errormsg(ERR_INVALID_VAR_DECL, line_number, "", filename);
-                continue;
-            }
-
-            atrc::Variable _variable;
-            // from %var% = value
-            // to %var%
-            // to var
-            std::string _name = _line_trim.substr(0, _equ_pos);
-            atrc::trim(_name);
-            // if(_is_public) {
-            //     _variable.IsPublic = true;
-            //     _variable.Name = _name.substr(1, _name.length() - 2);
-            // } else {
-            //     _variable.IsPublic = false;
-            //     _variable.Name = _name.substr(2, _name.length() - 3);
-            // }
-            _variable.IsPublic = _is_public;
-            // true = 1, false = 0
-            _variable.Name = _name.substr(2- (size_t)_is_public, _name.length() - (3 - (size_t)_is_public));
-
-            if (_variable.Name.empty() || _variable.Name == "*") {
-                atrc::errormsg(ERR_INVALID_VAR_DECL, line_number, _variable.Name, filename);
-                continue;
-            }
-            if(atrc::VariableContainsVariable(variables, _variable)) {
-                atrc::errormsg(ERR_REREFERENCED_VAR, line_number, _variable.Name, filename);
-                continue;
-            }
-            std::string _value = _line_trim.substr(_equ_pos + 1);
-            ParseLineValueATRCtoSTRING(_value, line_number, variables, filename);
-            _variable.Value = _value;
-            variables->push_back(_variable);
+            check_variable_add(_line_trim, variables, line_number, filename);
             continue;
         }
         // Check if line is a block
@@ -263,39 +392,10 @@ atrc::ParseFile
             return std::make_pair(std::move(variables), std::move(blocks));
         }
         if (check == checkblock_success) {
-            // atrc::Block
-            atrc::Block block;
-            block.Name = _curr_block;
-            if(atrc::BlockContainsBlock(blocks,block)) {
-                atrc::errormsg(ERR_REREFERENCED_BLOCK, line_number, block.Name, filename);
-                continue;
-            }
-            blocks->push_back(block);
+            check_block_add(_curr_block, blocks, line_number, filename);
             continue;
         }
-        std::string _key_name = "";
-        std::string _key_value = "";
-        size_t _equ_pos = _line_trim.find('=');
-        if(_equ_pos == std::string::npos) {
-            atrc::errormsg(ERR_INVALID_KEY_DECL, line_number, "", filename);
-            continue;
-        }
-        _key_name = _line_trim.substr(0, _equ_pos);
-        atrc::trim(_key_name);
-        _key_value = _line_trim.substr(_equ_pos + 1);
-        ParseLineValueATRCtoSTRING(_key_value, line_number, variables, filename);
-        atrc::Key _key;
-        _key.Name = _key_name;
-        _key.Value = _key_value;
-        if (blocks.get()->size() == 0) {
-			atrc::errormsg(ERR_INVALID_VAR_DECL, line_number, _key.Name, filename);
-			continue;
-        }
-        if(atrc::BlockContainsKey(blocks.get()->back().Keys, _key)) {
-            atrc::errormsg(ERR_REREFERENCED_KEY, line_number, _key.Name, filename);
-            continue;
-        }
-        blocks->back().Keys.push_back(_key);
+        check_key_add(_line_trim, line_number, blocks, variables, filename);
     }
 
     file.close();

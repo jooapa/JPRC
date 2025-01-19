@@ -1,1 +1,4 @@
 #!ATRC
+#.IF LINUX \
+        Windows
+#.A

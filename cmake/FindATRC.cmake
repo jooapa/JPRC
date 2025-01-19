@@ -1,3 +1,11 @@
+# Search for the ATRC library
+# This script will search for the ATRC library in the ATRC directory
+# and set the ATRC variable to the path of the library.
+# The ATRC library is expected to be in the following directory structure:
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Determine the platform (Windows or Linux)
 if (WIN32)
     set(CompilePlatform "Windows")

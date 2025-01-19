@@ -18,21 +18,13 @@ include_directories("${PROJECT_SOURCE_DIR}/ATRC/include")
 
 # Set C++ standard for tests (if CMake version is greater than 3.12)
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-    set_property(TARGET ATRC.Test PROPERTY CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
 
 # Enable testing
 enable_testing()
-
-# Copy test.atrc file to the binary directory
-add_custom_command(
-    TARGET ATRC.Test PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    "${PROJECT_SOURCE_DIR}/ATRC.Test/test.atrc"
-    "${CMAKE_BINARY_DIR}/ATRC.Test/test.atrc"
-    COMMENT "Copying test.atrc to binary directory"
-)
 
 # For MSVC Debugging
 if (MSVC)

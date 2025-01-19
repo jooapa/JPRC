@@ -12,20 +12,11 @@ Uses C++17 standards
 cmake_minimum_required(VERSION 3.15)
 project(MyProject)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/ATRC_2.1.0/cmake")
-
-# Include the FindATRC script
-include(FindATRC)
-
 add_executable(${PROJECT_NAME}
     src/main.cpp
 )
 
-# Link the ATRC library
-target_link_libraries(${PROJECT_NAME} PRIVATE ${ATRC})
-
-# Include ATRC headers
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/ATRC_2.1.0/include")
+target_link_libraries(MyProject PRIVATE ${ATRC})
 ```
 
 ## Example program
@@ -89,7 +80,7 @@ insert2=insert second variable here: %*1% and first one here: %*0*
     cmake --build ./out/{out_dir}/build --config {Release|Debug}
 
     # Run test program
-    cmake --preset linux-x64-debug -B./out/linux-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=./cmake/toolchain-linux-x64.cmake -DATRC_BUILD_TESTS=ON && cmake --build ./out/linux-x64-debug/build --config Debug --target run_tests
+    cmake --preset linux-x64-debug -B./out/linux-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=./cmake/toolchain-linux-x64.cmake -DATRC_BUILD_TESTS=ON && cp ./ATRC.Test/test.atrc ./out/linux-x64-debug/build/ATRC.Test/test.atrc && cmake --build ./out/linux-x64-debug/build --config Debug --target run_tests 
 
     cmake --preset windows-x64-debug -B./out/windows-x64-debug/build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=./cmake/toolchain-windows-x64.cmake -DATRC_BUILD_TESTS=ON & cmake --build ./out/windows-x64-debug/build --config Debug --target run_tests
 
