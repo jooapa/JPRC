@@ -18,7 +18,7 @@ atrc::ATRC_FD::ATRC_FD(){this->MAINCONSTRUCTOR();}
 atrc::ATRC_FD::ATRC_FD(const char *path, ReadMode mode){
     this->MAINCONSTRUCTOR();
     this->Filename = path;
-    this->Read(mode);
+    this->ReadAgain(mode);
 }
 
 atrc::ATRC_FD::ATRC_FD(C_PATRC_FD fd){
@@ -63,8 +63,12 @@ atrc::PROXY_ATRC_FD atrc::ATRC_FD::operator[](const std::string& key) const {
 }
 
 
+bool atrc::ATRC_FD::Read(const char* path, ReadMode mode){
+    this->Filename = path;
+    return this->ReadAgain(mode);
+}
 
-bool atrc::ATRC_FD::Read(ReadMode mode){
+bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
     std::string filename = this->Filename;
     std::string encoding = "UTF-8";
     std::string extension = "atrc";

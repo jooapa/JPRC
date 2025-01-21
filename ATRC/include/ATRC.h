@@ -157,7 +157,8 @@ class ATRC_API ATRC_FD {
         ATRC_FD(const char* path, ReadMode mode = ATRC_READ_ONLY);
         ATRC_FD(C_PATRC_FD filedata);
         ~ATRC_FD();
-        bool Read(ReadMode mode = ATRC_READ_ONLY);
+        bool ReadAgain(ReadMode mode = ATRC_READ_ONLY);
+        bool Read(const char* path, ReadMode mode = ATRC_READ_ONLY);
         std::string ReadVariable(const std::string& varname);
         std::string ReadKey(const std::string& block, const std::string& key);
         bool DoesExistBlock(const std::string& block);

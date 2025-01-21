@@ -8,33 +8,20 @@ Uses C++17 standards
 
 ## Use with CMake
 
-```
+```bash
 
-set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/cmake")
+# Define the path to the ATRC configuration file
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/ATRC_2.2.0/cmake")
+
+# Find ATRC library using its config file
 find_package(ATRC REQUIRED)
 
+# Define project
 project(MyProject)
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(MyProject src/main.cpp)
 
+# Include header files
 target_include_directories(MyProject PRIVATE ${ATRC_INCLUDE_DIR})
-
-target_link_directories(MyProject PRIVATE
-    $<$<CONFIG:Debug>:${ATRC_LIB_DEBUG}>
-    $<$<CONFIG:Release>:${ATRC_LIB_RELEASE}>
-)
-target_link_libraries(MyProject PRIVATE
-    $<$<CONFIG:Debug>:d_ATRC_Windows_x${CMAKE_SIZEOF_VOID_P}>
-    $<$<CONFIG:Release>:ATRC_Windows_x${CMAKE_SIZEOF_VOID_P}>
-)
-
-if (WIN32)
-    add_custom_command(TARGET MyProject POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<$<CONFIG:Debug>:${ATRC_LIB_DEBUG}/d_ATRC_Windows_x${CMAKE_SIZEOF_VOID_P}.dll>
-            $<$<CONFIG:Release>:${ATRC_LIB_RELEASE}/ATRC_Windows_x${CMAKE_SIZEOF_VOID_P}.dll>
-            $<TARGET_FILE_DIR:MyProject>
-    )
-endif()
 ```
 
 ## Example program
@@ -51,14 +38,6 @@ int main()
 		return 1;
 	}
     std::cout << fd["var_name"] << std::endl;
-
-    C_PATRC_FD c_fd = fd.ToCStruct();
-    const char* line = fd["block_name"]["key"];
-    const char* args[] = {"Hello everyone", nullptr};
-    std::cout << "Before: " << line << std::endl;
-    char* res = InsertVar_S(line, args);
-    std::cout << "After: " << res << std::endl;
-    delete[] res;
     return 0;
 }
 ```
