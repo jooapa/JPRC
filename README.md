@@ -9,14 +9,32 @@ Uses C++17 standards
 ## Use with CMake
 
 ```
-cmake_minimum_required(VERSION 3.15)
-project(MyProject)
 
-add_executable(${PROJECT_NAME}
-    src/main.cpp
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/cmake")
+find_package(ATRC REQUIRED)
+
+project(MyProject)
+add_executable(${PROJECT_NAME} src/main.cpp)
+
+target_include_directories(MyProject PRIVATE ${ATRC_INCLUDE_DIR})
+
+target_link_directories(MyProject PRIVATE
+    $<$<CONFIG:Debug>:${ATRC_LIB_DEBUG}>
+    $<$<CONFIG:Release>:${ATRC_LIB_RELEASE}>
+)
+target_link_libraries(MyProject PRIVATE
+    $<$<CONFIG:Debug>:d_ATRC_Windows_x${CMAKE_SIZEOF_VOID_P}>
+    $<$<CONFIG:Release>:ATRC_Windows_x${CMAKE_SIZEOF_VOID_P}>
 )
 
-target_link_libraries(MyProject PRIVATE ${ATRC})
+if (WIN32)
+    add_custom_command(TARGET MyProject POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<$<CONFIG:Debug>:${ATRC_LIB_DEBUG}/d_ATRC_Windows_x${CMAKE_SIZEOF_VOID_P}.dll>
+            $<$<CONFIG:Release>:${ATRC_LIB_RELEASE}/ATRC_Windows_x${CMAKE_SIZEOF_VOID_P}.dll>
+            $<TARGET_FILE_DIR:MyProject>
+    )
+endif()
 ```
 
 ## Example program
