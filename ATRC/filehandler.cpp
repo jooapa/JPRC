@@ -339,43 +339,45 @@ atrc::ParseFile
         || _continue_on_second_line_preprocessor
         || _inside_preprocessor_block) 
         {
-            std::cout << _line_trim << "\n";
-            // Start of preprocessor block
-            if(_line_trim[0] == '#' && _line_trim[1] == '.') {
-                _inside_preprocessor_block = false;
-                _line_trim = _line_trim.substr(1);
-                std::cout << "Preprocessor block: " << _line_trim << std::endl;
-                // Check if the line extends to the next line
-                if(_line_trim[_line_trim.length() - 1] == '\\') {
-                    _continue_on_second_line_preprocessor = true;
-                    _line_trim = _line_trim.substr(0, _line_trim.length() - 1);
-                }
-                // If extends, add the line to the preprocessor block
-                if(_continue_on_second_line_preprocessor) {
-                    parse_preprocessor_flag(_line_trim, _preprocessor.back());
-                    _continue_on_second_line_preprocessor = false;
-                    continue;
-                } else { // Else create a new preprocessor block
-                    _inside_preprocessor_block = true;
-                    preprocessor_block _block;
-                    parse_preprocessor_flag(_line_trim, _block);
-                    if(_block.flag == ".IF" || _block.flag == ".ELSE" || _block.flag == ".ELSEIF"){
-                        _preprocessor_block_level++;
+            /*
+                std::cout << _line_trim << "\n";
+                // Start of preprocessor block
+                if(_line_trim[0] == '#' && _line_trim[1] == '.') {
+                    _inside_preprocessor_block = false;
+                    _line_trim = _line_trim.substr(1);
+                    std::cout << "Preprocessor block: " << _line_trim << std::endl;
+                    // Check if the line extends to the next line
+                    if(_line_trim[_line_trim.length() - 1] == '\\') {
+                        _continue_on_second_line_preprocessor = true;
+                        _line_trim = _line_trim.substr(0, _line_trim.length() - 1);
+                    }
+                    // If extends, add the line to the preprocessor block
+                    if(_continue_on_second_line_preprocessor) {
+                        parse_preprocessor_flag(_line_trim, _preprocessor.back());
+                        _continue_on_second_line_preprocessor = false;
                         continue;
-                    } else if (_block.flag == ".ENDIF"){
-                        // Parse the preprocessor blocks
+                    } else { // Else create a new preprocessor block
+                        _inside_preprocessor_block = true;
+                        preprocessor_block _block;
+                        parse_preprocessor_flag(_line_trim, _block);
+                        if(_block.flag == ".IF" || _block.flag == ".ELSE" || _block.flag == ".ELSEIF"){
+                            _preprocessor_block_level++;
+                            continue;
+                        } else if (_block.flag == ".ENDIF"){
+                            // Parse the preprocessor blocks
 
-                    } else {
-                        errormsg(ERR_INVALID_PREPROCESSOR_FLAG, line_number, _line_trim, filename);
-                        file.close();
-                        return std::make_pair(std::move(variables), std::move(blocks));
+                        } else {
+                            errormsg(ERR_INVALID_PREPROCESSOR_FLAG, line_number, _line_trim, filename);
+                            file.close();
+                            return std::make_pair(std::move(variables), std::move(blocks));
+                        }
                     }
                 }
-            }
-            else if(_inside_preprocessor_block){
-                _preprocessor.back().lines.push_back(_line_trim);
-                continue;
-            }
+                else if(_inside_preprocessor_block){
+                    _preprocessor.back().lines.push_back(_line_trim);
+                    continue;
+                }
+            */
             // If the line is a comment, skip it
             continue;
         }
