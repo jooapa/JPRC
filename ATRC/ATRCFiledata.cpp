@@ -15,7 +15,14 @@ void atrc::ATRC_FD::MAINCONSTRUCTOR(){
 }
 
 atrc::ATRC_FD::ATRC_FD(){this->MAINCONSTRUCTOR();}
+
 atrc::ATRC_FD::ATRC_FD(const char *path, ReadMode mode){
+    std::string _path = path;
+    this->MAINCONSTRUCTOR();
+    this->Filename = _path;
+    this->ReadAgain(mode);
+}
+atrc::ATRC_FD::ATRC_FD(std::string& path, ReadMode mode){
     this->MAINCONSTRUCTOR();
     this->Filename = path;
     this->ReadAgain(mode);
@@ -63,7 +70,7 @@ atrc::PROXY_ATRC_FD atrc::ATRC_FD::operator[](const std::string& key) const {
 }
 
 
-bool atrc::ATRC_FD::Read(const char* path, ReadMode mode){
+bool atrc::ATRC_FD::Read(std::string& path, ReadMode mode){
     this->Filename = path;
     return this->ReadAgain(mode);
 }
