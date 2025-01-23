@@ -4,17 +4,14 @@
 #include <fstream>
 #include <utility>
 #include <string>
-static void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const std::unique_ptr<std::vector<atrc::Variable>> &variables, const std::string filename);
-const std::string PREPROCESSOR_FLAGS[] = {
-    ".IF",
-    ".ELSEIF",
-    ".ELSE",
-    ".ENDIF",
-    ".DEFINE",
-    ".UNDEF",
-    ".ERROR",
-};
+#include <filesystem>
+#include <stack>
+#include <vector>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
+static void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number, const std::unique_ptr<std::vector<atrc::Variable>> &variables, const std::string filename);
 
 void check_variable_add(const std::string &trim_line, std::unique_ptr<std::vector<atrc::Variable>> &variables, const int &line_number, const std::string &filename){
     bool _is_public = false;
@@ -261,31 +258,221 @@ static void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number
     _W_ParseLineValueATRCtoSTRING(line, line_number, variables.get(), filename);
 }
 
+bool evaluatePlatformTag(const std::string& tag) {
+#ifdef __linux__
+    return tag == "LINUX";
+#elif _WIN32 || _WIN64
+    return tag == "WINDOWS";
+#elif __APPLE__ || __MACH__
+    return tag == "MACOS";
+#elif __unix__
+    return tag == "UNIX";
+#else
+    return false;
+#endif
+}
+
+bool evaluateArchitectureTag(const std::string& tag) {
+#ifdef _WIN32
+#ifdef _WIN64
+    return tag == "X64";
+#else
+    return tag == "X86";
+#endif
+#elif __arm__
+    return tag == "ARM";
+#elif __aarch64__
+    return tag == "ARM64";
+#else
+    return false;
+#endif
+}
+
+bool evaluateLogicalOperator(const std::string& op, std::vector<bool>& results) {
+    if (op == "NOT") {
+        bool value = results.back();
+        results.pop_back();
+        return !value;
+    }
+    if (results.size() < 2) {
+        return false; // Syntax error
+    }
+    bool rhs = results.back(); results.pop_back();
+    bool lhs = results.back(); results.pop_back();
+    if (op == "AND") return lhs && rhs;
+    if (op == "OR") return lhs || rhs;
+    return false; // Unsupported operator
+}
+
+
+static const std::string PREPROCESSOR_FLAGS[] = {
+    ".IF",      // If               -> .IF <tag> <tag> ...
+    ".ELSEIF",  // Else if          -> .ELSEIF <tag> <tag> ...
+    ".ELSE",    // Else             -> .ELSE
+    ".ENDIF",   // End if           -> .ENDIF
+    
+    ".DEFINE",  // Define           -> .DEFINE=<var>=<value>
+    ".UNDEF",   // Undefine         -> .UNDEF=<var>
+
+    ".LOG",     // Log to console   -> .LOG=<message>
+    ".WARNING", // Warning message  -> .WARNING=<message>
+    ".ERROR",   // Error message    -> .ERROR=<message>
+    
+    ".IGNORE",  // Ignore n lines   -> .IGNORE=<n>
+
+
+};
+
+static const std::string PREPROCESSOR_TAGS[] = {
+    // Operating systems
+    "LINUX",
+    "WINDOWS",
+    "MACOS",
+    "UNIX",
+
+    // Architectures
+    "X86",
+    "X64",
+    "ARM",
+    "ARM64",
+
+    // Logical operators
+    "OR",
+    "AND",
+    "NOT",
+};
+
+enum class PPRes {
+    // See bool contents
+    SeeContents,
+    DontSeeContents,
+
+    EndIF,
+    Normal,
+
+    // Errors
+    InvalidFlag,
+    InvalidFlagContents,
+};
+
 typedef struct _preprocessor_block {
-    std::string flag;
-    std::vector<std::string> flag_contents;
-    std::vector<std::string> lines;
+    std::string flag;                               // Flag of the preprocessor block
+    std::string flag_contents;                      // Contents of the flag
+    
+    bool isSolved;                                  // Flag is solved in the preprocessor block
+    bool solvedResult;                              // Result of the flag    
+
+    int64_t numeral_data;                               // Numeral data for flags like .IGNORE
+    std::string string_data;                        // String data for flags like .LOG
+
+    std::string var_name;                           // Variable name for flags like .DEFINE
+    std::string var_value;                          // Variable value for flags like .DEFINE
+
+    std::vector<std::string> lines;                 // Lines that are inside the preprocessor block
+
+    _preprocessor_block() : flag(""), flag_contents(""), isSolved(false), solvedResult(false), lines({}), numeral_data(0), string_data(""), var_name(""), var_value("") {}
 } preprocessor_block;
 
-void parse_preprocessor_flag(std::string &line, preprocessor_block &_block){
-    std::cout << "Parsing preprocessor flag: " << line << " for: " << _block.flag << std::endl;
-    if(_block.flag != ""){
-        _block.lines.push_back(line);
-        return;
+/*+++
+Parses preprocessor line:
+
+#<flag> <contents...>
+-> 
+{
+    flag: <flag>
+    flag_contents: <contents>
+    isSolved: false|true        // Flag is solved in the preprocessor block
+    solvedResult: false|true    // Result of the flag
+    lines: [] // lines that are inside the preprocessor block. Will be parsed outside this function
+}
+---*/
+PPRes parse_preprocessor_flag(std::string &_line, preprocessor_block &_block, std::string &filename){
+    // Flag: line[1:line.find_first_of(' ')]
+    std::string line = _line + " ";
+    size_t _space_pos = line.find_first_of(' ');
+
+    if(_space_pos == std::string::npos){
+        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, -1, line, filename);
+        return PPRes::InvalidFlag;
     }
-    for(const std::string &flag : PREPROCESSOR_FLAGS){
-        if(line.find(flag) == 0){
-            _block.flag = flag;
-            break;
+    _block.flag = line.substr(1, _space_pos - 1);
+    atrc::str_to_upper_s(_block.flag);
+    if(std::find(std::begin(PREPROCESSOR_FLAGS), std::end(PREPROCESSOR_FLAGS), _block.flag) == std::end(PREPROCESSOR_FLAGS)){
+        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, -1, _block.flag, filename);
+        return PPRes::InvalidFlag;
+    }
+
+    // End of the preprocessor block
+    if(_block.flag == ".ENDIF") return PPRes::EndIF;
+
+    // Contents: line[line.find_first_of(' '):]
+    std::string _contents = line.substr(_space_pos + 1);
+    atrc::trim(_contents);
+    atrc::str_to_upper_s(_contents);
+    _block.flag_contents = _contents;
+
+    // Blocks that require content tags: .FLAG <tag> <tag> ...
+    if (_block.flag == ".IF" || _block.flag == ".ELSEIF") {
+        std::vector<std::string> tags = atrc::split(_contents, ' ');
+        if (tags.empty()) {
+            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
+            return PPRes::InvalidFlagContents;
+        }
+
+        // Evaluate tags
+        std::vector<bool> results;
+        for (const std::string& tag : tags) {
+            if (tag == "LINUX" || tag == "WINDOWS" || tag == "MACOS" || tag == "UNIX") {
+                results.push_back(evaluatePlatformTag(tag));
+            } else if (tag == "X86" || tag == "X64" || tag == "ARM" || tag == "ARM64") {
+                results.push_back(evaluateArchitectureTag(tag));
+            } else if (tag == "OR" || tag == "AND" || tag == "NOT") {
+                if (results.size() < 2 && tag != "NOT") {
+                    atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
+                    return PPRes::InvalidFlagContents;
+                }
+                results.push_back(evaluateLogicalOperator(tag, results));
+            } else {
+                atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, -1, tag, filename);
+                return PPRes::InvalidFlagContents;
+            }
+        }
+
+        bool finalResult = results.back();
+        _block.solvedResult = finalResult;
+        _block.isSolved = true;
+        if(finalResult) return PPRes::SeeContents;
+        else return PPRes::DontSeeContents;
+    }
+    // Blocks that require ".FLAG=VALUE" syntax
+    else if(
+        _block.flag == ".LOG"       ||
+        _block.flag == ".WARNING"   ||
+        _block.flag == ".ERROR"     ||
+        _block.flag == ".IGNORE"
+    ){
+        std::vector<std::string> _tags = atrc::split(_contents, '=');
+        if(_tags.size() != 2){
+            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
+            return PPRes::InvalidFlagContents;
         }
     }
-    atrc::trim(_block.flag);
-    if(_block.flag == ".IF" || _block.flag == ".ELSEIF" || _block.flag == ".ELSE"){
-        std::string _flag_contents = line.substr(_block.flag.length());
-        atrc::trim(_flag_contents);
-        _block.flag_contents.push_back(_flag_contents);
+    // Blocks that require ".FLAG=NAME=VALUE" syntax
+    else if(
+        _block.flag == ".DEFINE"    || 
+        _block.flag == ".UNDEF"
+    ) {
+        std::vector<std::string> _tags = atrc::split(_contents, '=');
+        if(_tags.size() != 3){
+            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
+            return PPRes::InvalidFlagContents;
+        }
     }
+    
+    
+    return PPRes::Normal;
 }
+
 
 std::pair<
     std::unique_ptr<std::vector<atrc::Variable>>, 
@@ -293,14 +480,15 @@ std::pair<
 > 
 atrc::ParseFile
 (
-    const std::string &filename, 
+    const std::string &_filename, 
     const std::string &encoding, 
     const std::string &extension
 ) {
     std::unique_ptr<std::vector<atrc::Variable>> variables = std::make_unique<std::vector<atrc::Variable>>();
     std::unique_ptr<std::vector<atrc::Block>>  blocks = std::make_unique<std::vector<atrc::Block>>();
     std::vector<atrc::Key> keys;
-    if(encoding == "" || extension == ""){}
+    if(encoding == "" || extension == ""){} // Ignore for now
+    std::string filename = _filename;
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         atrc::errormsg(ERR_INVALID_FILE, -1, "Failed opening: " + filename, filename);
@@ -312,10 +500,12 @@ atrc::ParseFile
     int line_number = 0;
     std::string _curr_block = "";
     
-    bool _continue_on_second_line_preprocessor = false;
+
     int _preprocessor_block_level = 0;
-    std::vector<preprocessor_block> _preprocessor;
-    bool _inside_preprocessor_block = false;
+    std::stack<preprocessor_block> _preprocessor_blocks;
+    bool skip_preprocessor_block = false;
+    bool inside_preprocessor_block = false;
+
 
     while (std::getline(file, line)) {
         if(line_number++ == 0){
@@ -331,53 +521,41 @@ atrc::ParseFile
             continue;
         }
         std::string _line_trim = line;
-        atrc::ltrim(_line_trim);
+        atrc::trim(_line_trim);
 
         // Skip empty lines and comments
-        if (_line_trim == "") continue;
+        if (_line_trim.empty()) continue;
         if (_line_trim[0] == '#' 
-        || _continue_on_second_line_preprocessor
-        || _inside_preprocessor_block) 
-        {
-            /*
-                std::cout << _line_trim << "\n";
-                // Start of preprocessor block
-                if(_line_trim[0] == '#' && _line_trim[1] == '.') {
-                    _inside_preprocessor_block = false;
-                    _line_trim = _line_trim.substr(1);
-                    std::cout << "Preprocessor block: " << _line_trim << std::endl;
-                    // Check if the line extends to the next line
-                    if(_line_trim[_line_trim.length() - 1] == '\\') {
-                        _continue_on_second_line_preprocessor = true;
-                        _line_trim = _line_trim.substr(0, _line_trim.length() - 1);
-                    }
-                    // If extends, add the line to the preprocessor block
-                    if(_continue_on_second_line_preprocessor) {
-                        parse_preprocessor_flag(_line_trim, _preprocessor.back());
-                        _continue_on_second_line_preprocessor = false;
-                        continue;
-                    } else { // Else create a new preprocessor block
-                        _inside_preprocessor_block = true;
-                        preprocessor_block _block;
-                        parse_preprocessor_flag(_line_trim, _block);
-                        if(_block.flag == ".IF" || _block.flag == ".ELSE" || _block.flag == ".ELSEIF"){
-                            _preprocessor_block_level++;
-                            continue;
-                        } else if (_block.flag == ".ENDIF"){
-                            // Parse the preprocessor blocks
+        || inside_preprocessor_block
+        || skip_preprocessor_block
+        ) 
+        {   
+            // Line is a preprocessor block
+            if(_line_trim[0] == '#' && _line_trim[1] == '.'){
+                preprocessor_block _block;
+                PPRes _res = parse_preprocessor_flag(_line_trim.substr(0), _block, filename);
+                switch(_res) {
+                    case PPRes::EndIF: {
 
-                        } else {
-                            errormsg(ERR_INVALID_PREPROCESSOR_FLAG, line_number, _line_trim, filename);
-                            file.close();
-                            return std::make_pair(std::move(variables), std::move(blocks));
-                        }
-                    }
+                    } break;
+                    case PPRes::SeeContents: 
+                        break;
+                    case PPRes::DontSeeContents: 
+                        break;
+                    
+                    // Error handling, logging made in parse_preprocessor_flag()
+                    case PPRes::InvalidFlag: 
+                    case PPRes::InvalidFlagContents:
+                    default: 
+                        file.close();
+                        return std::make_pair(std::make_unique<std::vector<atrc::Variable>>(), std::make_unique<std::vector<atrc::Block>>());
+                        break;
                 }
-                else if(_inside_preprocessor_block){
-                    _preprocessor.back().lines.push_back(_line_trim);
-                    continue;
-                }
-            */
+            } 
+            
+            else { // Inside preprocessor block
+
+            }
             // If the line is a comment, skip it
             continue;
         }

@@ -17,6 +17,10 @@
 #define FILE_MODE_ERR                   110
 #define ERR_WRITECHECK                  111
 #define ERR_INVALID_PREPROCESSOR_FLAG   112
+#define ERR_INVALID_PREPROCESSOR_TAG    113
+#define ERR_INVALID_PREPROCESSOR_VALUE  114
+#define ERR_INVALID_PREPROCESSOR_SYNTAX 115
+
 
 // File
 #define ERR_CLASS_READER                200
@@ -49,6 +53,12 @@
 #define ERR_MEMORY_ALLOCATION_FAILED    502
 #ifdef __cplusplus
 namespace atrc {
+std::string str_to_lower(const char *str);
+void str_to_lower_s(std::string &str);
+std::string str_to_upper(const char *str);
+void str_to_upper_s(std::string &str);
+std::vector<std::string> split(const std::string &str, char separator);
+
 enum class
 ATRC_SAVE{
     FULL_SAVE = -1, 
@@ -173,6 +183,18 @@ inline void errormsg(int err_num=-1,
             break;
         case ERR_INVALID_PREPROCESSOR_FLAG:
             msg = "Invalid preprocessor flag: '" + var_name + "'";
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_INVALID_PREPROCESSOR_TAG:
+            msg = "Invalid preprocessor tag: '" + var_name + "'";
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_INVALID_PREPROCESSOR_VALUE:
+            msg = "Invalid preprocessor value: '" + var_name + "'";
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_INVALID_PREPROCESSOR_SYNTAX:
+            msg = "Invalid preprocessor syntax: '" + var_name + "'";
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_KEY_DECL:

@@ -154,11 +154,12 @@ class ATRC_API PROXY_ATRC_FD;
 class ATRC_API ATRC_FD {
     public:
         ATRC_FD();
-        ATRC_FD(const char* path, ReadMode mode = ATRC_READ_ONLY);
+        ATRC_FD(std::string& path, ReadMode mode = ATRC_READ_ONLY);
+        ATRC_FD(const char *path, ReadMode mode = ATRC_READ_ONLY);
         ATRC_FD(C_PATRC_FD filedata);
         ~ATRC_FD();
         bool ReadAgain(ReadMode mode = ATRC_READ_ONLY);
-        bool Read(const char* path, ReadMode mode = ATRC_READ_ONLY);
+        bool Read(std::string& path, ReadMode mode = ATRC_READ_ONLY);
         std::string ReadVariable(const std::string& varname);
         std::string ReadKey(const std::string& block, const std::string& key);
         bool DoesExistBlock(const std::string& block);
@@ -229,6 +230,11 @@ private:
 
 
 
+#ifdef __cplusplus
+} // namespace atrc
+namespace atrc_std {
+#endif // __cplusplus
+
 /*+++
 ATRC STDLIB:
     - atrc_to_vector    (C++ only)
@@ -275,7 +281,7 @@ ATRC_API double atrc_to_double(const char* value);
 #       pragma warning(pop)
 #   endif // (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
     } // extern "C"
-} // namespace atrc
+} // namespace atrc_std
 #endif // __cplusplus
 
 #endif // ATRC_H
