@@ -7,6 +7,5 @@ wkhtmltopdf --load-error-handling ignore index.htm api_reference.htm installatio
 
 set "PATH=;C:\Program Files (x86)\HTML Help Workshop;%PATH%"
 
-cd ..\chm
 hhc ATRC_C-CPP.hhp
 endlocal

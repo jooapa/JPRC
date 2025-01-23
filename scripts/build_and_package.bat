@@ -1,5 +1,5 @@
 :: Following required in PATH
-:: debian, 7z, Windows build tools, Strawberry Perl
+:: debian, 7z, Windows build tools, Strawberry Perl, HTML Help Workshop
 
 @echo off
 setlocal
