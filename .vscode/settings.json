@@ -73,6 +73,8 @@
         "forward_list": "cpp",
         "iomanip": "cpp",
         "ratio": "cpp",
-        "vcruntime.h": "c"
+        "vcruntime.h": "c",
+        "stack": "cpp",
+        "deque": "cpp"
     }
 }
