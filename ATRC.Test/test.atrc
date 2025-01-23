@@ -1,4 +1,4 @@
 #!ATRC
-#.IF LINUX \
-        Windows
-#.A
+#.IF WINDOWS
+%test%=value
+#.ENDIF
