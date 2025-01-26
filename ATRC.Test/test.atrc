@@ -1,6 +1,12 @@
 #!ATRC
-#.IF WINDOWS X64
+#.IF WINDOWS
+
+#.IF X86
+%os%=WINDOWS 32-bit
+#.ELSE
 %os%=WINDOWS 64-bit
+#.ENDIF 
+
 #.ELSEIF LINUX
 %os%=LINUX
 #.ELSE
@@ -13,6 +19,18 @@
 #.SUCCESS Using 64-bit machine!
 %arch%=X64
 #.ENDIF
+
+#.LOG
+#.WARNING
+#.ERROR
+#.ERRORCOUT
+#.DEBUG
+#.SUCCESS
+
+#.DEFINE test=123
+
+#.IGNORE 4
+'
 
 [block]
 testq=a

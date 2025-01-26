@@ -315,6 +315,7 @@ enum class PPRes {
     InvalidFlagContents,// Invalid flag contents
 
     ThreeParts,         // .FLAG=<var>=<value>
+    Undefine,           // .UNDEF <var>
     Message,            // .LOG, .WARNING, .ERROR...
 };
 
@@ -324,7 +325,7 @@ enum class PPRes {
     ".ELSE",    // Else             -> .ELSE
     ".ENDIF",   // End if           -> .ENDIF
     
-    ".DEFINE",  // Define           -> .DEFINE= var>=<value>
+    ".DEFINE",  // Define           -> .DEFINE <var>=<value>
     ".UNDEF",   // Undefine         -> .UNDEF <var>
 
     ".LOG",     // Log to console   -> .LOG <message>           // Logs to stdout, no color
@@ -489,15 +490,19 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
         }
     }
 
-    else if (block.flag == ".DEFINE" || block.flag == ".UNDEF") {
-        std::vector<std::string> parts = atrc::split(block.flag_contents, '=');
-        if (parts.size() != 3) {
-            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
+    else if (block.flag == ".DEFINE") {
+        size_t eqPos = block.flag_contents.find('=');
+        if (eqPos == std::string::npos) {
+            atrc::errormsg(ERR_INVALID_PREPROCESSOR_VALUE, -1, line, filename);
             return PPRes::InvalidFlagContents;
         }
-        block.var_name = parts[1];
-        block.var_value = parts[2];
+        block.var_name = atrc::trim_copy(block.flag_contents.substr(0, eqPos));
+        block.var_value = atrc::trim_copy(block.flag_contents.substr(eqPos + 1));
         return PPRes::ThreeParts;
+    }
+    else if(block.flag == ".UNDEF") {
+        block.var_name = block.flag_contents;
+        return PPRes::Undefine;
     }
 
     return PPRes::Normal;
@@ -517,6 +522,7 @@ atrc::ParseFile
     std::unique_ptr<std::vector<atrc::Variable>> variables = std::make_unique<std::vector<atrc::Variable>>();
     std::unique_ptr<std::vector<atrc::Block>>  blocks = std::make_unique<std::vector<atrc::Block>>();
     std::vector<atrc::Key> keys;
+    std::vector<std::pair<std::string, std::string>> definitions;
     if(encoding == "" || extension == ""){} // Ignore for now
     std::string filename = _filename;
     if(!std::filesystem::exists(filename)){
@@ -579,7 +585,26 @@ atrc::ParseFile
                         }
                         break;
                     case PPRes::ThreeParts:
-                        // TODO: Add values to temporary variables or own vector
+                        if(_block.flag == ".DEFINE") {
+                            for(auto &def : definitions) {
+                                if(def.first == _block.var_name) {
+                                    def.second = _block.var_value;
+                                    continue;
+                                }
+                            }
+                            std::pair<std::string, std::string> _def;
+                            _def.first = _block.var_name;
+                            _def.second = _block.var_value;
+                            definitions.push_back(_def);
+                        }
+                        break;
+                    case PPRes::Undefine:
+                        for(auto &def : definitions) {
+                            if(def.first == _block.var_name) {
+                                def.second = "";
+                                continue;
+                            }
+                        }
                         break;
                     case PPRes::DontSeeContents:
                         wait_for_new_block = true;
@@ -711,7 +736,7 @@ void atrc::_W_Save_(
     const std::string &xtra_info3,
     const std::string &xtra_info4
 ) {
-        std::string line = "";
+    std::string line = "";
     std::string final_data = "";
     switch (action)
     {
