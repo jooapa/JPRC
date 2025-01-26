@@ -79,6 +79,7 @@
         "unordered_set": "cpp",
         "list": "cpp",
         "xhash": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "functional": "cpp"
     }
 }

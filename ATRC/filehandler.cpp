@@ -284,7 +284,7 @@ bool evaluateArchitectureTag(const std::string &tag) {
 #endif
 }
 
-bool evaluateLogicalOperator(const std::string &op, std::vector<bool> &results) {
+bool evaluateLogicalOperator(const std::string &op, std::list<bool> &results, size_t index) {
     if (op == "NOT") {
         if (results.empty()) return false; // Syntax error
         bool value = results.back();
@@ -405,11 +405,14 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
 
     // Handle .ENDIF
     if (block.flag == ".ENDIF") return PPRes::EndIF;
-
+    if(block.flag == ".ELSE") {
+        block.isSolved = true;
+        block.solvedResult = true;
+        return PPRes::SeeContents;
+    };
     // Extract and process flag contents
     block.flag_contents = atrc::trim_copy(lineCopy.substr(spacePos + 1));
     atrc::str_to_upper_s(block.flag_contents);
-
     if (block.flag == ".IF" || block.flag == ".ELSEIF") {
         std::vector<std::string> tags = atrc::split(block.flag_contents, ' ');
         if (tags.empty()) {
@@ -418,20 +421,47 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
         }
 
         // Evaluate tags and logical expressions
-        std::vector<bool> results;
-        for (const auto &tag : tags) {
+        std::list<bool> results;
+
+        std::string logical_operator = "";
+        uint64_t wait_for_next_value = 0;
+        for(size_t i = 0; i < tags.size(); i++){
+            std::string &tag = tags[i];
             if (PREPROCESSOR_TAGS.find(tag) != PREPROCESSOR_TAGS.end()) {
                 if (tag == "LINUX" || tag == "WINDOWS" || tag == "MACOS" || tag == "UNIX")
                     results.push_back(evaluatePlatformTag(tag));
                 else if (tag == "X86" || tag == "X64" || tag == "ARM" || tag == "ARM64")
                     results.push_back(evaluateArchitectureTag(tag));
-                else
-                    results.push_back(evaluateLogicalOperator(tag, results));
+                else {
+                    if(tag == "NOT"){
+                        wait_for_next_value++;
+                        logical_operator = tag;
+                        continue;
+                    } else if(tag == "AND" || tag == "OR"){
+                        if(results.empty()){
+                            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
+                            return PPRes::InvalidFlagContents;
+                        }
+                        wait_for_next_value++;
+                        logical_operator = tag;
+                        continue;
+                    }
+                }
+                if(wait_for_next_value-- == 1){
+                    if(logical_operator.empty()){
+                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, -1, tag, filename);
+                        return PPRes::InvalidFlagContents;
+                    }
+                    results.push_back(evaluateLogicalOperator(logical_operator, results, i));
+                    wait_for_next_value = 0;
+                    logical_operator = "";
+                }
             } else {
                 atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, -1, tag, filename);
                 return PPRes::InvalidFlagContents;
             }
         }
+
 
         block.isSolved = true;
         block.solvedResult = results.back();

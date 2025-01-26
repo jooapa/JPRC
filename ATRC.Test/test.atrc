@@ -1,14 +1,16 @@
 #!ATRC
-#.IF WINDOWS
-%os%=WINDOWS
+#.IF WINDOWS X64
+%os%=WINDOWS 64-bit
 #.ELSEIF LINUX
 %os%=LINUX
+#.ELSE
+%os%=NONE?
 #.ENDIF
 
 #.IF ARM
 %arch%=ARM
 #.ELSEIF X64
-#.DEBUG Using 64-bit machine!
+#.SUCCESS Using 64-bit machine!
 %arch%=X64
 #.ENDIF
 
