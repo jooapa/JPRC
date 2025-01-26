@@ -1,9 +1,10 @@
-#include <ATRC.h>
+#define _CRT_SECURE_NO_WARNINGS
+#include "./include/ATRC.h"
+#include "./include/filer.h"
 #include <iostream>
 #include <string>
 #include <cstring>
 #include <vector>
-#include <filer.h>
 #include <fstream>
 /*+++
 Wrap around functions from C++ to c
@@ -18,7 +19,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
         // Delete previous file and create a new one
         std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
         if (ofs.is_open()) {
-            ofs << FILEHEADER << "\n";
+            ofs << "#!ATRC" << "\n";
         } else {
             atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
             return false;
@@ -28,7 +29,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
         if (!ifs.good()) {
             std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
             if (ofs.is_open()) {
-                ofs << FILEHEADER << "\n";
+                ofs << "#!ATRC" << "\n";
             } else {
                 atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
                 return false;
@@ -42,7 +43,6 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
     self->Filename = strdup(filename.c_str());
 #endif
     if (parsedData.first->empty() && parsedData.second->empty()) {
-        std::cerr << "Failed to parse file: " << filename << std::endl;
         return false;
     }
 

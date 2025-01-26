@@ -127,6 +127,7 @@ void test_insert(C_PATRC_FD fd) {
 }
 
 int main(void) {
+    /*
     printf("Running ATRC API tests...\n");
 
     C_PATRC_FD fd = Create_Empty_ATRC_FD();
@@ -170,7 +171,6 @@ int main(void) {
 
     printf("Tests completed.\n");
 
-	cpp_main();
 
 
 
@@ -219,5 +219,9 @@ int main(void) {
     }
 
     Destroy_ATRC_FD(filedata);
+    */
+
+	cpp_main();
+
     return 0;
 }

@@ -4,13 +4,14 @@
 using namespace atrc;
 void cpp_main(void)
 {
-    ATRC_FD fd = ATRC_FD("file.atrc");
+    // ATRC_FD fd = ATRC_FD("out/linux-x64-debug/build/ATRC.Test/test.atrc");
+    ATRC_FD fd = ATRC_FD("out/win_64/ATRC.Test/Debug/test.atrc");
+    
     if (!fd.CheckStatus()) {
-        std::cout << "File parsed unsuccesfully!" << std::endl;
         return;
     }
-    std::cout << fd["var_name"] << std::endl;
-
+    std::cout << "OS: " << fd["os"] << std::endl;
+    std::cout << "ARCH: " << fd["arch"] << std::endl;
     // C_PATRC_FD c_fd = fd.ToCStruct();
     // if (c_fd == NULL) {
     //     std::cout << "Failed to convert to C struct!" << std::endl;

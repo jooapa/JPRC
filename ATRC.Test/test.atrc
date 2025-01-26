@@ -1,4 +1,17 @@
 #!ATRC
 #.IF WINDOWS
-%test%=value
+%os%=WINDOWS
+#.ELSEIF LINUX
+%os%=LINUX
 #.ENDIF
+
+#.IF ARM
+%arch%=ARM
+#.ELSEIF X64
+#.DEBUG Using 64-bit machine!
+%arch%=X64
+#.ENDIF
+
+
+[block]
+testq=a

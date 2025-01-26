@@ -39,7 +39,27 @@ if (MSVC)
         "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.lib"
         COMMENT "Copying ATRC DLLs and LIBs to binary directory"
     )
+
+    # Copy the test.atrc file to the binary directory
+    add_custom_command(
+        TARGET ATRC.Test POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/test.atrc"
+        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/test.atrc"
+        COMMENT "Copying test.atrc to binary directory"
+    )
+else ()
+    # Copy the test.atrc file to the binary directory
+    add_custom_command(
+        TARGET ATRC.Test POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/test.atrc"
+        "${CMAKE_BINARY_DIR}/ATRC.Test/test.atrc"
+        COMMENT "Copying test.atrc to binary directory"
+    )
 endif()
+
+
 
 # Add the custom test targets
 add_custom_target(run_tests

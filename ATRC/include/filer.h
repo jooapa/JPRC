@@ -1,6 +1,35 @@
 #ifndef FILER_H
 #define FILER_H
-#include <ATRC.h>
+#include "./ATRC.h"
+
+/*
+Name            FG  BG
+Black           30  40
+Red             31  41
+Green           32  42
+Yellow          33  43
+Blue            34  44
+Magenta         35  45
+Cyan            36  46
+White           37  47
+Bright Black    90  100
+Bright Red      91  101
+Bright Green    92  102
+Bright Yellow   93  103
+Bright Blue     94  104
+Bright Magenta  95  105
+Bright Cyan     96  106
+Bright White    97  107
+*/
+
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 
 // File
 #define ERR_CLASS_FILEHANDLER           100
@@ -147,6 +176,21 @@ inline void rtrim(std::string &s) {
 inline void trim(std::string &s) {
     rtrim(s);
     ltrim(s);
+}
+
+inline std::string ltrim_copy(std::string s) {
+    ltrim(s);
+    return s;
+}
+
+inline std::string rtrim_copy(std::string s) {
+    rtrim(s);
+    return s;
+}
+
+inline std::string trim_copy(std::string s) {
+    trim(s);
+    return s;
 }
 // Remove newlines from string
 inline void remove_newlines(std::string &s) {

@@ -18,7 +18,7 @@
 #   define _WRAPPER_EXIM_ 
 #endif // _WRAPPER_EXIM_
 
-#define FILEHEADER "#!ATRC\0"
+#define FILEHEADER ""
 #define __atrc__one__of__two__(cpp, c) \
     __atrc__one__of__two_helper__(cpp, c)
 #define __nmsp__    namespace atrc {
@@ -152,53 +152,53 @@ typedef struct ATRC_API _Block {
 class ATRC_API PROXY_ATRC_FD;
 
 class ATRC_API ATRC_FD {
-    public:
-        ATRC_FD();
-        ATRC_FD(std::string& path, ReadMode mode = ATRC_READ_ONLY);
-        ATRC_FD(const char *path, ReadMode mode = ATRC_READ_ONLY);
-        ATRC_FD(C_PATRC_FD filedata);
-        ~ATRC_FD();
-        bool ReadAgain(ReadMode mode = ATRC_READ_ONLY);
-        bool Read(std::string& path, ReadMode mode = ATRC_READ_ONLY);
-        std::string ReadVariable(const std::string& varname);
-        std::string ReadKey(const std::string& block, const std::string& key);
-        bool DoesExistBlock(const std::string& block);
-        bool DoesExistVariable(const std::string& varname);
-        bool DoesExistKey(const std::string& block, const std::string& key);
-        bool IsPublic(const std::string& varname);
-        void InsertVar(std::string& line, std::vector<std::string>& args);
-        std::string InsertVar_S(const std::string& line, std::vector<std::string>& args);
-        bool AddBlock(const std::string& blockname);
-        bool RemoveBlock(const std::string& blockname);
-        bool AddVariable(const std::string& varname, const std::string& value);
-        bool RemoveVariable(const std::string& varname);
-        bool ModifyVariable(const std::string& varname, const std::string& value);
-        bool AddKey(const std::string& block, const std::string& key, const std::string& value);
-        bool RemoveKey(const std::string& block, const std::string& key);
-        bool ModifyKey(const std::string& block, const std::string& key, const std::string& value);
-        C_PATRC_FD ToCStruct();
+public:
+    ATRC_FD();
+    ATRC_FD(std::string& path, ReadMode mode = ATRC_READ_ONLY);
+    ATRC_FD(const char *path, ReadMode mode = ATRC_READ_ONLY);
+    ATRC_FD(C_PATRC_FD filedata);
+    ~ATRC_FD();
+    bool ReadAgain(ReadMode mode = ATRC_READ_ONLY);
+    bool Read(std::string& path, ReadMode mode = ATRC_READ_ONLY);
+    std::string ReadVariable(const std::string& varname);
+    std::string ReadKey(const std::string& block, const std::string& key);
+    bool DoesExistBlock(const std::string& block);
+    bool DoesExistVariable(const std::string& varname);
+    bool DoesExistKey(const std::string& block, const std::string& key);
+    bool IsPublic(const std::string& varname);
+    void InsertVar(std::string& line, std::vector<std::string>& args);
+    std::string InsertVar_S(const std::string& line, std::vector<std::string>& args);
+    bool AddBlock(const std::string& blockname);
+    bool RemoveBlock(const std::string& blockname);
+    bool AddVariable(const std::string& varname, const std::string& value);
+    bool RemoveVariable(const std::string& varname);
+    bool ModifyVariable(const std::string& varname, const std::string& value);
+    bool AddKey(const std::string& block, const std::string& key, const std::string& value);
+    bool RemoveKey(const std::string& block, const std::string& key);
+    bool ModifyKey(const std::string& block, const std::string& key, const std::string& value);
+    C_PATRC_FD ToCStruct();
 
-        bool CheckStatus();
+    bool CheckStatus();
 
-        std::vector<Variable>* GetVariables();
-        std::vector<Block>* GetBlocks();
-        std::string GetFilename();
-        bool GetAutoSave() const;
-        void SetAutoSave(bool autosave);
-        bool GetWriteCheck() const;
-        void SetWriteCheck(bool writecheck);
-        
-        PROXY_ATRC_FD operator[](const std::string& key);
-        PROXY_ATRC_FD operator[](const std::string& key) const;
+    std::vector<Variable>* GetVariables();
+    std::vector<Block>* GetBlocks();
+    std::string GetFilename();
+    bool GetAutoSave() const;
+    void SetAutoSave(bool autosave);
+    bool GetWriteCheck() const;
+    void SetWriteCheck(bool writecheck);
+    
+    PROXY_ATRC_FD operator[](const std::string& key);
+    PROXY_ATRC_FD operator[](const std::string& key) const;
 
-    private:
-        void MAINCONSTRUCTOR();
-        bool AutoSave;
-        bool Writecheck;
-        std::unique_ptr<std::vector<Variable>> Variables;
-        std::unique_ptr<std::vector<Block>> Blocks;
-        std::string Filename;
-    };
+private:
+    void MAINCONSTRUCTOR();
+    bool AutoSave;
+    bool Writecheck;
+    std::unique_ptr<std::vector<Variable>> Variables;
+    std::unique_ptr<std::vector<Block>> Blocks;
+    std::string Filename;
+};
 typedef ATRC_FD* PATRC_FD;
 
 class ATRC_API PROXY_ATRC_FD {

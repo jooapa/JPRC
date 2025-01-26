@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_DEPRECATE
-#include <ATRC.h>
-#include <filer.h>
+#include "./include/ATRC.h"
+#include "./include/filer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

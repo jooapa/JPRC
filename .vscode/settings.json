@@ -75,6 +75,10 @@
         "ratio": "cpp",
         "vcruntime.h": "c",
         "stack": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "unordered_set": "cpp",
+        "list": "cpp",
+        "xhash": "cpp",
+        "codecvt": "cpp"
     }
 }

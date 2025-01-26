@@ -1,10 +1,10 @@
 #define _CRT_SECURE_NO_DEPRECATE
-#include <filer.h>
+#include "./include/ATRC.h"
+#include "./include/filer.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <cstring>
-#include <ATRC.h>
 #include <sstream>
 
 uint64_t atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_SUCCESSFULL_ACTION;

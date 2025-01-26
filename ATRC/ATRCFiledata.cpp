@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_DEPRECATE
-#include <ATRC.h>
-#include <filer.h>
+#include "./include/ATRC.h"
+#include "./include/filer.h"
 #include <iostream>
 #include <cstring>
 #include <fstream>
@@ -83,7 +83,7 @@ bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
         // Delete previous file and create a new one
         std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
         if (ofs.is_open()) {
-            ofs << FILEHEADER << "\n";
+            ofs << "#!ATRC" << "\n";
         } else {
             atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
             return false;
@@ -93,7 +93,7 @@ bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
         if (!ifs.good()) {
             std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
             if (ofs.is_open()) {
-                ofs << FILEHEADER << "\n";
+                ofs << "#!ATRC" << "\n";
             } else {
                 atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
                 return false;
@@ -103,7 +103,6 @@ bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
 
     auto parsedData = atrc::ParseFile(filename, encoding, extension);
     if (parsedData.first->empty() && parsedData.second->empty()) {
-        std::cerr << "Failed to parse file: " << filename << std::endl;
         return false;
     } else {
         this->Variables = std::move(parsedData.first);
@@ -321,14 +320,10 @@ void atrc::ATRC_FD::InsertVar(std::string &line, std::vector<std::string> &args)
             var += line[i];
             if (line[i] == '%') {
                 if (_looking_for_var) {
-                    
-
                     if (var.substr(0, 2) == "%*") {
-
                         if(var == "%*%"){
                             _result += args[(size_t)_arg_counter++];
                         } else {
-                            
                             // check %*<digit>%
                             if(var.size() > 3) {
                                 // size_t inject_num = std::stoull(var.substr(2, var.size() - 3));
