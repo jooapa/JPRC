@@ -208,13 +208,17 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
 
 
 std::vector<atrc::Variable>* atrc::ATRC_FD::GetVariables(){
-    return this->Variables.get();
+    std::unique_ptr<std::vector<Variable>> _vars = std::make_unique<std::vector<Variable>>();
+    for(Variable &var : *this->Variables){
+        if(var.IsPublic) _vars->push_back(var);
+    }
+    return _vars.get();
 }
 std::vector<atrc::Block>* atrc::ATRC_FD::GetBlocks(){
     return this->Blocks.get();
 }
-std::string atrc::ATRC_FD::GetFilename(){
-    return this->Filename;
+std::string* atrc::ATRC_FD::GetFilename(){
+    return &this->Filename;
 }
 bool atrc::ATRC_FD::GetAutoSave() const {
     return this->AutoSave;

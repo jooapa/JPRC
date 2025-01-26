@@ -182,7 +182,7 @@ public:
 
     std::vector<Variable>* GetVariables();
     std::vector<Block>* GetBlocks();
-    std::string GetFilename();
+    std::string *GetFilename();
     bool GetAutoSave() const;
     void SetAutoSave(bool autosave);
     bool GetWriteCheck() const;
