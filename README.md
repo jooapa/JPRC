@@ -98,9 +98,9 @@ user_info=None
 
     # VS
     # 32-bit
-    cmake -S . -B out\win_32 -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 17 2022" -A Win32 & cmake --build out\win_32 & c:\Users\anton\Documents\GitHub\ATRC\out\win_32\ATRC.Test\Debug\ATRC.Test.exe    
+    cmake -S . -B out\win_32 -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 17 2022" -A Win32 & cmake --build out\win_32 & .\out\win_32\ATRC.Test\Debug\ATRC.Test.exe    
     # 64-bit
-    cmake -S . -B out\win_64 -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 17 2022" -A x64 & cmake --build out\win_64 & c:\Users\anton\Documents\GitHub\ATRC\out\win_64\ATRC.Test\Debug\ATRC.Test.exe    
+    cmake -S . -B out\win_64 -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 17 2022" -A x64 & cmake --build out\win_64 & .\out\win_64\ATRC.Test\Debug\ATRC.Test.exe    
     # Create release package
     # Requires: debian, 7z, Windows build tools, Strawberry Perl, HTML Help Workshop
     .\scripts\build_and_package.bat
