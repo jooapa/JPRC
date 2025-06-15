@@ -48,7 +48,7 @@ int main()
 # define variable
 %var_name%=value
 # define private variable
-<%priv_var>=value
+<%priv_var%=value
 
 # define block
 [block_name]
