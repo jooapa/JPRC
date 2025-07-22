@@ -81,11 +81,11 @@ WelcomeMessage=Hi %username%, loading at: %*%\%&    # Once injected, outputs: "H
 
 Build and run with CMake. See cmake\README.md or run ready-made scripts
 
-```bat
-    .\vs_run.bat :: See usage
-    .\scripts\run_tests.bat
+```cmd
+.\vs_run.bat :: See usage
+.\scripts\run_tests.bat
 
-    # Create release package
-    # Requires: WSL2 debian, 7z, Windows build tools and Strawberry Perl
-    .\scripts\build_and_package.bat
+# Create release package
+# Requires: WSL2 debian, 7z, Windows build tools and Strawberry Perl
+.\scripts\build_and_package.bat
 ```
