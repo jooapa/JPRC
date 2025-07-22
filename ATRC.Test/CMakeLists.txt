@@ -1,5 +1,5 @@
 ﻿# Add executable for testing
-add_executable(ATRC.Test 
+add_executable(ATRC.Test
     "ATRC.Test.c"
     "ATRC.Test.cpp"
     "ATRC.Test.h"
@@ -28,36 +28,23 @@ enable_testing()
 
 # For MSVC Debugging
 if (MSVC)
-    message(STATUS "Copying ATRC DLLs and LIBs to binary directory")
+    message(STATUS "Copying ATRC DLLs to binary directory")
     add_custom_command(
         TARGET ATRC.Test POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         "${CMAKE_BINARY_DIR}/ATRC/Debug/ATRC.dll"
         "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.dll"
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_BINARY_DIR}/ATRC/Debug/ATRC.lib"
-        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.lib"
-        COMMENT "Copying ATRC DLLs and LIBs to binary directory"
-    )
-
-    # Copy the test.atrc file to the binary directory
-    add_custom_command(
-        TARGET ATRC.Test POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_CURRENT_SOURCE_DIR}/test.atrc"
-        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/test.atrc"
-        COMMENT "Copying test.atrc to binary directory"
-    )
-else ()
-    # Copy the test.atrc file to the binary directory
-    add_custom_command(
-        TARGET ATRC.Test POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_CURRENT_SOURCE_DIR}/test.atrc"
-        "${CMAKE_BINARY_DIR}/ATRC.Test/test.atrc"
-        COMMENT "Copying test.atrc to binary directory"
+        COMMENT "Copying ATRC DLLs to binary directory"
     )
 endif()
+# Copy the test.atrc file to the binary directory
+add_custom_command(
+    TARGET ATRC.Test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    "${CMAKE_CURRENT_SOURCE_DIR}/test.atrc"
+    "${CMAKE_BINARY_DIR}/ATRC.Test/test.atrc"
+    COMMENT "Copying test.atrc to binary directory"
+)
 
 
 

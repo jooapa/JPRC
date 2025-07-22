@@ -13,8 +13,9 @@ add_subdirectory("ATRC")
 # Set manually if argument is not working
 set(ATRC_BUILD_TESTS ON CACHE BOOL "Build tests for ATRC library")
 
-# if(DEFINED ATRC_BUILD_TESTS)
-#     add_subdirectory("ATRC.Test")
-# else()
-#     message(STATUS "ATRC_BUILD_TESTS is not defined. Skipping ATRC.Test project. You can set this variable on manually inside ${CMAKE_CURRENT_LIST_FILE}")
-# endif()
+
+if(${ATRC_BUILD_TESTS} STREQUAL "ON")
+    add_subdirectory("ATRC.Test")
+else()
+    message(STATUS "ATRC_BUILD_TESTS is not defined. Skipping ATRC.Test project. You can set this variable on manually inside ${CMAKE_CURRENT_LIST_FILE}")
+endif()

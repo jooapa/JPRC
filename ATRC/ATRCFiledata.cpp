@@ -11,7 +11,6 @@ void atrc::ATRC_FD::MAINCONSTRUCTOR(){
     this->Filename = "";
     this->Variables = std::vector<Variable>(); 
     this->Blocks = std::vector<Block>();
-
 }
 
 atrc::ATRC_FD::ATRC_FD(){this->MAINCONSTRUCTOR();}
@@ -25,7 +24,9 @@ atrc::ATRC_FD::ATRC_FD(const char *path, ReadMode mode){
 atrc::ATRC_FD::ATRC_FD(std::string& path, ReadMode mode){
     this->MAINCONSTRUCTOR();
     this->Filename = path;
-    this->ReadAgain(mode);
+    if (!this->ReadAgain(mode)) {
+        errormsg(ERR_INVALID_FILE, -1, "Failed to read file: " + path, path);
+    };
 }
 
 atrc::ATRC_FD::ATRC_FD(C_PATRC_FD fd){
@@ -99,13 +100,11 @@ bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
         }
     }
 
-    auto parsedData = atrc::ParseFile(filename, encoding, extension);
-    if (parsedData.first->empty() && parsedData.second->empty()) {
+    bool parsedData = atrc::ParseFile(filename, encoding, extension, this->Variables, this->Blocks);
+    if (!parsedData) {
         return false;
-    } else {
-        this->Variables = std::move(parsedData.first);
-        this->Blocks = std::move(parsedData.second);
     }
+ 
     return true;
 }
 
@@ -125,13 +124,13 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
 
     // Allocate memory for Variables
     self->Variables->VariableCount = 0;
-    self->Variables->Variables = (C_Variable*)malloc(this->Variables->size() * sizeof(C_Variable));
+    self->Variables->Variables = (C_Variable*)malloc(this->Variables.size() * sizeof(C_Variable));
     if (!self->Variables->Variables) {
         Destroy_ATRC_FD(self);
         return NULL;
     }
 
-    for (const atrc::Variable& var : *this->Variables) {
+    for (const atrc::Variable& var : this->Variables) {
         // Allocate Name
         self->Variables->Variables[self->Variables->VariableCount].Name = new char[var.Name.size() + 1];
         if (!self->Variables->Variables[self->Variables->VariableCount].Name) {
@@ -155,13 +154,13 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
 
     // Allocate memory for Blocks
     self->Blocks->BlockCount = 0;
-    self->Blocks->Blocks = (C_Block*)malloc(this->Blocks->size() * sizeof(C_Block));
+    self->Blocks->Blocks = (C_Block*)malloc(this->Blocks.size() * sizeof(C_Block));
     if (!self->Blocks->Blocks) {
         Destroy_ATRC_FD(self);
         return NULL;
     }
 
-    for (const atrc::Block& block : *this->Blocks) {
+    for (const atrc::Block& block : this->Blocks) {
         // Allocate Block Name
         self->Blocks->Blocks[self->Blocks->BlockCount].Name = new char[block.Name.size() + 1];
         if (!self->Blocks->Blocks[self->Blocks->BlockCount].Name) {
@@ -234,7 +233,7 @@ void atrc::ATRC_FD::SetWriteCheck(bool writecheck) {
 
 std::string atrc::ATRC_FD::ReadVariable(const std::string& varname){
     std::string res = "";
-    for(Variable var : *this->Variables){
+    for(Variable var : this->Variables){
         if(var.Name == varname){
             if(var.IsPublic) {
                 res = var.Value;
@@ -250,7 +249,7 @@ std::string atrc::ATRC_FD::ReadVariable(const std::string& varname){
 }
 std::string atrc::ATRC_FD::ReadKey(const std::string& block, const std::string& key){
     std::string res = "";
-    for(Block blk : *this->Blocks){
+    for(Block blk : this->Blocks){
         if(blk.Name == block){
             for(Key k : blk.Keys){
                 if(k.Name == key){
@@ -269,13 +268,13 @@ std::string atrc::ATRC_FD::InsertVar_S(const std::string &line, std::vector<std:
     return res;
 }
 bool atrc::ATRC_FD::DoesExistBlock(const std::string& block){
-    for(Block &blk : *this->Blocks){
+    for(Block &blk : this->Blocks){
         if(blk.Name == block) return true;
     }
     return false;
 }
 bool atrc::ATRC_FD::DoesExistVariable(const std::string& varname){
-    for(Variable& var : *this->Variables){
+    for(Variable& var : this->Variables){
         if(var.Name == varname){
             if(var.IsPublic) return true;
             else{
@@ -288,12 +287,12 @@ bool atrc::ATRC_FD::DoesExistVariable(const std::string& varname){
 }
 
 bool atrc::ATRC_FD::CheckStatus() {
-	if (Variables->empty() && Blocks->empty()) return false;
+	//if (Variables.empty() && Blocks.empty()) return false;
     return true;
 }
 
 bool atrc::ATRC_FD::DoesExistKey(const std::string& block, const std::string& key){
-    for(Block &blk : *this->Blocks){
+    for(Block &blk : this->Blocks){
             if(blk.Name == block){
                 for(Key &k : blk.Keys){
                     if(k.Name == key) return true;
@@ -303,7 +302,7 @@ bool atrc::ATRC_FD::DoesExistKey(const std::string& block, const std::string& ke
         return false;
 }
 bool atrc::ATRC_FD::IsPublic(const std::string& varname){
-    for(Variable &var : *this->Variables){
+    for(Variable &var : this->Variables){
         if(var.Name == varname){
             return var.IsPublic;
         } 
@@ -362,7 +361,7 @@ bool atrc::ATRC_FD::AddBlock(const std::string& blockname){
     }
     Block blk;
     blk.Name = blockname;
-    this->Blocks->push_back(blk);
+    this->Blocks.push_back(blk);
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::ADD_BLOCK, -1, blockname);
     }
@@ -377,11 +376,11 @@ bool atrc::ATRC_FD::RemoveBlock(const std::string& blockname){
     }
 
     int i = 0;
-    for(Block blk : *this->Blocks) {
+    for(Block blk : this->Blocks) {
         if(blk.Name == block.Name) break;
         i++;
     }
-    this->Blocks->erase(this->Blocks->begin() + i);
+    this->Blocks.erase(this->Blocks.begin() + i);
     if(this->AutoSave) {
         atrc::_W_Save_(this, atrc::ATRC_SAVE::REMOVE_BLOCK, i, blockname);
     }
@@ -395,7 +394,7 @@ bool atrc::ATRC_FD::AddVariable(const std::string& varname, const std::string& v
         return false;
     }
     var.Value = value;
-    this->Variables->push_back(var);
+    this->Variables.push_back(var);
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::ADD_VAR, -1, "%"+var.Name+"%="+atrc::ParseLineSTRINGtoATRC(var.Value));
     }
@@ -410,13 +409,13 @@ bool atrc::ATRC_FD::RemoveVariable(const std::string& varname){
     }
 
     int i = 0;    
-    for(Variable var : *this->Variables){
+    for(Variable var : this->Variables){
         if(var.Name == varname){
             break;
         }
         i++;
     }
-    this->Variables->erase(this->Variables->begin() + i);
+    this->Variables.erase(this->Variables.begin() + i);
 
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::REMOVE_VAR, i, varname);
@@ -437,13 +436,13 @@ bool atrc::ATRC_FD::ModifyVariable(const std::string& varname, const std::string
         }
     }
     int i = 0;    
-    for(Variable &var : *this->Variables){
+    for(Variable &var : this->Variables){
         if(var.Name == varname){
             break;
         }
         i++;
     }
-    this->Variables->at((size_t)i).Value = value;
+    this->Variables.at((size_t)i).Value = value;
     if(this->AutoSave){
         atrc::_W_Save_(this, atrc::ATRC_SAVE::MODIFY_VAR, i, atrc::ParseLineSTRINGtoATRC(value)); // Values taken from filedata->Variables->at(xtra_info).[type]
     } 
@@ -462,7 +461,7 @@ bool atrc::ATRC_FD::AddKey(const std::string& block, const std::string& key, con
     Key _key;
     _key.Name = key;
     _key.Value = value;
-    for(Block &_block : *this->Blocks){
+    for(Block &_block : this->Blocks){
         if(_block.Name == block){
             _block.Keys.push_back(_key);
             break;
@@ -483,7 +482,7 @@ bool atrc::ATRC_FD::RemoveKey(const std::string& block, const std::string& key){
         return false;
     }
     int i = 0;
-    for (Block &_block : *this->Blocks) {
+    for (Block &_block : this->Blocks) {
         if (_block.Name == block) {
             auto it = _block.Keys.begin();
             while (it != _block.Keys.end()) {
@@ -529,7 +528,7 @@ bool atrc::ATRC_FD::ModifyKey(const std::string& block, const std::string& key, 
     }
 
     int i = 0;
-    for(Block &_blk : *this->Blocks){
+    for(Block &_blk : this->Blocks){
         if(_blk.Name == block){
             for(Key &_key : _blk.Keys){
                 if(_key.Name == key){

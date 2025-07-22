@@ -1,0 +1,7 @@
+#!ATRC
+#nu chuo
+%TestVariable%=TestValue
+[VAR_SAFETY]
+%PremadeVariable%=Constant value is
+[PremadeBlock]
+PremadeValue=%PremadeVariable%: 10

@@ -256,6 +256,10 @@ static void ParseLineValueATRCtoSTRING(std::string& line, const int &line_number
     _W_ParseLineValueATRCtoSTRING(line, line_number, variables.get(), filename);
 }
 
+
+
+
+
 bool evaluatePlatformTag(const std::string &tag) {
 #ifdef __linux__
     return tag == "LINUX";
@@ -509,6 +513,11 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
 }
 
 
+
+
+
+
+
 std::pair<
     std::unique_ptr<std::vector<atrc::Variable>>, 
     std::unique_ptr<std::vector<atrc::Block>>
@@ -756,16 +765,16 @@ void atrc::_W_Save_(
         
         break;
     case atrc::ATRC_SAVE::ADD_BLOCK: {
-        std::ofstream file(filedata->GetFilename(), std::ios::app);
-        if (!file.is_open()) {
-            atrc::errormsg(ERR_INVALID_FILE, 
-                -1, 
-                "Failed opening for saving: " + filedata->GetFilename(), 
-                filedata->GetFilename()
-                );
-            file.close();
-            return;
-        }
+            std::ofstream file(filedata->GetFilename(), std::ios::app);
+            if (!file.is_open()) {
+                atrc::errormsg(ERR_INVALID_FILE, 
+                    -1, 
+                    "Failed opening for saving: " + filedata->GetFilename(), 
+                    filedata->GetFilename()
+                    );
+                file.close();
+                return;
+            }
         file << "\n" << "[" << xtra_info2 + "]";
         file.close();
     }

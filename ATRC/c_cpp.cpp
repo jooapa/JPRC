@@ -37,13 +37,16 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
             }
         }
     }
-    auto parsedData = atrc::ParseFile(filename, encoding, extension);
+    std::vector<atrc::Variable> variables;
+    std::vector<atrc::Block> blocks;
+    auto parsedData = atrc::ParseFile(filename, encoding, extension, variables, blocks);
 #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
     self->Filename = _strdup(filename.c_str());
 #else
     self->Filename = strdup(filename.c_str());
 #endif
-    if (parsedData.first->empty() && parsedData.second->empty()) {
+    if (!parsedData) {
+        atrc::errormsg(ERR_INVALID_FILE, -1, filename, filename);
         return false;
     }
 
@@ -64,15 +67,15 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
     self->Blocks->BlockCount = 0;
 
     // Process variables
-    self->Variables->VariableCount = parsedData.first->size();
+    self->Variables->VariableCount = variables.size();
     self->Variables->Variables = (C_PVariable)malloc(self->Variables->VariableCount * sizeof(C_Variable));
     if (!self->Variables->Variables) {
         Destroy_ATRC_FD(self);
         return false;
     }
 
-    for (size_t i = 0; i < parsedData.first->size(); i++) {
-        const atrc::Variable &var = parsedData.first->at(i);
+    for (size_t i = 0; i < variables.size(); i++) {
+        const atrc::Variable &var = variables[i];
         #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
         self->Variables->Variables[i].Name = _strdup(var.Name.c_str());
         self->Variables->Variables[i].Value = _strdup(var.Value.c_str());
@@ -84,15 +87,15 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
     }
 
     // Process blocks
-    self->Blocks->BlockCount = parsedData.second->size();
+    self->Blocks->BlockCount = blocks.size();
     self->Blocks->Blocks = (C_PBlock)malloc(self->Blocks->BlockCount * sizeof(C_Block));
     if (!self->Blocks->Blocks) {
         Destroy_ATRC_FD(self);
         return false;
     }
 
-    for (size_t i = 0; i < parsedData.second->size(); i++) {
-        const atrc::Block &block = parsedData.second->at(i);
+    for (size_t i = 0; i < blocks.size(); i++) {
+        const atrc::Block &block = blocks[i];
         #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
         self->Blocks->Blocks[i].Name = _strdup(block.Name.c_str());
         #else

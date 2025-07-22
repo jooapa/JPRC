@@ -1,5 +1,7 @@
 {
     "files.associations": {
+        "*.H": "c",
+        "*.C": "c",
         "algorithm": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -80,6 +82,8 @@
         "list": "cpp",
         "xhash": "cpp",
         "codecvt": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "yvals_core.h": "cpp",
+        "xkeycheck.h": "cpp"
     }
 }

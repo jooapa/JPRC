@@ -49,7 +49,7 @@ Bright White    97  107
 #define ERR_INVALID_PREPROCESSOR_TAG    113
 #define ERR_INVALID_PREPROCESSOR_VALUE  114
 #define ERR_INVALID_PREPROCESSOR_SYNTAX 115
-
+#define ERR_INVALID_SAVE_ACTION         116
 
 // File
 #define ERR_CLASS_READER                200
@@ -147,7 +147,16 @@ bool BlockContainsBlock(std::vector<Block>& blocks,const Block& block);
 bool VariableContainsVariable(std::vector<Variable>& variables, const Variable& variable);
 std::string ParseLineSTRINGtoATRC(const std::string &line);
 
+typedef struct _REUSABLE {
+    uint64_t line_number;
+    std::string filename;
+} REUSABLE, * P_REUSABLE;
 
+void ParseLineValueATRCtoSTRING(
+    std::string& line, 
+    const REUSABLE &reus,
+    const std::vector<atrc::Variable> &variables
+);
 
 ATRC_API void _W_Save_(
 ATRC_FD *filedata = nullptr,
@@ -301,6 +310,10 @@ inline void errormsg(int err_num=-1,
             msg = "Error with filename or fileheader: '" + var_name + "'";
             err_class = ERR_CLASS_FILEHANDLER;
             break;
+        case ERR_INVALID_SAVE_ACTION:
+            msg = "Invalid save action: '" + var_name + "'";
+            err_class = ERR_CLASS_SAVER;
+            break;
         default:
             msg = "Unknown error at line " + std::to_string(line_number);
             break;
@@ -309,7 +322,7 @@ inline void errormsg(int err_num=-1,
 }
 
 ATRC_API 
-bool atrc::ParseFile
+bool ParseFile
 (
     const std::string &_filename, 
     const std::string &encoding, 
