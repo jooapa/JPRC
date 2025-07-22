@@ -29,8 +29,16 @@
 
 #.DEFINE test=123
 
-#.IGNORE 4
+#.IGNORE 1
 '
 
 [block]
+
+[settings]
 testq=a
+
+#.IF WINDOWS
+user_home=C:\Users\%*%
+#.ELSE
+user_home=/home/%*%
+#.ENDIF

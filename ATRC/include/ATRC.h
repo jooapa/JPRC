@@ -132,13 +132,13 @@ namespace atrc {
 C++ only declarations
 ---*/
 #ifdef __cplusplus
-typedef struct ATRC_API Variable {
+typedef struct ATRC_API _Variable {
     std::string Name;
     std::string Value;
     bool IsPublic = true;
 } Variable, * PVariable;
 
-typedef struct ATRC_API Key {
+typedef struct ATRC_API _Key {
     std::string Name;
     std::string Value;
 } Key, * PKey;
@@ -180,7 +180,7 @@ public:
 
     bool CheckStatus();
 
-    std::vector<Variable>* GetVariables();
+    std::vector<atrc::Variable> GetVariables();
     std::vector<Block>* GetBlocks();
     std::string GetFilename();
     bool GetAutoSave() const;
@@ -195,8 +195,8 @@ private:
     void MAINCONSTRUCTOR();
     bool AutoSave;
     bool Writecheck;
-    std::unique_ptr<std::vector<Variable>> Variables;
-    std::unique_ptr<std::vector<Block>> Blocks;
+    std::vector<Variable> Variables;
+    std::vector<Block> Blocks;
     std::string Filename;
 };
 typedef ATRC_FD* PATRC_FD;
@@ -233,6 +233,41 @@ private:
 #ifdef __cplusplus
 } // namespace atrc
 namespace atrc_std {
+#endif // __cplusplus
+
+
+/*
+Inject macro for C
+USAGE:
+{
+    const char *res = NULL;
+    ATRC_INJECT("INPUT %*%, %*%\n", "arg1", "arg2", ...) // -> "INPUT arg1, arg2\n"
+    // use res as needed
+    free(res);
+}
+*/
+#define ATRC_CINJECT(line, ...) \
+if(line != NULL) { \
+    const char *message = line; \
+    const char *args[] = {__VA_ARGS__, NULL}; \
+    res = InsertVar_S(message, args); \
+} \
+else { \
+    res = NULL; \
+} \
+
+#ifdef __cplusplus
+/*
+Inject macro for C++
+USAGE:
+{
+    std::string _res;
+    ATRC_INJECT("INPUT %*%, %*%\n", "arg1", "arg2", ...) // -> "INPUT arg1, arg2\n"
+    // use res as needed
+}
+*/
+#define ATRC_INJECT(line, ...) \
+// TODO: Implement this macro for C++
 #endif // __cplusplus
 
 /*+++

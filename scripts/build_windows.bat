@@ -2,7 +2,7 @@
 REM Define the project root directory
 cd ..
 set PROJECT_ROOT=%cd%
-set VERSION=2.2.0
+set /P VERSION=< "%PROJECT_ROOT%\project\VERSION"
 set OUTPUT_DIR=%PROJECT_ROOT%\ATRC_%VERSION%
 set ERROR_ENCOUNTERED=0
 

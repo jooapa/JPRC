@@ -1,5 +1,5 @@
 ﻿add_library(ATRC SHARED 
-    "filehandler.cpp"
+    "filehandler2.cpp"
     "core_dev.cpp"
     "c.c"
     "c_cpp.cpp"

@@ -9,8 +9,8 @@ void atrc::ATRC_FD::MAINCONSTRUCTOR(){
     this->AutoSave = false;
     this->Writecheck = false;
     this->Filename = "";
-    this->Variables = std::make_unique<std::vector<Variable>>(); 
-    this->Blocks = std::make_unique<std::vector<Block>>();
+    this->Variables = std::vector<Variable>(); 
+    this->Blocks = std::vector<Block>();
 
 }
 
@@ -32,14 +32,14 @@ atrc::ATRC_FD::ATRC_FD(C_PATRC_FD fd){
     this->MAINCONSTRUCTOR();
     this->AutoSave = fd->AutoSave;
     this->Filename = fd->Filename;
-    this->Variables = std::make_unique<std::vector<Variable>>();
-    this->Blocks = std::make_unique<std::vector<Block>>();
+    this->Variables = std::vector<Variable>();
+    this->Blocks = std::vector<Block>();
     for(uint64_t i = 0; i < fd->Variables->VariableCount; i++){
         Variable var;
         var.Name = fd->Variables->Variables[i].Name;
         var.Value = fd->Variables->Variables[i].Value;
         var.IsPublic = fd->Variables->Variables[i].IsPublic;
-        this->Variables->push_back(var);
+        this->Variables.push_back(var);
     }
     for(uint64_t i = 0; i < fd->Blocks->BlockCount; i++){
         Block blk;
@@ -50,15 +50,13 @@ atrc::ATRC_FD::ATRC_FD(C_PATRC_FD fd){
             key.Value = fd->Blocks->Blocks[i].Keys[j].Value;
             blk.Keys.push_back(key);
         }
-        this->Blocks->push_back(blk);
+        this->Blocks.push_back(blk);
     }
 }
 
 atrc::ATRC_FD::~ATRC_FD(){
-    this->Variables->clear();
-    this->Blocks->clear();
-    this->Variables.reset();
-    this->Blocks.reset();
+    this->Variables.clear();
+    this->Blocks.clear();
 }
 
 atrc::PROXY_ATRC_FD atrc::ATRC_FD::operator[](const std::string& key) {
@@ -207,15 +205,15 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
 }
 
 
-std::vector<atrc::Variable>* atrc::ATRC_FD::GetVariables(){
-    std::unique_ptr<std::vector<Variable>> _vars = std::make_unique<std::vector<Variable>>();
-    for(Variable &var : *this->Variables){
-        if(var.IsPublic) _vars->push_back(var);
+std::vector<atrc::Variable> atrc::ATRC_FD::GetVariables(){
+    std::vector<Variable> _vars = std::vector<Variable>();
+    for(Variable &var : this->Variables){
+        if(var.IsPublic) _vars.push_back(var);
     }
-    return _vars.get();
+    return _vars;
 }
 std::vector<atrc::Block>* atrc::ATRC_FD::GetBlocks(){
-    return this->Blocks.get();
+    return &this->Blocks;
 }
 std::string atrc::ATRC_FD::GetFilename(){
     return this->Filename;

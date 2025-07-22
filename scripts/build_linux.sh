@@ -3,7 +3,7 @@
 # Define the root of your project
 cd ..
 PROJECT_ROOT=$(pwd)
-VERSION="2.2.0"
+VERSION=$(< "${PROJECT_ROOT}/project/VERSION")
 OUT_DIR="${PROJECT_ROOT}/out"
 ATRC_DIR="${PROJECT_ROOT}/ATRC_${VERSION}"
 

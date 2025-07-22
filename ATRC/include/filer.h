@@ -143,8 +143,8 @@ char* _ATRC_WRAP_FUNC_5(const char* b, const char** c);
 #include <ATRC.h>
 namespace atrc {
 bool BlockContainsKey(std::vector<Key>& keys, const Key& key);
-bool BlockContainsBlock(std::unique_ptr<std::vector<Block>>& blocks,const Block& block);
-bool VariableContainsVariable(std::unique_ptr<std::vector<Variable>>& variables, const Variable& variable);
+bool BlockContainsBlock(std::vector<Block>& blocks,const Block& block);
+bool VariableContainsVariable(std::vector<Variable>& variables, const Variable& variable);
 std::string ParseLineSTRINGtoATRC(const std::string &line);
 
 
@@ -309,15 +309,13 @@ inline void errormsg(int err_num=-1,
 }
 
 ATRC_API 
-std::pair<
-    std::unique_ptr<std::vector<Variable>>, 
-    std::unique_ptr<std::vector<Block>>
-> 
-ParseFile
+bool atrc::ParseFile
 (
-    const std::string &filename, 
+    const std::string &_filename, 
     const std::string &encoding, 
-    const std::string &extension
+    const std::string &extension,
+    std::vector<atrc::Variable> &variables,
+    std::vector<atrc::Block> &blocks
 );
 } // namespace atrc
 #endif // __cplusplus

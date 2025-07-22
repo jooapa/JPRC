@@ -10,7 +10,14 @@
 # ATRC_DLL_DEBUG          : Full path to the debug version of the ATRC DLL (Windows only).
 # ATRC_DLL_RELEASE        : Full path to the release version of the ATRC DLL (Windows only).
 # ATRC_ARCH               : Architecture of the ATRC library (x64 or x86).
-
+# 
+# Usage in CMake Projects:
+# project(MyProject VERSION 1.0 LANGUAGES CXX)
+# set(ATRC_DIR "path/to/ATRC_2.2.0/cmake")
+# find_package(ATRC REQUIRED)
+# target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
+# target_include_directories(MyProject PRIVATE ${ATRC_INCLUDE_DIR})
+# 
 
 # Define the ATRC library root directory
 set(ATRC_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
@@ -80,17 +87,3 @@ set(ATRC_LIB_RELEASE    ${ATRC_LIB_RELEASE_PATH})
 set(ATRC_DLL_DEBUG      ${ATRC_DLL_DEBUG_PATH})
 set(ATRC_DLL_RELEASE    ${ATRC_DLL_RELEASE_PATH})
 set(ATRC_ARCH           ${ATRC_ARCH})
-
-
-# Include the CMake package configuration helpers
-include(CMakePackageConfigHelpers)
-
-# Generate a version file for compatibility
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/ATRCConfigVersion.cmake"
-    VERSION ${ATRC_VERSION}
-    COMPATIBILITY AnyNewerVersion
-)
-
-# Export the ATRC package
-export(PACKAGE ATRC)

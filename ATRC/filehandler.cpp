@@ -721,6 +721,18 @@ atrc::ParseFile
     return std::make_pair(std::move(variables), std::move(blocks));
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 void save_final_data(const std::string &filename, const std::string &final_data){
     std::ofstream ofs(filename, std::ofstream::trunc);
     ofs << final_data;
@@ -1008,7 +1020,7 @@ void atrc::_W_Save_(
                 size_t equ_pos = trim_line.find_first_of('=');
                 std::string variable_name = trim_line.substr(0, equ_pos-1);
                 trim(variable_name);
-                _W_ParseLineValueATRCtoSTRING(line, var_line_num, filedata->GetVariables(), filedata->GetFilename());
+                _W_ParseLineValueATRCtoSTRING(line, var_line_num, (filedata->GetVariables()).get(), filedata->GetFilename());
                 if(variable_name == "%" + xtra_info2 + "%"){
                     continue;
                 }
@@ -1039,7 +1051,7 @@ void atrc::_W_Save_(
                 size_t equ_pos = trim_line.find_first_of('=');
                 std::string variable_name = trim_line.substr(0, equ_pos-1);
                 trim(variable_name);
-                _W_ParseLineValueATRCtoSTRING(line, var_line_num, filedata->GetVariables(), filedata->GetFilename());
+                _W_ParseLineValueATRCtoSTRING(line, var_line_num, (filedata->GetVariables()).get(), filedata->GetFilename());
                 if(variable_name == "%" + xtra_info2 + "%"){
                     final_data += filedata->GetVariables()->at((size_t)xtra_info).Name +"="+ filedata->GetVariables()->at((size_t)xtra_info).Value + "\n";
                     continue;

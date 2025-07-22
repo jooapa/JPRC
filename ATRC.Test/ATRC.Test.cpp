@@ -25,4 +25,8 @@ void cpp_main(void)
     // char* res = InsertVar_S(line, args);
     // std::cout << "After: " << res << std::endl;
     // delete[] res;
+    std::string res = "";
+    ATRC_INJECT("Hello everyone", "a");
+    std::cout << "After: " << res << std::endl;
+
 }

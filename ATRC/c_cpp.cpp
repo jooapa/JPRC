@@ -6,6 +6,7 @@
 #include <cstring>
 #include <vector>
 #include <fstream>
+#include <cstdlib>
 /*+++
 Wrap around functions from C++ to c
 ---*/
@@ -182,8 +183,12 @@ char* _ATRC_WRAP_FUNC_5(const char* line, const char** args) {
         return nullptr;
     }
 
-    char* cstr = new char[res.length() + 1];
+    char *cstr = (char*)malloc(res.length() + 1);
+    if (cstr == NULL) {
+        return nullptr; // Memory allocation failed
+    }
     strcpy(cstr, res.c_str());
-
+    cstr[res.length()] = '\0'; // Null-terminate the string
+    
     return cstr;
 }
