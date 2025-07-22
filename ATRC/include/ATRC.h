@@ -114,7 +114,8 @@ ATRC_API bool ModifyVariable(C_PATRC_FD self, const char* varname, const char* v
 ATRC_API bool AddKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
 ATRC_API bool RemoveKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
-
+ATRC_API bool WriteCommentToBottom(C_PATRC_FD self, const char* comment);
+ATRC_API bool WriteCommentToTop(C_PATRC_FD self, const char* comment);
 
 ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
@@ -176,6 +177,8 @@ public:
     bool AddKey(const std::string& block, const std::string& key, const std::string& value);
     bool RemoveKey(const std::string& block, const std::string& key);
     bool ModifyKey(const std::string& block, const std::string& key, const std::string& value);
+    bool WriteCommentToTop(const std::string& comment);
+    bool WriteCommentToBottom(const std::string& comment);
     C_PATRC_FD ToCStruct();
 
     bool CheckStatus();

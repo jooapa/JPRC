@@ -68,7 +68,7 @@ Bright White    97  107
 #define ERR_KEY_EXISTS                  305
 #define ERR_VAR_EXISTS                  306
 #define ERR_INSERT_WRONG                307
-
+#define ERR_EMPTY_COMMENT               308
 // File
 #define ERR_CLASS_STDLIB                401
 
@@ -99,6 +99,9 @@ ATRC_SAVE{
     ADD_VAR,
     REMOVE_VAR,
     MODIFY_VAR,
+    WRITE_COMMENT,
+    WRITE_COMMENT_TO_BOTTOM,
+    WRITE_COMMENT_TO_TOP,
 };
 }
 #else 
@@ -112,6 +115,8 @@ typedef enum {
     ADD_VAR,
     REMOVE_VAR,
     MODIFY_VAR,
+    WRITE_COMMENT_TO_BOTTOM,
+    WRITE_COMMENT_TO_TOP,
 } ATRC_SAVE;
 #endif // __cplusplus
 
@@ -214,6 +219,7 @@ inline void errormsg(int err_num=-1,
     std::string msg = "";
     int err_class = -1;
     switch(err_num){
+
 	    case ERR_MEMORY_ALLOCATION_FAILED:
 		    msg = "Memory allocation failed";
 		    err_class = ERR_CLASS_MEMORY;

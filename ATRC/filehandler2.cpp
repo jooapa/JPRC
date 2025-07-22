@@ -486,7 +486,7 @@ void atrc::_W_Save_(ATRC_FD *filedata, const atrc::ATRC_SAVE &action, const int 
     std::string final_data = "";
     std::ifstream file(filedata->GetFilename(), std::ios::app);
     atrc::REUSABLE reus;
-    reus.line_number = xtra_info;
+    reus.line_number = -1;
     reus.filename = filedata->GetFilename();
     if (!file.is_open()) {
         atrc::errormsg(ERR_INVALID_FILE, 
@@ -580,8 +580,100 @@ void atrc::_W_Save_(ATRC_FD *filedata, const atrc::ATRC_SAVE &action, const int 
         file.close();
         save_final_data(filedata->GetFilename(), final_data);
     } break;
-    case atrc::ATRC_SAVE::REMOVE_KEY: {} break;
-    case atrc::ATRC_SAVE::MODIFY_KEY: {} break;
+    case atrc::ATRC_SAVE::REMOVE_KEY: {
+        bool block_found = false;
+        bool key_removed = false;
+        std::string curr_block = "";
+        while (std::getline(file, line)) {
+            std::string line_trim = line;
+            trim(line_trim);
+            if(key_removed) {
+                final_data += line + "\n";
+            } else {
+                if(block_found){
+                    size_t equ_pos = line_trim.find_first_of('=');
+                    std::string key_name = line_trim.substr(0, equ_pos);
+                    trim(key_name);
+                    if(key_name == xtra_info2){
+                        key_removed = true;
+                        continue;
+                    } else{
+                        final_data += line + "\n";
+                    }
+                    continue;
+                }
+                if(line_trim[0] != '['){
+                    final_data += line + "\n";
+                    continue;
+                }
+                int check = check_for_block_declaration(curr_block, line, reus);
+                if(check == checkblock_failure){
+                    file.close();
+                    break;
+                }
+                if(check == checkblock_success){
+                    if(curr_block == xtra_info4){
+                        block_found = true;
+                        final_data += line + "\n";
+                        continue;
+                    } else {
+                        final_data += line + "\n";
+                        continue;
+                    }
+                }
+            }
+        }
+        file.close();
+        save_final_data(filedata->GetFilename(), final_data);
+    } break;
+    case atrc::ATRC_SAVE::MODIFY_KEY: {
+        bool block_found = false;
+        bool key_modified = false;
+        std::string curr_block = "";
+
+        while(std::getline(file, line)){
+            std::string line_trim = line;
+            trim(line_trim);
+            if(key_modified) {
+                final_data += line + "\n";
+            } else {
+                if(block_found){
+                    size_t equ_pos = line_trim.find_first_of('=');
+                    std::string key_name = line_trim.substr(0, equ_pos);
+                    trim(key_name);
+                    if(key_name == xtra_info2){
+                        final_data += xtra_info2+"="+xtra_info3+"\n";
+                        continue;
+                    } else{
+                        final_data += line + "\n";
+                    }
+                    continue;
+                }
+                if(line_trim[0] != '['){
+                    final_data += line + "\n";
+                    continue;
+                }
+                int check = check_for_block_declaration(curr_block, line, reus);
+                if(check == checkblock_failure){
+                    file.close();
+                    break;
+                }
+                if(check ==checkblock_success){
+                    if(curr_block == xtra_info4){
+                        block_found = true;
+                        final_data += line + "\n";
+                        continue;
+                    } else {
+                        final_data += line + "\n";
+                        continue;
+                    }
+                }
+            }
+        }
+
+        file.close();
+        save_final_data(filedata->GetFilename(), final_data);
+    } break;
     case atrc::ATRC_SAVE::ADD_VAR: {
         bool var_added = false;
         std::string var_line = xtra_info2+"\n";
@@ -589,11 +681,68 @@ void atrc::_W_Save_(ATRC_FD *filedata, const atrc::ATRC_SAVE &action, const int 
         file.close(); 
         save_final_data(filedata->GetFilename(), final_data);
     } break;
-    case atrc::ATRC_SAVE::REMOVE_VAR: {} break;
-    case atrc::ATRC_SAVE::MODIFY_VAR: {} break;
+    case atrc::ATRC_SAVE::REMOVE_VAR: {
+        int var_line_num = 0;
+        while(std::getline(file, line)){
+            reus.line_number = var_line_num++;
+            std::string trim_line = line;
+            trim(trim_line);
+            if(trim_line[0] == '%'){
+                size_t equ_pos = trim_line.find_first_of('=');
+                std::string variable_name = trim_line.substr(0, equ_pos-1);
+                trim(variable_name);
+                _W_ParseLineValueATRCtoSTRING(line, reus, (filedata->GetVariables()));
+                if(variable_name == "%" + xtra_info2 + "%"){
+                    continue;
+                }
+            }
+            final_data += line + "\n";
+        }
+        file.close();
+        save_final_data(filedata->GetFilename(), final_data);
+    } break;
+    case atrc::ATRC_SAVE::MODIFY_VAR: {
+        int var_line_num = 0;
+        while(std::getline(file, line)){
+            reus.line_number = var_line_num++;
+            std::string trim_line = line;
+            trim(trim_line);
+            if(trim_line[0] == '%'){
+                size_t equ_pos = trim_line.find_first_of('=');
+                std::string variable_name = trim_line.substr(0, equ_pos-1);
+                trim(variable_name);
+                std::vector<atrc::Variable> args = filedata->GetVariables(); // TODO: Improve, no memory copying in future
+                _W_ParseLineValueATRCtoSTRING(line, reus, args);
+                if(variable_name == "%" + xtra_info2 + "%"){
+                    final_data += args.at((size_t)xtra_info).Name +"="+ args.at((size_t)xtra_info).Value + "\n";
+                    continue;
+                }
+            }
+            final_data += line + "\n";
+        }
+        file.close();
+        save_final_data(filedata->GetFilename(), final_data);
+    } break;
+    case atrc::ATRC_SAVE::WRITE_COMMENT_TO_BOTTOM: {
+        // Added to the bottom of the file
+        std::string comment = xtra_info2;
+        while(std::getline(file, line)){
+            final_data += line + "\n";
+        }
+        final_data += comment + "\n";
+        file.close();
+        save_final_data(filedata->GetFilename(), final_data);
+    } break;
+    case atrc::ATRC_SAVE::WRITE_COMMENT_TO_TOP: {
+        // Added to the top of the file
+        std::string comment = xtra_info2;
+        add_to_top_of_file(comment, final_data, {}, file, ln_num);
+        file.close();
+        save_final_data(filedata->GetFilename(), final_data);
+    } break;
     default:
         atrc::errormsg(ERR_INVALID_SAVE_ACTION, -1, "", filedata->GetFilename());
-        return;
+        break;
     }
     if(file.is_open()) file.close();
 }

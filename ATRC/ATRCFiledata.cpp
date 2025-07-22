@@ -547,7 +547,18 @@ bool atrc::ATRC_FD::ModifyKey(const std::string& block, const std::string& key, 
     return true;
 }
 
-
+bool atrc::ATRC_FD::WriteCommentToTop(const std::string& comment) {
+    if (this->AutoSave) {
+        atrc::_W_Save_(this, atrc::ATRC_SAVE::WRITE_COMMENT_TO_TOP, -1, comment);
+    }
+    return true;
+}
+bool atrc::ATRC_FD::WriteCommentToBottom(const std::string& comment) {
+    if (this->AutoSave) {
+        atrc::_W_Save_(this, atrc::ATRC_SAVE::WRITE_COMMENT_TO_BOTTOM, -1, comment);
+    }
+    return true;
+}
 
 
 /*+++
@@ -641,3 +652,4 @@ atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator>>(const std::string& value) {
 atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator>>(const char* value) {
     return operator>>(std::string(value));
 }
+

@@ -485,6 +485,25 @@ bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* 
     return true;
 }
 
+bool WriteCommentToBottom(C_PATRC_FD self, const char* comment) {
+    if (!self) return false;
+
+    // Add the comment line to the end of the file
+    if (self->AutoSave) {
+        _ATRC_WRAP_FUNC_3(self, WRITE_COMMENT_TO_BOTTOM, -1, comment, "", "");
+    }
+    return true;
+}
+bool WriteCommentToTop(C_PATRC_FD self, const char* comment) {
+    if (!self) return false;
+
+    // Add the comment line to the top of the file
+    if (self->AutoSave) {
+        _ATRC_WRAP_FUNC_3(self, WRITE_COMMENT_TO_TOP, -1, comment, "", "");
+    }
+    return true;
+}
+
 C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode mode){
     C_PATRC_FD res = Create_Empty_ATRC_FD();
     if(res == NULL) return NULL;
