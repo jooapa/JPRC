@@ -28,4 +28,7 @@ void cpp_main(void)
 
     fd.AddVariable("TestVariable", "TestValue");
 
+    std::string res = "";
+    ATRC_INJECT(fd, "This is a test: %*%", "TestVariable");
+    std::cout << res << std::endl;
 }

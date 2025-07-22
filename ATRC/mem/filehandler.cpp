@@ -317,7 +317,6 @@ enum class PPRes {
     Ignore,             // Ignore n lines
     InvalidFlag,        // Invalid flag
     InvalidFlagContents,// Invalid flag contents
-
     ThreeParts,         // .FLAG=<var>=<value>
     Undefine,           // .UNDEF <var>
     Message,            // .LOG, .WARNING, .ERROR...
@@ -630,12 +629,12 @@ atrc::ParseFile
                         break;
                     case PPRes::Message: 
                         if(_block.flag == ".LOG")       std::cout << _block.string_data << std::endl;
-                   else if(_block.flag == ".SUCCESS")   std::cout << ANSI_COLOR_GREEN << _block.string_data << ANSI_COLOR_RESET << std::endl;
-                   else if(_block.flag == ".DEBUG")     std::cout << ANSI_COLOR_CYAN << _block.string_data << ANSI_COLOR_RESET << std::endl;
-                   else if(_block.flag == ".WARNING")   std::cout << ANSI_COLOR_YELLOW<< _block.string_data << ANSI_COLOR_RESET << std::endl;
-                   else if(_block.flag == ".ERROR")     std::cerr << ANSI_COLOR_RED << _block.string_data << ANSI_COLOR_RESET << std::endl;
-                   else if(_block.flag == ".ERRORCOUT") std::cout << ANSI_COLOR_RED << _block.string_data << ANSI_COLOR_RESET << std::endl;
-                   else break;
+                        else if(_block.flag == ".SUCCESS")   std::cout << ANSI_COLOR_GREEN << _block.string_data << ANSI_COLOR_RESET << std::endl;
+                        else if(_block.flag == ".DEBUG")     std::cout << ANSI_COLOR_CYAN << _block.string_data << ANSI_COLOR_RESET << std::endl;
+                        else if(_block.flag == ".WARNING")   std::cout << ANSI_COLOR_YELLOW<< _block.string_data << ANSI_COLOR_RESET << std::endl;
+                        else if(_block.flag == ".ERROR")     std::cerr << ANSI_COLOR_RED << _block.string_data << ANSI_COLOR_RESET << std::endl;
+                        else if(_block.flag == ".ERRORCOUT") std::cout << ANSI_COLOR_RED << _block.string_data << ANSI_COLOR_RESET << std::endl;
+                        else break;
                     case PPRes::Ignore: 
                         _ignore_lines = _block.numeral_data;
                         break;
@@ -645,7 +644,7 @@ atrc::ParseFile
                     default: 
                         file.close();
                         return std::make_pair(std::make_unique<std::vector<atrc::Variable>>(), std::make_unique<std::vector<atrc::Block>>());
-                        break;
+                        break;  
                 }
             } 
             

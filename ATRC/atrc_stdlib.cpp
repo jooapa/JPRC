@@ -118,10 +118,10 @@ C_PString_Arr atrc_to_list(const char separator, const char* value) {
 }
 
 
-void atrc_free_list(C_PString_Arr list) {
+void *atrc_free_list(C_PString_Arr list) {
     atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_UNSUCCESSFULL_ACTION;
     if (list == NULL){ 
-        return;
+        return NULL;
     }
 
     for (size_t i = 0; i < list->count; i++) {
@@ -131,6 +131,7 @@ void atrc_free_list(C_PString_Arr list) {
     list->count = 0; // Reset count
     if(list != NULL) free(list);
     atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_SUCCESSFULL_ACTION;
+    return NULL;
 }
 
 } // namespace atrc_std

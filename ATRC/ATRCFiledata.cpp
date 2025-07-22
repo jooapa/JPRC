@@ -328,7 +328,17 @@ void atrc::ATRC_FD::InsertVar(std::string &line, std::vector<std::string> &args)
                             // check %*<digit>%
                             if(var.size() > 3) {
                                 // size_t inject_num = std::stoull(var.substr(2, var.size() - 3));
-                                size_t inject_num = std::stoi(var.substr(2, var.size() - 3));
+                                std::string inject_num_str = var.substr(2, var.size() - (3+2)); // digits up to %*xxxx*
+                                size_t injectables = 0;
+                                for(char c : inject_num_str) {
+                                    if (!isdigit(c)) {
+                                        return;
+                                    }
+                                    injectables++;
+                                }
+                                
+                                size_t inject_num = std::stoi(var.substr(2, var.size() - (3+injectables))); 
+
                                 if(args.size() > inject_num){
                                     _result += args[inject_num];
                                 } else {

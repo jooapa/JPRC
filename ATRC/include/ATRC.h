@@ -119,9 +119,9 @@ ATRC_API bool WriteCommentToTop(C_PATRC_FD self, const char* comment);
 
 ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
-ATRC_API void Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self);
-ATRC_API void Destroy_ATRC_FD_Variables(C_PATRC_FD self);
-ATRC_API void Destroy_ATRC_FD(C_PATRC_FD self);
+ATRC_API void *Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self);
+ATRC_API void *Destroy_ATRC_FD_Variables(C_PATRC_FD self);
+ATRC_API void *Destroy_ATRC_FD(C_PATRC_FD self);
 
 #ifdef __cplusplus
 } // extern "C"
@@ -264,13 +264,20 @@ else { \
 Inject macro for C++
 USAGE:
 {
-    std::string _res;
+    std::string res;
     ATRC_INJECT("INPUT %*%, %*%\n", "arg1", "arg2", ...) // -> "INPUT arg1, arg2\n"
     // use res as needed
 }
 */
-#define ATRC_INJECT(line, ...) \
-// TODO: Implement this macro for C++
+#define ATRC_INJECT(fd, line, ...) \
+if(line != "") { \
+    std::string message = line; \
+    std::vector<std::string> args = {__VA_ARGS__}; \
+    res = fd.InsertVar_S(message, args); \
+} \
+else { \
+    res = ""; \
+} 
 #endif // __cplusplus
 
 /*+++
@@ -303,7 +310,7 @@ typedef struct _C_String_Arr {
 
 ATRC_API C_PString_Arr atrc_to_list(const char separator, const char* value);
 
-ATRC_API void atrc_free_list(C_PString_Arr list);
+ATRC_API void *atrc_free_list(C_PString_Arr list);
 
 ATRC_API bool atrc_to_bool(const char* value);
 

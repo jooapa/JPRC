@@ -50,7 +50,7 @@ Bright White    97  107
 #define ERR_INVALID_PREPROCESSOR_VALUE  114
 #define ERR_INVALID_PREPROCESSOR_SYNTAX 115
 #define ERR_INVALID_SAVE_ACTION         116
-
+#define ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS 117
 // File
 #define ERR_CLASS_READER                200
 
@@ -238,6 +238,10 @@ inline void errormsg(int err_num=-1,
             break;
         case ERR_WRITECHECK:
             msg = "Writecheck creation failed: '" + var_name + "'";
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
+        case ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS:
+            msg = "Invalid preprocessor flag contents: '" + var_name + "'";
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_PREPROCESSOR_FLAG:

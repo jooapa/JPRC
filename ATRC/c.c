@@ -536,8 +536,8 @@ C_PATRC_FD Create_Empty_ATRC_FD(void){
     return res;
 }
 
-void Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self) {
-	if (!self) return;
+void *Destroy_ATRC_FD_Variables(C_PATRC_FD self) {
+	if (!self) return self;
     // Free Variables
     if (self->Variables) {
         if (self->Variables->Variables) {
@@ -557,9 +557,10 @@ void Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self) {
         free(self->Variables);
         self->Variables = NULL;
     }
+    return self;
 }
-void Destroy_ATRC_FD_Variables(C_PATRC_FD self) {
-	if (!self) return;
+void *Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self) {
+	if (!self) return self;
     // Free Blocks
     if (self->Blocks) {
         if (self->Blocks->Blocks) {
@@ -589,12 +590,13 @@ void Destroy_ATRC_FD_Variables(C_PATRC_FD self) {
         free(self->Blocks);
         self->Blocks = NULL;
     }
+    return self;
 }
 
-void Destroy_ATRC_FD(C_PATRC_FD self) {
-    if (!self) return;
-	Destroy_ATRC_FD_Blocks_And_Keys(self);
-	Destroy_ATRC_FD_Variables(self);
+void *Destroy_ATRC_FD(C_PATRC_FD self) {
+    if (!self) return self;
+	if(!Destroy_ATRC_FD_Blocks_And_Keys(self)) return self;
+	if(!Destroy_ATRC_FD_Variables(self)) return self;
     // Free Filename
     if (self->Filename) {
         free(self->Filename);
@@ -603,6 +605,7 @@ void Destroy_ATRC_FD(C_PATRC_FD self) {
 
     // Free the main structure
     free(self);
+    return self;
 }
 
 
