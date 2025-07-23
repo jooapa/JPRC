@@ -84,6 +84,12 @@
         "codecvt": "cpp",
         "functional": "cpp",
         "yvals_core.h": "cpp",
-        "xkeycheck.h": "cpp"
+        "xkeycheck.h": "cpp",
+        "math.h": "cpp",
+        "corecrt_math_defines.h": "cpp",
+        "corecrt_math.h": "cpp",
+        "corecrt.h": "cpp",
+        "unordered_map": "cpp",
+        "variant": "cpp"
     }
 }

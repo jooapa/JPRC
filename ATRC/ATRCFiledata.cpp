@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include <cstdlib>
 
 void atrc::ATRC_FD::MAINCONSTRUCTOR(){
     this->AutoSave = false;
@@ -115,7 +116,7 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
     self->AutoSave = this->AutoSave;
 
     // Allocate and copy Filename
-    self->Filename = new char[this->Filename.size() + 1];
+    self->Filename = (char*)malloc(this->Filename.size() + 1);
     if (!self->Filename) {
         Destroy_ATRC_FD(self);
         return NULL;
@@ -132,7 +133,7 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
 
     for (const atrc::Variable& var : this->Variables) {
         // Allocate Name
-        self->Variables->Variables[self->Variables->VariableCount].Name = new char[var.Name.size() + 1];
+        self->Variables->Variables[self->Variables->VariableCount].Name = (char*)malloc(var.Name.size() + 1);
         if (!self->Variables->Variables[self->Variables->VariableCount].Name) {
             Destroy_ATRC_FD(self);
             return NULL;
@@ -140,7 +141,7 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
         std::strcpy(self->Variables->Variables[self->Variables->VariableCount].Name, var.Name.c_str());
 
         // Allocate Value
-        self->Variables->Variables[self->Variables->VariableCount].Value = new char[var.Value.size() + 1];
+        self->Variables->Variables[self->Variables->VariableCount].Value = (char*)malloc(var.Value.size() + 1);
         if (!self->Variables->Variables[self->Variables->VariableCount].Value) {
             Destroy_ATRC_FD(self);
             return NULL;
@@ -149,6 +150,7 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
 
         // Copy IsPublic
         self->Variables->Variables[self->Variables->VariableCount].IsPublic = var.IsPublic;
+        self->Variables->Variables[self->Variables->VariableCount].line_number = var.line_number;
         self->Variables->VariableCount++;
     }
 
@@ -162,13 +164,13 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
 
     for (const atrc::Block& block : this->Blocks) {
         // Allocate Block Name
-        self->Blocks->Blocks[self->Blocks->BlockCount].Name = new char[block.Name.size() + 1];
+        self->Blocks->Blocks[self->Blocks->BlockCount].Name = (char*)malloc(block.Name.size() + 1);
         if (!self->Blocks->Blocks[self->Blocks->BlockCount].Name) {
             Destroy_ATRC_FD(self);
             return NULL;
         }
         std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Name, block.Name.c_str());
-
+        self->Blocks->Blocks[self->Blocks->BlockCount].line_number = block.line_number;
         // Allocate Keys
         self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount = 0;
         self->Blocks->Blocks[self->Blocks->BlockCount].Keys = (C_Key*)malloc(block.Keys.size() * sizeof(C_Key));
@@ -179,7 +181,7 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
 
         for (const atrc::Key& key : block.Keys) {
             // Allocate Key Name
-            self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name = new char[key.Name.size() + 1];
+            self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name = (char*)malloc(key.Name.size() + 1);
             if (!self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name) {
                 Destroy_ATRC_FD(self);
                 return NULL;
@@ -187,13 +189,16 @@ C_PATRC_FD atrc::ATRC_FD::ToCStruct() {
             std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Name, key.Name.c_str());
 
             // Allocate Key Value
-            self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value = new char[key.Value.size() + 1];
+            self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value = (char*)malloc(key.Value.size() + 1);
             if (!self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value) {
                 Destroy_ATRC_FD(self);
                 return NULL;
             }
+
             std::strcpy(self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].Value, key.Value.c_str());
 
+            self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].line_number = key.line_number;
+            self->Blocks->Blocks[self->Blocks->BlockCount].Keys[self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount].enum_value = key.enum_value;
             self->Blocks->Blocks[self->Blocks->BlockCount].KeyCount++;
         }
 
@@ -570,6 +575,18 @@ bool atrc::ATRC_FD::WriteCommentToBottom(const std::string& comment) {
     return true;
 }
 
+uint64_t atrc::ATRC_FD::GetEnumValue(const std::string& block, const std::string& key) {
+    for (const Block& blk : this->Blocks) {
+        if (blk.Name == block) {
+            for (const Key& k : blk.Keys) {
+                if (k.Name == key) {
+                    return k.enum_value;
+                }
+            }
+        }
+    }
+    return 0; // Return 0 if not found
+}
 
 /*+++
 PROXY_ATRC_FD
@@ -587,7 +604,7 @@ atrc::PROXY_ATRC_FD::operator const char*() const {
     try {
         if (x == std::string::npos) {
             std::string res_str = fd->ReadVariable(key);
-            const char *res = new char[res_str.size() + 1];
+            const char *res = (char*)malloc(res_str.size() + 1);
             std::strcpy(const_cast<char*>(res), res_str.c_str());
             return res;
         }
@@ -595,7 +612,7 @@ atrc::PROXY_ATRC_FD::operator const char*() const {
             std::string block = key.substr(0, x);
             std::string key_ = key.substr(x + 1, key.size() - x - 1);
             std::string res_str = fd->ReadKey(block, key_);
-            const char *res = new char[res_str.size() + 1];
+            const char *res = (char*)malloc(res_str.size() + 1);
             std::strcpy(const_cast<char*>(res), res_str.c_str());
             return res;
         }
@@ -662,4 +679,3 @@ atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator>>(const std::string& value) {
 atrc::PROXY_ATRC_FD& atrc::PROXY_ATRC_FD::operator>>(const char* value) {
     return operator>>(std::string(value));
 }
-

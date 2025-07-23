@@ -51,6 +51,7 @@ Bright White    97  107
 #define ERR_INVALID_PREPROCESSOR_SYNTAX 115
 #define ERR_INVALID_SAVE_ACTION         116
 #define ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS 117
+#define ERR_INVALID_INCLUDE_FILE        118
 // File
 #define ERR_CLASS_READER                200
 
@@ -74,12 +75,16 @@ Bright White    97  107
 
 // Error types
 #define ERR_STDLIB_CAST_ERROR           402
-
+#define ERR_INVALID_POWER_VALUE         403
+#define ERR_INVALID_EXPRESSION          404
+#define ERR_INVALID_NUMBER              405
 // File
 #define ERR_CLASS_MEMORY                501
 
 // Error types
 #define ERR_MEMORY_ALLOCATION_FAILED    502
+
+
 #ifdef __cplusplus
 namespace atrc {
 std::string str_to_lower(const char *str);
@@ -146,6 +151,11 @@ char* _ATRC_WRAP_FUNC_5(const char* b, const char** c);
 #include <vector>
 #include <algorithm>
 #include <ATRC.h>
+#include <variant>
+#include <cmath>
+#include <unordered_map>
+#include <stdexcept>
+
 namespace atrc {
 bool BlockContainsKey(std::vector<Key>& keys, const Key& key);
 bool BlockContainsBlock(std::vector<Block>& blocks,const Block& block);
@@ -211,6 +221,76 @@ inline void remove_newlines(std::string &s) {
     s.erase(std::remove(s.begin(), s.end(), '\n'), s.end());
 }
 
+
+enum class MATH_TOKEN_TYPE {
+    NUMBER,
+    OPERATOR
+};
+
+enum class MATH_NUMBER_TYPE {
+    UNSOLVED,
+    FLOAT,
+    HEXADECIMAL,
+    BINARY,
+    PI,
+    E,
+    GOLDEN_RATIO,
+};
+
+enum class MATH_OPERATOR_TYPE {
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE,
+    MODULO,
+    POWER,
+    OPEN_PAREN,
+    CLOSE_PAREN,
+
+    SQRT,
+    SQRT2,
+    ABS,
+    LOG,
+    LOG10,
+
+    SIN,
+    COS,
+    TAN,
+
+    ASIN,
+    ACOS,
+    ATAN,
+
+    LOG2E,
+    LOG10E,
+};
+
+#define ATRC_PI             (double)3.14159265358979323846
+#define ATRC_E              (double)2.71828182845904523536
+#define ATRC_GOLDEN_RATIO   (double)1.61803398874989484820
+#define ATRC_SQRT2          (double)1.41421356237309504880
+#define ATRC_LOG2E          (double)1.44269504088896340736
+#define ATRC_LOG10E         (double)0.43429448190325182765
+
+struct MathToken {
+    MATH_TOKEN_TYPE type;
+    std::variant<double, MATH_OPERATOR_TYPE> value;
+    MATH_NUMBER_TYPE numberType = MATH_NUMBER_TYPE::UNSOLVED;
+};
+
+class MathParser {
+public:
+    double evaluate(const std::string& expression);
+
+private:
+    std::vector<MathToken> tokenize(const std::string& input);
+    std::vector<MathToken> toRPN(const std::vector<MathToken>& tokens);
+    double evaluateRPN(const std::vector<MathToken>& rpn);
+};
+
+
+#define linecheck(line_number) (line_number == -1 ? "~unknown~" : std::to_string(line_number))
+
 inline void errormsg(int err_num=-1, 
                     int line_number=-1, const 
                     std::string& var_name="",
@@ -219,113 +299,124 @@ inline void errormsg(int err_num=-1,
     std::string msg = "";
     int err_class = -1;
     switch(err_num){
-
-	    case ERR_MEMORY_ALLOCATION_FAILED:
-		    msg = "Memory allocation failed";
-		    err_class = ERR_CLASS_MEMORY;
-		    break;
-        case ERR_STDLIB_CAST_ERROR:
-            msg = "Unsuccesfull cast to other type in a STDLIB function: '" + var_name + "' at line " + std::to_string(line_number);
-            err_class = ERR_CLASS_STDLIB;
-            break;
-        case ERR_INVALID_VAR_DECL:
-            msg = "Invalid variable declaration: '" + var_name +"' at line " + std::to_string(line_number);
+        case ERR_INVALID_INCLUDE_FILE:
+            msg = "Invalid include file: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
+        case ERR_INVALID_NUMBER:
+            msg = "Invalid number at or close to: '" + var_name + "' at line " + linecheck(line_number);
+            err_class = ERR_CLASS_STDLIB;
+            break;
+	    case ERR_MEMORY_ALLOCATION_FAILED:
+		    msg = "Memory allocation failed at line " + linecheck(line_number);
+		    err_class = ERR_CLASS_MEMORY;
+		    break;
+        case ERR_INVALID_EXPRESSION:
+            msg = "Invalid math expression at or close to: '" + var_name + "' at line " + linecheck(line_number);
+            err_class = ERR_CLASS_STDLIB;
+            break;
+        case ERR_STDLIB_CAST_ERROR:
+            msg = "Unsuccesfull cast to other type in a STDLIB function: '" + var_name + "' at line " + linecheck(line_number);
+            err_class = ERR_CLASS_STDLIB;
+            break;
+        case ERR_INVALID_POWER_VALUE:
+            msg = "Invalid power value at or close to: '" + var_name + "' at line " + linecheck(line_number);
+            err_class = ERR_CLASS_STDLIB;
+            break;
         case ERR_INVALID_BLOCK_DECL:
-            msg = "Invalid block declaration at line " + std::to_string(line_number) + ". Stopping parsing";
+            msg = "Invalid block declaration at line " + linecheck(line_number) + ". Stopping parsing";
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_WRITECHECK:
-            msg = "Writecheck creation failed: '" + var_name + "'";
+            msg = "Writecheck creation failed: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS:
-            msg = "Invalid preprocessor flag contents: '" + var_name + "'";
+            msg = "Invalid preprocessor flag contents: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_PREPROCESSOR_FLAG:
-            msg = "Invalid preprocessor flag: '" + var_name + "'";
+            msg = "Invalid preprocessor flag: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_PREPROCESSOR_TAG:
-            msg = "Invalid preprocessor tag: '" + var_name + "'";
+            msg = "Invalid preprocessor tag: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_PREPROCESSOR_VALUE:
-            msg = "Invalid preprocessor value: '" + var_name + "'";
+            msg = "Invalid preprocessor value: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_PREPROCESSOR_SYNTAX:
-            msg = "Invalid preprocessor syntax: '" + var_name + "'";
+            msg = "Invalid preprocessor syntax: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_KEY_DECL:
-            msg = "Invalid key declaration at line " + std::to_string(line_number);
+            msg = "Invalid key declaration at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_NO_VAR_VECTOR:
-            msg = "No variable vector found";
+            msg = "No variable vector found at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case FILE_MODE_ERR:
-            msg = "Error with file mode";
+            msg = "Error with file mode at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_REREFERENCED_VAR:
-            msg = "Re-Rereferenced variable: '" + var_name + "' at line " + std::to_string(line_number);
+            msg = "Re-Rereferenced variable: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_REREFERENCED_BLOCK:
-            msg = "Re-referenced block: '" + var_name + "' at line " + std::to_string(line_number);
+            msg = "Re-referenced block: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_REREFERENCED_KEY:
-            msg = "Re-Referenced key: '" + var_name + "' at line " + std::to_string(line_number);
+            msg = "Re-Referenced key: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INSERT_WRONG:
-            msg = "Invalid insert variable declaration: '" + var_name + "'";
+            msg = "Invalid insert variable declaration: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_INSERT_VAR;
             break;
         case ERR_UNAUTHORIZED_ACCESS_TO_VAR:
-            msg = "Unauthorized access to variable: '" + var_name + "'";
+            msg = "Unauthorized access to variable: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_READER;
             break;
         case ERR_BLOCK_NOT_FOUND:
-            msg = "Block not found: '" + var_name + "'";
+            msg = "Block not found: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_SAVER;
             break;
         case ERR_KEY_NOT_FOUND:
-            msg = "Key not found: '" + var_name + "'";
+            msg = "Key not found: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_SAVER;
             break;
         case ERR_VAR_NOT_FOUND:
-            msg = "Variable not found: '" + var_name + "'";
+            msg = "Variable not found: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_SAVER;
             break;
         case ERR_BLOCK_EXISTS:
-            msg = "Block already exists: '" + var_name + "'";
+            msg = "Block already exists: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_SAVER;
             break;
         case ERR_KEY_EXISTS:
-            msg = "Key already exists: '" + var_name + "'";
+            msg = "Key already exists: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_SAVER;
             break;
         case ERR_VAR_EXISTS:
-            msg = "Variable already exists: '" + var_name + "'";
+            msg = "Variable already exists: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_SAVER;
             break;
         case ERR_INVALID_FILE:
-            msg = "Error with filename or fileheader: '" + var_name + "'";
+            msg = "Error with filename or fileheader: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;
             break;
         case ERR_INVALID_SAVE_ACTION:
-            msg = "Invalid save action: '" + var_name + "'";
+            msg = "Invalid save action: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_SAVER;
             break;
         default:
-            msg = "Unknown error at line " + std::to_string(line_number);
+            msg = "Unknown error at line " + linecheck(line_number);
             break;
     }
     std::cerr << "~ATRC~Error<" << err_class << "?" << err_num << ">"<< "<" << filename << ">" <<": " << msg << std::endl;

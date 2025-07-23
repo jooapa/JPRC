@@ -83,6 +83,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
         self->Variables->Variables[i].Name = strdup(var.Name.c_str());
         self->Variables->Variables[i].Value = strdup(var.Value.c_str());
         #endif
+        self->Variables->Variables[i].line_number = var.line_number;
         self->Variables->Variables[i].IsPublic = var.IsPublic;
     }
 
@@ -101,6 +102,7 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
         #else
         self->Blocks->Blocks[i].Name = strdup(block.Name.c_str());
         #endif
+        self->Blocks->Blocks[i].line_number = block.line_number;
         self->Blocks->Blocks[i].KeyCount = block.Keys.size();
         self->Blocks->Blocks[i].Keys = (C_PKey)malloc(self->Blocks->Blocks[i].KeyCount * sizeof(C_Key));
 
@@ -118,6 +120,8 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
             self->Blocks->Blocks[i].Keys[j].Name = strdup(key.Name.c_str());
             self->Blocks->Blocks[i].Keys[j].Value = strdup(key.Value.c_str());
             #endif
+            self->Blocks->Blocks[i].Keys[j].line_number = key.line_number;
+            self->Blocks->Blocks[i].Keys[j].enum_value = key.enum_value;
         }
     }
 
@@ -194,4 +198,11 @@ char* _ATRC_WRAP_FUNC_5(const char* line, const char** args) {
     cstr[res.length()] = '\0'; // Null-terminate the string
     
     return cstr;
+}
+
+void *ATRC_FREE_MEMORY(void *ptr){
+    if (ptr != NULL) {
+        free(ptr);
+    }
+    return ptr;
 }

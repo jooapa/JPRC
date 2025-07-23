@@ -1,7 +1,51 @@
 #!ATRC
 #nu chuo
+#
+#.INCLUDE test2.atrc
+#
+#.IF %test2% EQU "LOL"
+#.ERROR abcdefg
+#.ENDIF
+#
+#.IF %test3% EQU "lol3"
+#.ERROR abcdef
+#.ENDIF
+#
+#.LOG
+#.LOG
 %TestVariable%=TestValue
 [VAR_SAFETY]
 %PremadeVariable%=Constant value is
+%SECTOR_SIZE%=4096.0
+%VOL_DESC_START%=16
+%PVD_OFFSET%=%SECTOR_SIZE% / %VOL_DESC_START%
 [PremadeBlock]
 PremadeValue=%PremadeVariable%: 10
+
+%KAKKAPAA%=JIIPEE
+#.IF %KAKKAPAA% EQU JIIPEE
+#.SUCCESS WORKS
+#.ENDIF
+
+%SIGMA%=AATEEPAATEE
+#.IF %SIGMA% EQU %KAKKAPAA%
+#.ERROR LOL ITKE
+#.ELSEIF %SIGMA% EQU %SIGMA%
+#.LOG HIHIHIHAA
+#.ENDIF 
+
+
+#.IF LINUX EQU 1
+#.WARNING AHA
+#.ELSE
+#.LOG WINDOWS TROLOLO
+#.ENDIF
+
+
+#.IF 10 LTE 9
+#.ERROR ABC
+#.ENDIF
+
+%JP_PAINO%=999
+%JP_BMI_KERROIN%=100^2
+%JP_BMI%=%JP_PAINO% * %JP_BMI_KERROIN%

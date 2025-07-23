@@ -4,7 +4,7 @@
 using namespace atrc;
 void cpp_main(void)
 {
-    std::cout << "ATRC Test Application" << std::endl;
+    std::cout << "ATRC Test Application\n" << std::endl;
     ATRC_FD fd = ATRC_FD("./test.atrc", ReadMode::ATRC_READ_ONLY);
     if (!fd.CheckStatus()) {
         std::cerr << "Failed to read ATRC file. Please check the file path and format." << std::endl;
@@ -28,7 +28,16 @@ void cpp_main(void)
 
     fd.AddVariable("TestVariable", "TestValue");
 
+    
     std::string res = "";
     ATRC_INJECT(fd, "This is a test: %*%", "TestVariable");
     std::cout << res << std::endl;
+
+
+    double math_calculated = atrc_std::atrc_math_exp(fd["PVD_OFFSET"]);
+    std::cout << "Math calculated: " << math_calculated << std::endl;
+
+    std::cout << atrc_std::atrc_math_exp(fd["JP_BMI"]) << std::endl;
+
+    std::cout << fd["test3"] << std::endl;
 }

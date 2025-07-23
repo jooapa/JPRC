@@ -16,6 +16,37 @@
 /*+++
 Preprocessor handling functions, parsing, constants, etc.
 ---*/
+
+std::string resolveValue(const std::string &value, const std::vector<atrc::Variable> &variables) {
+    std::string val = value;
+    if(val.empty()) return ""; // Empty value
+
+    // Handle quoted strings
+    if ((val.front() == '"' && val.back() == '"') || (val.front() == '\'' && val.back() == '\'')) {
+        return val.substr(1, val.size() - 2);
+    }
+
+    // Handle booleans
+    if (val == "TRUE") return "1";
+    if (val == "FALSE") return "0";
+
+    // Handle variable substitution: %VAR%
+    if (val.front() == '%' && val.back() == '%') {
+        std::string varName = val.substr(1, val.length() - 2);
+        for (const auto &var : variables) {
+            std::string temp = var.Name;
+            atrc::str_to_upper_s(temp);
+            atrc::str_to_upper_s(varName);
+            if (temp == varName) return var.Value;
+        }
+        return ""; // Undefined variable = empty string
+    }
+
+    return val; // Literal fallback
+}
+
+
+
 bool evaluatePlatformTag(const std::string &tag) {
 #ifdef __linux__
     return tag == "LINUX";
@@ -44,26 +75,39 @@ bool evaluateArchitectureTag(const std::string &tag) {
 #endif
 }
 
-bool evaluateLogicalOperator(const std::string &op, std::list<bool> &results, size_t index) {
+bool evaluateLogicalOperator(const std::string &op, std::list<std::string> &results, size_t index, const std::vector<atrc::Variable> &variables) {
     if (op == "NOT") {
-        if (results.empty()) return false; // Syntax error
-        bool value = results.back();
+        if (results.empty()) return false;
+        std::string value = resolveValue(results.back(), variables);
         results.pop_back();
-        return !value;
+        return value == "0";
+    }
+    
+    if (results.size() < 2) return false;
+    std::string rhs = resolveValue(results.back(), variables); results.pop_back();
+    std::string lhs = resolveValue(results.back(), variables); results.pop_back();
+
+    if (op == "AND") return lhs == "1" && rhs == "1";
+    if (op == "OR") return lhs == "1" || rhs == "1";
+    if (op == "EQU") return lhs == rhs;
+    if (op == "NEQ") return lhs != rhs;
+
+    // Only allow numeric comparison if both sides look like numbers
+    try {
+        double lnum = std::stod(lhs);
+        double rnum = std::stod(rhs);
+        if (op == "GT") return lnum > rnum;
+        if (op == "LT") return lnum < rnum;
+        if (op == "GTE") return lnum >= rnum;
+        if (op == "LTE") return lnum <= rnum;
+    } catch (...) {
+        return false; // Type mismatch (non-numeric used in GT/LT etc.)
     }
 
-    if (results.size() < 2) return false; // Syntax error
-
-    bool rhs = results.back();
-    results.pop_back();
-    bool lhs = results.back();
-    results.pop_back();
-
-    if (op == "AND") return lhs && rhs;
-    if (op == "OR") return lhs || rhs;
-
-    return false; // Unsupported operator
+    return false;
 }
+
+
 
 enum class PPRes {
     SeeContents,        // Flag is solved in the preprocessor block
@@ -87,6 +131,7 @@ enum class PPRes {
     
     ".DEFINE",  // Define           -> .DEFINE <var>=<value>
     ".UNDEF",   // Undefine         -> .UNDEF <var>
+    ".INCLUDE", // Include file     -> .INCLUDE <file>
 
     ".LOG",     // Log to console   -> .LOG <message>           // Logs to stdout, no color
     ".WARNING", // Warning message  -> .WARNING <message>       // Logs to stdout, yellow
@@ -113,17 +158,29 @@ enum class PPRes {
     "OR",
     "AND",
     "NOT",
+
+    "EQU",
+    "NEQ",
+    "GT",
+    "LT",
+    "GTE",
+    "LTE",
+
+    Boolean values
+    "FALSE",
+    "TRUE",
+
 */
 const std::unordered_set<std::string> PREPROCESSOR_FLAGS = {
     ".IF", ".ELSEIF", ".ELSE", ".ENDIF", 
-    ".DEFINE", ".UNDEF", 
+    ".DEFINE", ".UNDEF", ".INCLUDE",
     ".LOG", ".WARNING", ".ERROR", ".ERRORCOUT", ".SUCCESS", ".DEBUG",
     ".IGNORE"
 };
 const std::unordered_set<std::string> PREPROCESSOR_TAGS = {
     "LINUX", "WINDOWS", "MACOS", "UNIX", 
     "X86", "X64", "ARM", "ARM64", 
-    "AND", "OR", "NOT"
+    "AND", "OR", "NOT", "EQU", "NEQ", "GT", "LT", "GTE", "LTE"
 };
 
 // Struct: Preprocessor block metadata
@@ -153,22 +210,22 @@ Parses preprocessor line:
     lines: [] // lines that are inside the preprocessor block. Will be parsed outside this function
 }
 ---*/
-PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, const std::string &filename){
+PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, const atrc::REUSABLE &reus, std::vector<atrc::Variable> &variables) {
     PPRes res = PPRes::Normal;
     std::string lineCopy = line + " ";
     size_t spacePos = lineCopy.find_first_of(' ');
 
     if (spacePos == std::string::npos) {
-        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, -1, line, filename);
+        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, (int)reus.line_number, line, reus.filename);
         return PPRes::InvalidFlag;
     }
-
     block.flag = lineCopy.substr(1, spacePos - 1);
     atrc::str_to_upper_s(block.flag);
     if (PREPROCESSOR_FLAGS.find(block.flag) == PREPROCESSOR_FLAGS.end()) {
-        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, -1, block.flag, filename);
+        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, (int)reus.line_number, block.flag, reus.filename);
         return PPRes::InvalidFlag;
     }
+
 
     // Handle .ENDIF
     if (block.flag == ".ENDIF") return PPRes::EndIF;
@@ -180,26 +237,43 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
     
     // Extract and process flag contents
     block.flag_contents = atrc::trim_copy(lineCopy.substr(spacePos + 1));
-    atrc::str_to_upper_s(block.flag_contents);
+    if(block.flag == ".INCLUDE") {
+        block.flag_contents = atrc::trim_copy(block.flag_contents);
+        block.string_data = block.flag_contents;
+        return PPRes::SeeContents; // Include file contents will be processed later
+    }
+
+    // For if statements
     if (block.flag == ".IF" || block.flag == ".ELSEIF") {
         std::vector<std::string> tags = atrc::split(block.flag_contents, ' ');
         if (tags.empty()) {
-            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
+            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, (int)reus.line_number, line, reus.filename);
             return PPRes::InvalidFlagContents;
         }
-
+        
         // Evaluate tags and logical expressions
-        std::list<bool> results;
+        std::list<std::string> results;
 
         std::string logical_operator = "";
         uint64_t wait_for_next_value = 0;
+        bool jump_to_tags = false;
         for(size_t i = 0; i < tags.size(); i++){
             std::string &tag = tags[i];
-            if (PREPROCESSOR_TAGS.find(tag) != PREPROCESSOR_TAGS.end()) {
-                if (tag == "LINUX" || tag == "WINDOWS" || tag == "MACOS" || tag == "UNIX")
-                    results.push_back(evaluatePlatformTag(tag));
-                else if (tag == "X86" || tag == "X64" || tag == "ARM" || tag == "ARM64")
-                    results.push_back(evaluateArchitectureTag(tag));
+            if(tag.empty()) continue;
+            if (tag.front() == '"' && tag.back() == '"' || tag.front() == '\'' && tag.back() == '\'') {
+                results.push_back(tag);
+                if(wait_for_next_value > 0) {jump_to_tags = !jump_to_tags; continue;}
+            }
+            else if (PREPROCESSOR_TAGS.find(tag) != PREPROCESSOR_TAGS.end()) {
+                atrc::str_to_upper_s(tag);
+                if (tag == "LINUX" || tag == "WINDOWS" || tag == "MACOS" || tag == "UNIX") {
+                    results.push_back(std::to_string(evaluatePlatformTag(tag)));
+                    continue;
+                }
+                else if (tag == "X86" || tag == "X64" || tag == "ARM" || tag == "ARM64") {
+                    results.push_back(std::to_string(evaluateArchitectureTag(tag)));
+                    continue;
+                }
                 else {
                     if(tag == "NOT"){
                         wait_for_next_value++;
@@ -207,32 +281,49 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
                         continue;
                     } else if(tag == "AND" || tag == "OR"){
                         if(results.empty()){
-                            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
+                            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, (int)reus.line_number, line, reus.filename);
                             return PPRes::InvalidFlagContents;
                         }
-                        wait_for_next_value++;
+                        wait_for_next_value += 1;
+                        logical_operator = tag;
+                        continue;
+                    } else if(tag == "EQU" || tag == "NEQ" || tag == "GT" || tag == "LT" || tag == "GTE" || tag == "LTE") {
+                        if(results.empty()){
+                            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, (int)reus.line_number, line, reus.filename);
+                            return PPRes::InvalidFlagContents;
+                        }
+                        wait_for_next_value += 1;
                         logical_operator = tag;
                         continue;
                     }
                 }
                 if(wait_for_next_value-- == 1){
                     if(logical_operator.empty()){
-                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, -1, tag, filename);
+                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, (int)reus.line_number, tag, reus.filename);
                         return PPRes::InvalidFlagContents;
                     }
-                    results.push_back(evaluateLogicalOperator(logical_operator, results, i));
+                    results.push_back(std::to_string(evaluateLogicalOperator(logical_operator, results, i, variables)));
                     wait_for_next_value = 0;
                     logical_operator = "";
                 }
             } else {
-                atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, -1, tag, filename);
-                return PPRes::InvalidFlagContents;
+                results.push_back(resolveValue(tag, variables));
+                if(wait_for_next_value > 0) {jump_to_tags = !jump_to_tags; continue;}
             }
         }
 
+        if(wait_for_next_value-- == 1){
+            if(logical_operator.empty()){
+                atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, (int)reus.line_number, "~UNKNOWN~", reus.filename);
+                return PPRes::InvalidFlagContents;
+            }
+            results.push_back(std::to_string(evaluateLogicalOperator(logical_operator, results, tags.size(), variables)));
+            wait_for_next_value = 0;
+            logical_operator = "";
+        }
 
         block.isSolved = true;
-        block.solvedResult = results.back();
+        block.solvedResult = atrc_std::atrc_to_bool(results.back().c_str());
         return block.solvedResult == true ? PPRes::SeeContents : PPRes::DontSeeContents;
     }
     // Additional flag types with specific syntax
@@ -247,7 +338,7 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
         if(block.flag == ".IGNORE") {
             block.numeral_data = std::stoll(block.flag_contents);
             if(block.numeral_data < 0) {
-                atrc::errormsg(ERR_INVALID_PREPROCESSOR_VALUE, -1, line, filename);
+                atrc::errormsg(ERR_INVALID_PREPROCESSOR_VALUE, (int)reus.line_number, line, reus.filename);
                 return PPRes::InvalidFlagContents;
             }
             return PPRes::Ignore;
@@ -258,9 +349,10 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
     }
 
     else if (block.flag == ".DEFINE") {
+        
         size_t eqPos = block.flag_contents.find('=');
         if (eqPos == std::string::npos) {
-            atrc::errormsg(ERR_INVALID_PREPROCESSOR_VALUE, -1, line, filename);
+            atrc::errormsg(ERR_INVALID_PREPROCESSOR_VALUE, (int)reus.line_number, line, reus.filename);
             return PPRes::InvalidFlagContents;
         }
         block.var_name = atrc::trim_copy(block.flag_contents.substr(0, eqPos));
@@ -402,6 +494,7 @@ bool check_and_add_block(std::string &curr_block, std::vector<atrc::Block> &bloc
     }
     atrc::Block _block;
     _block.Name = curr_block;
+    _block.line_number = reus.line_number;
     blocks.push_back(_block);
     if(blocks.size() == -1) {
         atrc::errormsg(ERR_INVALID_BLOCK_DECL, (int)reus.line_number, curr_block, reus.filename);
@@ -430,9 +523,11 @@ bool check_and_add_key(std::string &line_trim, std::vector<atrc::Block> &blocks,
     atrc::Key _key;
     _key.Name = _key_name;
     _key.Value = _key_value;
+    _key.line_number = reus.line_number;
     size_t last_block_index = blocks.size() - 1;
     try {
         blocks[last_block_index].Keys.push_back(_key);
+        _key.enum_value = blocks[last_block_index].Keys.size() - 1;
     } catch (const std::exception &e) {
         std::cerr << "Error adding key: " << e.what() << std::endl;
         atrc::errormsg(ERR_INVALID_KEY_DECL, (int)reus.line_number, _key_name, reus.filename);
@@ -444,7 +539,6 @@ bool check_and_add_variable(std::string &line, std::vector<atrc::Variable> &vari
     atrc::Variable var;
     var.IsPublic = false;
     if(line[0] == '%') var.IsPublic = true;
-    
     size_t equ = line.find('=');
     if(equ == std::string::npos) {
         atrc::errormsg(ERR_INVALID_VAR_DECL, (int)reus.line_number, "", reus.filename);
@@ -461,6 +555,7 @@ bool check_and_add_variable(std::string &line, std::vector<atrc::Variable> &vari
         return false;
     }
     var.Value = line.substr(equ + 1);
+    var.line_number = reus.line_number;
     atrc::ParseLineValueATRCtoSTRING(var.Value, reus, variables);
     variables.push_back(var);
     return true;
@@ -478,6 +573,7 @@ uint32_t check_for_block_declaration(std::string &_curr_block, const std::string
 
 #define ATRC_CONTINUE 1
 #define ATRC_RETURN_FALSE 2
+#define ATRC_RETURN_TRUE 3
 int end_of_life_add(std::vector<atrc::Block> &blocks, std::vector<atrc::Variable> &variables, atrc::REUSABLE &reus, std::string &_line_trim, std::string &_curr_block) {
         // check for variable declaration
         if(_line_trim[0] == '%' || _line_trim.substr(0, 2) == "<%") {
@@ -495,11 +591,21 @@ int end_of_life_add(std::vector<atrc::Block> &blocks, std::vector<atrc::Variable
         }
         // check and add key to block
         check_and_add_key(_line_trim, blocks, reus, variables);
+        return ATRC_RETURN_TRUE;
 }
 
 bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, const std::string &extension, std::vector<atrc::Variable> &variables,std::vector<atrc::Block> &blocks) {
-    blocks.clear();
-    variables.clear();
+
+    // This is used to hold #.INCLUDE files.
+    // Once #.INCLUDE is detected, the file will be read and the variables and blocks will be added to this vector.
+    // And can be used to access the variables and blocks from the included files.
+    std::vector<
+        std::pair<
+            std::vector<atrc::Variable>, 
+            std::vector<atrc::Block>
+        > 
+    > filedatas;
+
     std::vector< std::pair<std::string, std::string> > definitions;
     if(encoding == "" || extension == ""){} // Ignore for now
     std::string filename = _filename;
@@ -547,18 +653,52 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
         || wait_for_new_block
         ) {
             // check if line is a preprocessor directive
-            if(_line_trim[0] == '#' && _line_trim[1] == '.'){
+            if(_line_trim.length() > 1 && (_line_trim[0] == '#' && _line_trim[1] == '.')) {
                 // Handle preprocessor directive
                 PreprocessorBlock _block;
-                PPRes _res = parsePreprocessorFlag(_line_trim.substr(0), _block, filename);
+                PPRes _res = parsePreprocessorFlag(_line_trim.substr(0), _block, REUSABLE, variables);
                 switch(_res){
                     case PPRes::SeeContents: {
-                        if(solved_preprocessor_block) break;
-                        if(_block.isSolved && _block.solvedResult) {
-                            inside_preprocessor_block = true;   // Start reading lines
-                            solved_preprocessor_block = true;   // Block is solved
-                            wait_for_new_block = false;
-                            _preprocessor_blocks.push(_block);
+                        if(_block.flag == ".INCLUDE") {
+                            std::vector<atrc::Variable> _vars = std::vector<atrc::Variable>();
+                            std::vector<atrc::Block> _blocks = std::vector<atrc::Block>();
+                            std::string include_filename = _block.string_data;
+                            if(include_filename.empty()) {
+                                atrc::errormsg(ERR_INVALID_INCLUDE_FILE, (int)REUSABLE.line_number, _line_trim, REUSABLE.filename);
+                                file.close();
+                                return false;
+                            }
+                            if(!std::filesystem::exists(include_filename)) {
+                                atrc::errormsg(ERR_INVALID_INCLUDE_FILE, (int)REUSABLE.line_number, include_filename, REUSABLE.filename);
+                                file.close();
+                                return false;
+                            }
+                            bool include_result = atrc::ParseFile(include_filename, encoding, extension, _vars, _blocks);
+                            filedatas.push_back(std::make_pair(_vars, _blocks));
+                            if(!include_result) {
+                                atrc::errormsg(ERR_INVALID_INCLUDE_FILE, (int)REUSABLE.line_number, include_filename, REUSABLE.filename);
+                                file.close();
+                                return false;
+                            }
+                            // Add variables and blocks from the included file to the main variables and blocks
+                            for (auto var : _vars) {
+                                if(!atrc::VariableContainsVariable(variables, var)) {
+                                    variables.push_back(var);
+                                }
+                            }
+                            for (auto block : _blocks) {
+                                if(!atrc::BlockContainsBlock(blocks, block)) {
+                                    blocks.push_back(block);
+                                }
+                            }
+                        } else {
+                            if(solved_preprocessor_block) break;
+                            if(_block.isSolved && _block.solvedResult) {
+                                inside_preprocessor_block = true;   // Start reading lines
+                                solved_preprocessor_block = true;   // Block is solved
+                                wait_for_new_block = false;
+                                _preprocessor_blocks.push(_block);
+                            }
                         }
                     } break;
                     case PPRes::DontSeeContents: {
@@ -569,9 +709,11 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
                         inside_preprocessor_block = false;
                         solved_preprocessor_block = false;
                         if(_preprocessor_blocks.empty()) {
-                            atrc::errormsg(ERR_INVALID_PREPROCESSOR_SYNTAX, -1, line, filename);
-                            file.close();
-                            return false;
+                            if(_block.flag != ".ENDIF") {
+                                atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, (int)REUSABLE.line_number, _line_trim, REUSABLE.filename);
+                                file.close();
+                                return false;
+                            }
                         }
                     } break;
                     case PPRes::Normal: break;
@@ -601,6 +743,7 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
                         }
                     } break;
                     case PPRes::Message: {
+                        if(wait_for_new_block) break;
                         if(_block.flag == ".LOG")       std::cout << _block.string_data << std::endl;
                         else if(_block.flag == ".SUCCESS")   std::cout << ANSI_COLOR_GREEN << _block.string_data << ANSI_COLOR_RESET << std::endl;
                         else if(_block.flag == ".DEBUG")     std::cout << ANSI_COLOR_CYAN << _block.string_data << ANSI_COLOR_RESET << std::endl;
@@ -609,19 +752,22 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
                         else if(_block.flag == ".ERRORCOUT") std::cout << ANSI_COLOR_RED << _block.string_data << ANSI_COLOR_RESET << std::endl;
                     } break;
                     case PPRes::InvalidFlag: {
-                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, -1, line, filename);
+                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, (int)REUSABLE.line_number, line, REUSABLE.filename);
                         file.close();
                     } return false;
                     case PPRes::InvalidFlagContents: {
-                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS, -1, line, filename);
+                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS, (int)REUSABLE.line_number, line, REUSABLE.filename);
                         file.close();
                     } return false;
                     default : {
-                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, -1, line, filename);
+                        atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG, (int)REUSABLE.line_number, line, REUSABLE.filename);
                         file.close();
                     } return false;
                 }
-            } else if (!wait_for_new_block){ // Inside preprocessor block
+            } else if(_line_trim[0] == '#' && _line_trim[1] != '.'){
+                // Just a plain comment... skip it.
+            }
+            else if (!wait_for_new_block){ // Inside preprocessor block
                 PreprocessorBlock _block = _preprocessor_blocks.top();
                 _block.lines.push_back(_line_trim);
             }
@@ -631,7 +777,6 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
             _ignore_lines--;
             continue;
         }
-
         if(_preprocessor_blocks.size() > 0){
             for(size_t i = 0; i < _preprocessor_blocks.size(); i++){
                 PreprocessorBlock *_block = &_preprocessor_blocks.top();
@@ -647,7 +792,7 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
                             return false;
                         } else if(results == ATRC_CONTINUE) {
                             continue;
-                        }
+                        } else {}
                     }
                 }
                 _preprocessor_blocks.pop(); // pop after processing
@@ -660,7 +805,7 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
             return false;
         } else if(results == ATRC_CONTINUE) {
             continue;
-        }
+        } else {}
     }
     file.close();
     return true;

@@ -1,0 +1,4 @@
+#!ATRC
+# test2.atrc
+#.INCLUDE test3.atrc
+%test2%=LOL

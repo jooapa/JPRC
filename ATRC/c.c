@@ -9,6 +9,19 @@ bool Read(C_PATRC_FD self, const char* path, ReadMode mode) {
     return _ATRC_WRAP_FUNC_1(self, path, mode);
 }
 
+uint64_t GetEnumValue(C_PATRC_FD self, const char* block, const char* key) {
+    for(uint64_t i = 0; i < self->Blocks->BlockCount; i++){
+        if(strcmp(block, self->Blocks->Blocks[i].Name) == 0){
+            for(uint64_t j = 0; j < self->Blocks->Blocks[i].KeyCount; j++){
+                if(strcmp(key, self->Blocks->Blocks[i].Keys[j].Name) == 0){
+                    return self->Blocks->Blocks[i].Keys[j].enum_value;
+                }
+            }
+        }
+    }
+    return 0; // Return 0 if not found
+}
+
 const char* ReadVariable(C_PATRC_FD self, const char* varname) {
     const char* res = "";
     for(uint64_t i = 0; i < self->Variables->VariableCount; i++){

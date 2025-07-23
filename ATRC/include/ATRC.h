@@ -65,6 +65,7 @@ typedef struct C_Variable {
     char *Name;
     char *Value;
     bool IsPublic;
+    uint64_t line_number;
 } C_Variable, *C_PVariable;
 
 typedef struct _C_Variable_Arr {
@@ -75,12 +76,15 @@ typedef struct _C_Variable_Arr {
 typedef struct C_Key {
     char *Name;
     char *Value;
+    uint64_t line_number;
+    uint64_t enum_value;
 } C_Key, *C_PKey;
 
 typedef struct _C_Block {
     char *Name;
     C_Key *Keys;
     uint64_t KeyCount;
+    uint64_t line_number;
 } C_Block, *C_PBlock;
 
 typedef struct _C_Block_Arr {
@@ -116,12 +120,15 @@ ATRC_API bool RemoveKey(C_PATRC_FD self, const char* block, const char* key);
 ATRC_API bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
 ATRC_API bool WriteCommentToBottom(C_PATRC_FD self, const char* comment);
 ATRC_API bool WriteCommentToTop(C_PATRC_FD self, const char* comment);
+ATRC_API uint64_t GetEnumValue(C_PATRC_FD self, const char* block, const char* key);
 
 ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode);
 ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
 ATRC_API void *Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self);
 ATRC_API void *Destroy_ATRC_FD_Variables(C_PATRC_FD self);
 ATRC_API void *Destroy_ATRC_FD(C_PATRC_FD self);
+
+ATRC_API void *ATRC_FREE_MEMORY(void *ptr);
 
 #ifdef __cplusplus
 } // extern "C"
@@ -137,17 +144,21 @@ typedef struct ATRC_API _Variable {
     std::string Name;
     std::string Value;
     bool IsPublic = true;
+    uint64_t line_number;
 } Variable, * PVariable;
 
 typedef struct ATRC_API _Key {
     std::string Name;
     std::string Value;
+    uint64_t line_number;
+    uint64_t enum_value;
 } Key, * PKey;
 
 
 typedef struct ATRC_API _Block {
     std::string Name;
     std::vector<Key> Keys;
+    uint64_t line_number;
 } Block, * PBlock;
 
 class ATRC_API PROXY_ATRC_FD;
@@ -180,6 +191,8 @@ public:
     bool WriteCommentToTop(const std::string& comment);
     bool WriteCommentToBottom(const std::string& comment);
     C_PATRC_FD ToCStruct();
+
+    uint64_t GetEnumValue(const std::string& block, const std::string& key);
 
     bool CheckStatus();
 
@@ -233,12 +246,16 @@ private:
 
 
 
+
+/*+++
+Start of ATRC standard library
+Namespace: atrc_std
+---*/
+
 #ifdef __cplusplus
 } // namespace atrc
 namespace atrc_std {
 #endif // __cplusplus
-
-
 /*
 Inject macro for C
 USAGE:
@@ -297,6 +314,7 @@ enum ATRC_ERR {
 };
 
 extern uint64_t atrc_stdlib_errval;
+extern bool atrc_stdlib_writecheck;
 
 #ifdef __cplusplus
 ATRC_API std::vector<std::string> atrc_to_vector(char separator, const std::string &value);
@@ -320,6 +338,7 @@ ATRC_API int64_t atrc_to_int64_t(const char* value);
 
 ATRC_API double atrc_to_double(const char* value);
 
+ATRC_API double atrc_math_exp(const char* value);
 
 #ifdef __cplusplus
 #   if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
