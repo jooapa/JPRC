@@ -52,6 +52,8 @@ Bright White    97  107
 #define ERR_INVALID_SAVE_ACTION         116
 #define ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS 117
 #define ERR_INVALID_INCLUDE_FILE        118
+#define ERR_INVALID_RAW_STRING          119
+
 // File
 #define ERR_CLASS_READER                200
 
@@ -167,10 +169,26 @@ typedef struct _REUSABLE {
     std::string filename;
 } REUSABLE, * P_REUSABLE;
 
+
+#define RAW_STR_VAR 0
+#define RAW_STR_KEY 1
+#define RAW_STR_NONE 2
+
+#define RAW_STR_ACTIVE 1
+#define RAW_STR_INACTIVE 0
+#define CREATE_RAW_STRING 2
+typedef struct RAW_STRING {
+    std::string content = "";
+    int is_active = RAW_STR_INACTIVE;
+    int type = RAW_STR_NONE;
+} RAW_STRING, * P_RAW_STRING;
+
+
 void ParseLineValueATRCtoSTRING(
     std::string& line, 
     const REUSABLE &reus,
-    const std::vector<atrc::Variable> &variables
+    const std::vector<atrc::Variable> &variables,
+    RAW_STRING &raw_str
 );
 
 ATRC_API void _W_Save_(
@@ -299,6 +317,10 @@ inline void errormsg(int err_num=-1,
     std::string msg = "";
     int err_class = -1;
     switch(err_num){
+        case ERR_INVALID_RAW_STRING:
+            msg = "Invalid raw string at or close to: '" + var_name + "' at line " + linecheck(line_number);
+            err_class = ERR_CLASS_FILEHANDLER;
+            break;
         case ERR_INVALID_INCLUDE_FILE:
             msg = "Invalid include file: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;

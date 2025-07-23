@@ -121,6 +121,9 @@ enum class PPRes {
     ThreeParts,         // .FLAG=<var>=<value>
     Undefine,           // .UNDEF <var>
     Message,            // .LOG, .WARNING, .ERROR...
+
+    SR,              // Start raw string
+    ER,              // End raw string
 };
 
 /*
@@ -141,6 +144,9 @@ enum class PPRes {
     ".DEBUG",   // Debug message    -> .DEBUG <message>         // Logs to stdout, cyan
     
     ".IGNORE",  // Ignore n lines   -> .IGNORE <n>
+
+    ".SR",      // Raw string       -> .R
+    ".ER"
 
     Operating systems
     "LINUX",
@@ -175,12 +181,12 @@ const std::unordered_set<std::string> PREPROCESSOR_FLAGS = {
     ".IF", ".ELSEIF", ".ELSE", ".ENDIF", 
     ".DEFINE", ".UNDEF", ".INCLUDE",
     ".LOG", ".WARNING", ".ERROR", ".ERRORCOUT", ".SUCCESS", ".DEBUG",
-    ".IGNORE"
+    ".IGNORE", ".SR", ".ER"
 };
 const std::unordered_set<std::string> PREPROCESSOR_TAGS = {
     "LINUX", "WINDOWS", "MACOS", "UNIX", 
     "X86", "X64", "ARM", "ARM64", 
-    "AND", "OR", "NOT", "EQU", "NEQ", "GT", "LT", "GTE", "LTE"
+    "AND", "OR", "NOT", "EQU", "NEQ", "GT", "LT", "GTE", "LTE",
 };
 
 // Struct: Preprocessor block metadata
@@ -237,6 +243,31 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
     
     // Extract and process flag contents
     block.flag_contents = atrc::trim_copy(lineCopy.substr(spacePos + 1));
+    if(block.flag == ".SR") {
+        block.flag_contents = atrc::trim_copy(block.flag_contents);
+        if(block.flag_contents.empty()) {
+            atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS, (int)reus.line_number, line, reus.filename);
+            return PPRes::InvalidFlagContents;
+        }
+        if(block.flag_contents == "KEY") {
+            block.var_name = "KEY";
+            block.numeral_data = RAW_STR_KEY;
+        } else if(block.flag_contents == "VAR") {
+            block.var_name = "VAR";
+            block.numeral_data = RAW_STR_VAR;
+        } else {
+            atrc::errormsg(ERR_INVALID_PREPROCESSOR_FLAG_CONTENTS, (int)reus.line_number, line, reus.filename);
+            return PPRes::InvalidFlagContents;
+        }
+        block.isSolved = true;
+        block.solvedResult = true;
+        return PPRes::SR; // Raw string start
+    } else if(block.flag == ".ER") {
+        block.isSolved = true;
+        block.solvedResult = true;
+        return PPRes::ER; // Raw string end
+    }
+    
     if(block.flag == ".INCLUDE") {
         block.flag_contents = atrc::trim_copy(block.flag_contents);
         block.string_data = block.flag_contents;
@@ -438,8 +469,10 @@ void _W_ParseLineValueATRCtoSTRING(std::string& line, const atrc::REUSABLE &reus
 
     line = _value;
 }
-void atrc::ParseLineValueATRCtoSTRING(std::string& line, const atrc::REUSABLE &reus, const std::vector<atrc::Variable> &variables) {
-    _W_ParseLineValueATRCtoSTRING(line, reus, variables);
+void atrc::ParseLineValueATRCtoSTRING(std::string& line, const atrc::REUSABLE &reus, const std::vector<atrc::Variable> &variables, RAW_STRING &raw_str) {
+    if(raw_str.is_active == RAW_STR_INACTIVE || raw_str.is_active == RAW_STR_ACTIVE) {
+        _W_ParseLineValueATRCtoSTRING(line, reus, variables);
+    }
 }
 
 std::string atrc::ParseLineSTRINGtoATRC(const std::string &line) {
@@ -502,7 +535,7 @@ bool check_and_add_block(std::string &curr_block, std::vector<atrc::Block> &bloc
     }
     return true;
 }
-bool check_and_add_key(std::string &line_trim, std::vector<atrc::Block> &blocks, atrc::REUSABLE &reus, std::vector<atrc::Variable> &vars){
+bool check_and_add_key(std::string &line_trim, std::vector<atrc::Block> &blocks, atrc::REUSABLE &reus, std::vector<atrc::Variable> &vars, atrc::RAW_STRING &raw_str){
     for(auto &block : blocks) {
         if(block.Name == line_trim) {
             atrc::errormsg(ERR_REREFERENCED_KEY, (int)reus.line_number, block.Name, reus.filename);
@@ -519,7 +552,9 @@ bool check_and_add_key(std::string &line_trim, std::vector<atrc::Block> &blocks,
     _key_name = line_trim.substr(0, _equ_pos);
     atrc::trim(_key_name);
     _key_value = line_trim.substr(_equ_pos + 1);
-    atrc::ParseLineValueATRCtoSTRING(_key_value, reus, vars);
+    if(raw_str.is_active == CREATE_RAW_STRING) {
+        atrc::ParseLineValueATRCtoSTRING(_key_value, reus, vars, raw_str);
+    }
     atrc::Key _key;
     _key.Name = _key_name;
     _key.Value = _key_value;
@@ -535,7 +570,7 @@ bool check_and_add_key(std::string &line_trim, std::vector<atrc::Block> &blocks,
     }
     return true;
 }
-bool check_and_add_variable(std::string &line, std::vector<atrc::Variable> &variables, atrc::REUSABLE &reus){
+bool check_and_add_variable(std::string &line, std::vector<atrc::Variable> &variables, atrc::REUSABLE &reus, atrc::RAW_STRING &raw_str){
     atrc::Variable var;
     var.IsPublic = false;
     if(line[0] == '%') var.IsPublic = true;
@@ -556,7 +591,9 @@ bool check_and_add_variable(std::string &line, std::vector<atrc::Variable> &vari
     }
     var.Value = line.substr(equ + 1);
     var.line_number = reus.line_number;
-    atrc::ParseLineValueATRCtoSTRING(var.Value, reus, variables);
+    if(raw_str.is_active != CREATE_RAW_STRING) {
+        atrc::ParseLineValueATRCtoSTRING(var.Value, reus, variables, raw_str);
+    }
     variables.push_back(var);
     return true;
 }
@@ -574,10 +611,10 @@ uint32_t check_for_block_declaration(std::string &_curr_block, const std::string
 #define ATRC_CONTINUE 1
 #define ATRC_RETURN_FALSE 2
 #define ATRC_RETURN_TRUE 3
-int end_of_life_add(std::vector<atrc::Block> &blocks, std::vector<atrc::Variable> &variables, atrc::REUSABLE &reus, std::string &_line_trim, std::string &_curr_block) {
+int end_of_life_add(std::vector<atrc::Block> &blocks, std::vector<atrc::Variable> &variables, atrc::REUSABLE &reus, std::string &_line_trim, std::string &_curr_block, atrc::RAW_STRING &raw_str) {
         // check for variable declaration
         if(_line_trim[0] == '%' || _line_trim.substr(0, 2) == "<%") {
-            check_and_add_variable(_line_trim, variables, reus);
+            check_and_add_variable(_line_trim, variables, reus, raw_str);
             return ATRC_CONTINUE;
         }
         // check for block declaration
@@ -590,7 +627,7 @@ int end_of_life_add(std::vector<atrc::Block> &blocks, std::vector<atrc::Variable
             return ATRC_CONTINUE;
         }
         // check and add key to block
-        check_and_add_key(_line_trim, blocks, reus, variables);
+        check_and_add_key(_line_trim, blocks, reus, variables, raw_str);
         return ATRC_RETURN_TRUE;
 }
 
@@ -619,7 +656,7 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
         file.close();
         return false;
     }
-
+    atrc::RAW_STRING raw_str;
     atrc::REUSABLE REUSABLE;
     REUSABLE.line_number = 0;
     REUSABLE.filename = filename;
@@ -658,6 +695,36 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
                 PreprocessorBlock _block;
                 PPRes _res = parsePreprocessorFlag(_line_trim.substr(0), _block, REUSABLE, variables);
                 switch(_res){
+                    case PPRes::SR:
+                        raw_str.is_active = CREATE_RAW_STRING; // Start raw string
+                        raw_str.type = (int)_block.numeral_data; // Set type to RAW_STR_KEY or RAW_STR_VAR
+                        raw_str.content = ""; // Reset content
+                        break;
+                    case PPRes::ER: 
+                        if(raw_str.type == RAW_STR_KEY) {
+                            blocks.back().Keys.back().Value += "\n" + raw_str.content;
+                            // Remove the last newline character if it exists
+                            if(!blocks.back().Keys.back().Value.empty() && blocks.back().Keys.back().Value.back() == '\n')
+                                blocks.back().Keys.back().Value.pop_back();
+                            
+                            atrc::ParseLineValueATRCtoSTRING(blocks.back().Keys.back().Value, REUSABLE, variables, raw_str);
+                        } else if(raw_str.type == RAW_STR_VAR) {
+                            variables.back().Value += "\n" + raw_str.content;
+
+                            // Remove the last newline character if it exists
+                            if(!variables.back().Value.empty() && variables.back().Value.back() == '\n')
+                                variables.back().Value.pop_back();
+
+                            atrc::ParseLineValueATRCtoSTRING(variables.back().Value, REUSABLE, variables, raw_str);
+                        } else {
+                            atrc::errormsg(ERR_INVALID_RAW_STRING, (int)REUSABLE.line_number, _line_trim, REUSABLE.filename);
+                            file.close();
+                            return false;
+                        }
+                    raw_str.is_active = RAW_STR_INACTIVE; // End raw string
+                        raw_str.type = RAW_STR_NONE;
+                        raw_str.content = "";
+                        break;
                     case PPRes::SeeContents: {
                         if(_block.flag == ".INCLUDE") {
                             std::vector<atrc::Variable> _vars = std::vector<atrc::Variable>();
@@ -786,7 +853,7 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
                 ) {
                     for (std::string &line : _block->lines) {
                         atrc::trim(line);
-                        int results = end_of_life_add(blocks, variables, REUSABLE, line, _curr_block);
+                        int results = end_of_life_add(blocks, variables, REUSABLE, line, _curr_block, raw_str);
                         if(results == ATRC_RETURN_FALSE) {
                             file.close();
                             return false;
@@ -799,7 +866,18 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
             }
         }
 
-        int results = end_of_life_add(blocks, variables, REUSABLE, line, _curr_block);
+        if(raw_str.is_active == CREATE_RAW_STRING || raw_str.is_active == RAW_STR_ACTIVE) {
+            if(raw_str.is_active != CREATE_RAW_STRING) {
+                if(_line_trim.empty()) {
+                    continue; // skip empty lines
+                }
+                raw_str.content += line + "\n";
+                continue;
+            }
+        }
+
+        int results = end_of_life_add(blocks, variables, REUSABLE, line, _curr_block, raw_str);
+        if(raw_str.is_active == CREATE_RAW_STRING) raw_str.is_active = RAW_STR_ACTIVE;
         if(results == ATRC_RETURN_FALSE) {
             file.close();
             return false;
@@ -1096,7 +1174,7 @@ void atrc::_W_Save_(ATRC_FD *filedata, const atrc::ATRC_SAVE &action, const int 
     } break;
     case atrc::ATRC_SAVE::WRITE_COMMENT_TO_BOTTOM: {
         // Added to the bottom of the file
-        std::string comment = xtra_info2;
+        std::string comment = "#" + xtra_info2;
         while(std::getline(file, line)){
             final_data += line + "\n";
         }
@@ -1106,7 +1184,7 @@ void atrc::_W_Save_(ATRC_FD *filedata, const atrc::ATRC_SAVE &action, const int 
     } break;
     case atrc::ATRC_SAVE::WRITE_COMMENT_TO_TOP: {
         // Added to the top of the file
-        std::string comment = xtra_info2;
+        std::string comment = "#" + xtra_info2;
         add_to_top_of_file(comment, final_data, {}, file, ln_num);
         file.close();
         save_final_data(filedata->GetFilename(), final_data);

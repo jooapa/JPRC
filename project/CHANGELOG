@@ -14,7 +14,7 @@ Preprocessor directives                                 2.3.0   DONE
 .IGNORE <rows> IGNORES amount of rows during parsing    2.3.0   DONE
 Preprocessor: %var% EQU <value>                         2.3.0   DONE
 Preprocessor directives: EQU, NEQ, GT, LT, GTE, LTE     2.3.0   DONE
-
+Preprocessor -> Raw string SR <KEY|VAR>, ER             2.3.0   WIP
 Add enums                                               2.3.0   DONE
 
 GetVariables -> Return list without private variables   2.3.0   DONE

@@ -1,91 +1,180 @@
-# ATRC resource/configuration file library for C/C++
+# ATRC - Advanced Tagged Resource Configuration Library
 
-Configuration file library made with C++17, with a wrapper for C
+ATRC is a robust **C++17 configuration library** with **full C compatibility**, designed for high-performance applications, game engines, and modular systems.
 
-## Documentation
+� **[Full Documentation](https://antonako1.github.io/ATRC/docs/index.html)**
 
-See [.\docs\index.html](https://antonako1.github.io/ATRC/docs/index.html)
+---
 
-## Use with CMake
+## 🔥 Key Features
 
-```cmake
-project(MyProject VERSION 1.0 LANGUAGES CXX)
+- **Dual Language Support**: Full-featured C++ API with C fallback interface
+- **Smart Preprocessor**: Conditional logic, file inclusion, platform detection
+- **Dynamic Variables**: Runtime variable injection and substitution
+- **Cross-Platform**: Windows and Linux support with architecture detection
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+---
 
-add_executable(MyProject "main.cpp")
+## 🚀 Quick Start
 
-set(LIBS_DIR "${CMAKE_SOURCE_DIR}/libs")
-
-# Add ATRC
-set(ATRC_DIR "path/to/ATRC-2.3.0/Include")
-find_package(ATRC REQUIRED)
-target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
-target_include_directories(MyProject PRIVATE ${ATRC_INCLUDE_DIR})
-```
-
-## Example program in C++
+### Basic Usage
 
 ```cpp
 #include <ATRC.h>
 
 int main() {
-    std::cout << "ATRC Test Application" << std::endl;
-    ATRC_FD fd = ATRC_FD("./test.atrc", ReadMode::ATRC_READ_ONLY);
-    if (!fd.CheckStatus()) {
-        std::cerr << "Failed to read ATRC file. Please check the file path and format." << std::endl;
-        return 1;
-    }
-    fd.SetAutoSave(true);
-    fd.SetWriteCheck(true);
+    atrc::ATRC_FD fd("./config.atrc", ATRC_READ_ONLY);
+    if (!fd.CheckStatus()) return 1;
 
-    std::cout << "Running C++ tests" << std::endl;
-    
-    fd.AddBlock("TestBlock");
-    fd.AddKey("TestBlock", "TestKey", "TestValue");
+    fd.AddVariable("Project", "ATRC");
+    fd.AddBlock("Settings");
+    fd.AddKey("Settings", "Version", "2.3.0");
 
-    fd.AddBlock("AnotherBlock");
-    fd.AddKey("AnotherBlock", "AnotherKey", "AnotherValue");
-    fd.AddKey("AnotherBlock", "AnotherKey2", "AnotherValue");
-
-    fd.RemoveBlock("TestBlock");
-    fd.RemoveBlock("AnotherBlock");
-
-    fd.AddVariable("TestVariable", "TestValue");
-    std::cout << fd["TestVariable"]["TestValue"] << std::endl;
-    return 0;
+    std::cout << fd["Project"] << std::endl;             // → "ATRC"
+    std::cout << fd["Settings"]["Version"] << std::endl; // → "2.3.0"
 }
 ```
 
-## Example resource file
+### Configuration Example
 
 ```ini
 #!ATRC
-# Example resource file
-%username%=admin                # Define username
-%domain%=atrc.com               # Define domain
-%email%=%username%@%domain%     # Define email. Outputs: "admin@atrc.com"
-[SystemData]                    # Define block
+%user%=admin
+%env%=production
+
+[ServerConfig]
 #.IF WINDOWS
-CurrentOperatingSystem=Windows  # User machine: Windows
-#.ELIF LINUX OR UNIX
-CurrentOperatingSystem=Linux    # User machine: Linux or Unix
+Platform=Windows
 #.ELSE
-#.ERROR Undefined platform      # Logs error message: "Undefined platform"
+Platform=Unix
 #.ENDIF
-WelcomeMessage=Hi %username%, loading at: %*%\%&    # Once injected, outputs: "Hi admin, loading at: 50% " 
+
+Host=%user%@server.com
+Environment=%env%
 ```
 
-## Building & Running
+### Advanced Features
 
-Build and run with CMake. See cmake\README.md or run ready-made scripts
+#### File Inclusion & Variable Injection
+```ini
+#!ATRC
+# Include global definitions
+#.INCLUDE globals.atrc
 
-```cmd
-.\vs_run.bat :: See usage
-.\scripts\run_tests.bat
-
-# Create release package
-# Requires: WSL2 debian, 7z, Windows build tools and Strawberry Perl
-.\scripts\build_and_package.bat
+[Injection Example]
+Inject1=Inject values from left to right with: %*%, %*%, %*%
+Inject2=Inject values in defined order: %*2%, %*0%, %*1%
 ```
+
+```cpp
+// Variable injection in C++
+std::string result = fd.InsertVar_S(fd["Injection Example"]["Inject1"], {"first", "second", "third"});
+// Result: "Inject values from left to right with: first, second, third"
+
+std::string ordered = fd.InsertVar_S(fd["Injection Example"]["Inject2"], {"A", "B", "C"});
+// Result: "Inject values in defined order: C, A, B"
+```
+
+#### Enums & Raw Strings
+```ini
+#!ATRC
+[EnumExample]
+Key=Value       # Once read with ATRC_FD::GetEnumValue(), it will return 0
+
+[RawStringExample]
+# Use VAR when creating a raw string value for a variable
+#.SR VAR
+%RawVar%=Raw
+STRING!
+#.ER
+
+# Use KEY when creating a raw string value for a key
+#.SR KEY
+RawString=This
+is
+a
+raw string!
+#.ER
+```
+
+```cpp
+// Using enums and raw strings
+int enumVal = fd.GetEnumValue("EnumExample", "Key");  // Returns 0
+std::string raw = fd["RawStringExample"]["RawString"]; // Multi-line string preserved
+```
+
+---
+
+## ⚙️ CMake Integration
+
+```cmake
+project(MyProject VERSION 1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+add_executable(MyProject "main.cpp")
+
+# Add ATRC
+set(ATRC_DIR "path/to/ATRC-2.3.0")
+find_package(ATRC REQUIRED)
+target_include_directories(MyProject PRIVATE ${ATRC_INCLUDE_DIR})
+target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
+```
+
+---
+
+## 🛠️ Build & Test
+
+```bat
+.\vs_run.bat                    # Open in Visual Studio
+.\scripts\run_test.bat          # Run tests
+.\scripts\build_and_package.bat # Create distributable zip
+```
+
+---
+
+## 📦 File Format
+
+ATRC files support:
+
+* **Variables**: `%key%=value` - Global runtime variables
+* **Blocks**: `[Name]` - Configuration sections
+* **Keys**: `Key=Value` - Settings within blocks
+* **Comments**: `# Comment` - Documentation
+* **Preprocessor**: `#.IF`, `#.INCLUDE`, etc. - Conditional logic
+
+---
+
+## 🧰 API Overview
+
+| C++ Class/Function         | C Equivalent                     |
+| -------------------------- | -------------------------------- |
+| `atrc::ATRC_FD`            | `C_ATRC_FD`                      |
+| `Block`, `Key`, `Variable` | `C_Block`, `C_Key`, `C_Variable` |
+
+### Utility Functions
+
+| Function             | Description                    |
+| -------------------- | ------------------------------ |
+| `atrc_to_list()`     | Splits value into string list  |
+| `atrc_to_bool()`     | Converts to `true/false`       |
+| `atrc_to_uint64_t()` | Parses to `uint64_t`           |
+| `atrc_to_double()`   | Parses to `double`             |
+| `atrc_math_exp()`    | Evaluates math expressions     |
+
+See the **[Full Documentation](https://antonako1.github.io/ATRC/docs/index.html)** for more and detailed information
+
+---
+
+## 🖥️ Supported Platforms
+
+* ✅ Windows (x86, x64)
+* ✅ Linux (x86, x64)
+
+---
+
+## 📄 License
+
+ATRC is open-source under the [BSD-2-Clause license](LICENSE.txt).
+
+Created by [Antonako](https://github.com/antonako1)
+
