@@ -42,6 +42,7 @@ void cpp_main(void)
     std::cout << fd["test3"] << std::endl << std::endl;
     std::cout << fd["raw_string"] << std::endl << std::endl;
     std::cout << fd["TESTBLOCK"]["TESTKEY"] << std::endl;
+    std::cout << fd.GetEnumValue("PremadeBlock", "PremadeValue") << std::endl;
     std::cout << "Test completed successfully." << std::endl;
     fd.WriteCommentToTop("This is a comment at the top of the file.");
     fd.WriteCommentToBottom("This is a comment at the bottom of the file.");

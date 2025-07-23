@@ -10,13 +10,10 @@ c
 #.ER
 
 [TESTBLOCK]
+
 #.SR KEY
 TESTKEY=jooa
 on 
 jonne
+TESTKEY31=jooa
 #.ER
-
-
-
-
-

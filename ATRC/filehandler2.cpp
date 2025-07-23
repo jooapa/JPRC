@@ -564,7 +564,6 @@ bool check_and_add_key(std::string &line_trim, std::vector<atrc::Block> &blocks,
         blocks[last_block_index].Keys.push_back(_key);
         _key.enum_value = blocks[last_block_index].Keys.size() - 1;
     } catch (const std::exception &e) {
-        std::cerr << "Error adding key: " << e.what() << std::endl;
         atrc::errormsg(ERR_INVALID_KEY_DECL, (int)reus.line_number, _key_name, reus.filename);
         return false;
     }

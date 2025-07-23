@@ -3,7 +3,7 @@
 # Summary of Exported Variables
 # -----------------------------
 # ATRC_FOUND              : Boolean indicating if the ATRC package is found.
-# ATRC_VERSION            : The version of the ATRC package (e.g., 2.2.0).
+# ATRC_VERSION            : The version of the ATRC package (e.g., 2.3.0).
 # ATRC_INCLUDE_DIR        : Path to the ATRC include directory.
 # ATRC_LIB_DEBUG          : Full path to the debug version of the ATRC library.
 # ATRC_LIB_RELEASE        : Full path to the release version of the ATRC library.
@@ -80,7 +80,7 @@ set(ATRC_DOCS_FILES
 
 # Export variables for consuming projects
 set(ATRC_FOUND          TRUE)
-set(ATRC_VERSION        2.2.0)
+set(ATRC_VERSION        2.3.0)
 set(ATRC_INCLUDE_DIR    ${ATRC_INCLUDE_DIR})
 set(ATRC_LIB_DEBUG      ${ATRC_LIB_DEBUG_PATH})
 set(ATRC_LIB_RELEASE    ${ATRC_LIB_RELEASE_PATH})

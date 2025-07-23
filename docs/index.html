@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ATRC C-CPP Documentation">
+    <title>ATRC C-CPP Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header id="header">
+        <h1>
+            ATRC - Advanced Tagged Resource Configuration Library
+        </h1>
+        <p>A robust C++17 configuration library with full C compatibility, designed for high-performance applications, game engines, and modular systems.</p>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="index.htm">Home</a></li>
+            <li><a href="installation_guide.htm">Installation guide</a></li>
+            <li><a href="api_reference.htm">API reference</a></li>
+            <li><a href="https://github.com/Antonako1/ATRC" target="_blank">GitHub Project</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Welcome to the ATRC Documentation</h2>
+        <p>
+            This documentation provides everything you need to integrate, install, and utilize the ATRC library for your C and C++ projects. ATRC offers advanced configuration management with smart preprocessing, dynamic variable injection, and cross-platform support.
+        </p>
+        <div class="btn-group">
+            <a href="installation_guide.htm">Get Started</a>
+            <a href="api_reference.htm">View API Reference</a>
+            <a href="https://github.com/Antonako1/ATRC" target="_blank">Visit GitHub</a>
+        </div>
+        
+        <section>
+            <h2>Key Features</h2>
+            <ul>
+                <li><strong>Dual Language Support</strong>: Full-featured C++ API with C fallback interface</li>
+                <li><strong>Smart Preprocessor</strong>: Conditional logic, file inclusion, platform detection</li>
+                <li><strong>Dynamic Variables</strong>: Runtime variable injection and substitution</li>
+                <li><strong>Cross-Platform</strong>: Windows and Linux support with architecture detection</li>
+                <li><strong>Advanced Features</strong>: Enums, raw strings, ordered injection, and more</li>
+                <li><strong>Lightweight and efficient</strong>: Designed for high-performance applications</li>
+                <li><strong>Open source and free to use</strong>: BSD-2-Clause license</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>About ATRC</h2>
+            <p>
+                ATRC is a powerful configuration library that goes beyond simple key-value parsing. It features a smart preprocessor with conditional logic, file inclusion capabilities, and dynamic variable injection. Whether you're building game engines, multimedia applications, or any software requiring sophisticated configuration management, ATRC provides the tools you need. The library supports both C++17 and C interfaces, making it suitable for modern applications while maintaining compatibility with legacy systems. With features like platform detection, architecture awareness, and advanced string handling including raw strings and enums, ATRC adapts to your project's specific requirements.
+            </p>
+        </section>
+
+        <section>
+            <h2>Example Configuration File</h2>
+<pre><code>#!ATRC
+# Include global definitions
+#.INCLUDE globals.atrc
+
+# Global variables
+%user%=admin
+%env%=production
+
+# Platform detection
+#.IF WINDOWS
+Platform=Windows
+#.ELSE
+Platform=Unix
+#.ENDIF
+
+[ServerConfig]
+Host=%user%@server.com
+Environment=%env%
+
+[Injection Example]
+# Left-to-right injection
+Inject1=Values: %*%, %*%, %*%
+# Ordered injection: 0=A, 1=B, 2=C → displays C, A, B
+Inject2=Ordered: %*2%, %*0%, %*1%
+
+[EnumExample]
+Status=Active    # GetEnumValue() returns 0 for first occurrence
+
+[RawStringExample]
+#.SR KEY
+MultiLineConfig=This is a
+multi-line configuration
+that preserves formatting!
+#.ER</code></pre>
+        </section>
+
+        <section>
+            <h2>Example C++ Program</h2>
+<pre><code>// MAIN.CPP
+#include &lt;iostream&gt;
+#include &lt;ATRC.h&gt;
+
+int main() {
+    atrc::ATRC_FD fd("./config.atrc", ATRC_READ_ONLY);
+    
+    if (!fd.CheckStatus()) {
+        std::cout &lt;&lt; "File parsed unsuccessfully!" &lt;&lt; std::endl;
+        return 1;
+    }
+
+    // Access variables and keys
+    std::cout &lt;&lt; "User: " &lt;&lt; fd["user"] &lt;&lt; std::endl;
+    std::cout &lt;&lt; "Host: " &lt;&lt; fd["ServerConfig"]["Host"] &lt;&lt; std::endl;
+
+    // Variable injection example
+    std::string template_str = fd["Injection Example"]["Inject1"];
+    std::vector&lt;std::string&gt; values = {"first", "second", "third"};
+    std::string result = fd.InsertVar_S(template_str, values);
+    std::cout &lt;&lt; "Injected: " &lt;&lt; result &lt;&lt; std::endl;
+
+    // Enum example
+    int enumVal = fd.GetEnumValue("EnumExample", "Status");
+    std::cout &lt;&lt; "Enum value: " &lt;&lt; enumVal &lt;&lt; std::endl; // Returns 0
+
+    // Raw string example
+    std::string multiLine = fd["RawStringExample"]["MultiLineConfig"];
+    std::cout &lt;&lt; "Raw string:\n" &lt;&lt; multiLine &lt;&lt; std::endl;
+    
+    return 0;
+}</code></pre>
+        </section>
+        <section>
+            <h2>Example C Program</h2>
+<pre><code>// MAIN.C
+#include "ATRC.h"
+#include &lt;stdio.h&gt;
+
+int main() {
+    C_PATRC_FD filedata = Create_Empty_ATRC_FD();
+    if (filedata == NULL) {
+        printf("[FAIL] Create_Empty_ATRC_FD: Failed to create ATRC_FD\n");
+        return 1;
+    }
+
+    if (!Read(filedata, "config.atrc", ATRC_READ_ONLY)) {
+        printf("[FAIL] Read: Failed to read file 'config.atrc'\n");
+        Destroy_ATRC_FD(filedata);
+        return 1;
+    }
+
+    // Read variables
+    const char* user = ReadVariable(filedata, "user");
+    if (user != NULL) {
+        printf("[PASS] User: %s\n", user);
+    }
+
+    // Read block keys
+    const char* host = ReadKey(filedata, "ServerConfig", "Host");
+    if (host != NULL) {
+        printf("[PASS] Host: %s\n", host);
+    }
+
+    // Add new configuration
+    if (AddBlock(filedata, "NewSection")) {
+        printf("[PASS] AddBlock: Section added successfully\n");
+        
+        if (AddKey(filedata, "NewSection", "Setting", "Value")) {
+            printf("[PASS] AddKey: Key added successfully\n");
+        }
+    }
+
+    // Check existence
+    if (DoesExistBlock(filedata, "ServerConfig")) {
+        printf("[PASS] ServerConfig block exists\n");
+    }
+
+    Destroy_ATRC_FD(filedata);
+    return 0;
+}</code></pre>
+        </section>
+    </main>
+    <div id="back_to_top">
+        <a href="#header">Back to top</a>
+    </div>
+    <footer>
+        <p>&copy; 2024-2025 Antonako1</p>
+    </footer>
+</body>
+</html>
