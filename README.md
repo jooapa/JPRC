@@ -176,5 +176,5 @@ See the **[Full Documentation](https://antonako1.github.io/ATRC/docs/index.html)
 
 ATRC is open-source under the [BSD-2-Clause license](LICENSE.txt).
 
-Created by [Antonako](https://github.com/antonako1)
+Created by [Antonako1](https://github.com/antonako1)
 
