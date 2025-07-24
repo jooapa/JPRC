@@ -2,7 +2,7 @@
 
 ATRC is a robust **C++17 configuration library** with **full C compatibility**, designed for high-performance applications, game engines, and modular systems.
 
-� **[Full Documentation](https://antonako1.github.io/ATRC/docs/index.html)**
+� **[Full Documentation](https://github.com/Antonako1/ATRC/blob/main/docs/syntax.md)**
 
 ---
 
@@ -161,7 +161,7 @@ ATRC files support:
 | `atrc_to_double()`   | Parses to `double`             |
 | `atrc_math_exp()`    | Evaluates math expressions     |
 
-See the **[Full Documentation](https://antonako1.github.io/ATRC/docs/index.html)** for more and detailed information
+See the **[Full Documentation](https://github.com/Antonako1/ATRC/blob/main/docs/syntax.md)** for more and detailed information
 
 ---
 
