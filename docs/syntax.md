@@ -68,8 +68,78 @@ Inject markings are denoted in two of the following ways
 First row in the resource file should be `#!ATRC`, thus denoting the file as an ATRC file and the extension can be freely choosed.
 
 ## Variables
+
+Variables are global, constant values and can be accessed everywhere in the file, after defining one
+
+
+### Defining a variable
+
+`[<]%{NAME}%=value`
+
+The name CANNOT hold a `*`
+
+#### Public variable
+
+`%PublicVariable%=Value`
+
+Public variables are defined as shown above. 
+These can be read via the ATRC api and their values will be assigned inside the atrc file. 
+
+#### Private variable
+
+`<%PrivateVariable%=Value`
+
+Private variables are defined with a ´<´ before the variable. 
+These CANNOT be read via the ATRC api, but their values will be assigned inside the atrc file.   
+
+### Example
+
+```ini
+#!ATRC
+<%PrivateVariable%=First value
+%PublicVariable%=Another value
+
+%CombinedValues%=%PrivateVariable%, %PublicVariable%
+[TestBlock]
+CombinedValues=%PrivateVariable%, %PublicVariable%
+```
+
 ## Blocks
+
+Blocks are used to hold key-value pairs
+
+### Defining
+
+`[BlockName]`
+
+### Example
+
+```ini
+#!ATRC
+[ExampleBlock1]
+key=value
+[ExampleBlock2]
+key=value
+```
+
 ## Keys
+
+Keys are constant values that are saved inside a block.
+
+### Defining
+
+`name=value` 
+
+### Example
+
+```ini
+[TestBlock]
+key=value
+[TestBlock2]
+key=value
+```
+
+
 ## Comments
 There are two different ways of making comments/remarks in a file. 
 First one is with the comment character: `#`. 
@@ -87,17 +157,3 @@ These following
 are ignored
 by the parser
 ```
-
-
-## Preprocessor directives
-
-### Conditional Logic
-### File Inclusion
-### Platform Detection
-### Raw Strings
-### Miscellaneous
-
-## Advanced Features
-
-### Variable Injection
-### Enums
