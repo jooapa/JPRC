@@ -154,17 +154,17 @@ Expression string can hold the following values:
  - LOG2E
  - LOG10E
  - +, -, *, /, %, (, )
- - ^<val> (Power to)
- - SQRT(<val>)
- - ABS(<val>)
- - LOG(<val>)
- - LOG10(<val>)
- - SIN(<val>)
- - COS(<val>)
- - TAN(<val>)
- - ASIN(<val>)
- - ACOS(<val>)
- - ATAN(<val>)
+ - ^{val} (Power to)
+ - SQRT({val})
+ - ABS({val})
+ - LOG({val})
+ - LOG10({val})
+ - SIN({val})
+ - COS({val})
+ - TAN({val})
+ - ASIN({val})
+ - ACOS({val})
+ - ATAN({val})
 
 ```cpp
 ATRC_API double atrc_math_exp(const char* value);
