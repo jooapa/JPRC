@@ -45,9 +45,10 @@ C# binding                                              2.3.1   WIP
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 2.3.2
+.IGNORE -> {TD}. .IGNORE TD, Ignore 'till definition    2.3.2   WIP
 stdlib: replace all %*% with "str" or 'c'               2.3.2   WIP
-atrc_replace_injects_c       -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.1   WIP
-atrc_replace_injects_str     -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.1   WIP
+atrc_replace_injects_c   -> Docs (Free memory ATRC_FREE_MEMORY) 2.3.1   WIP
+atrc_replace_injects_str -> Docs (Free memory ATRC_FREE_MEMORY) 2.3.1   WIP
 Nested if-statements                                    2.3.2   WIP
 .DEFINE name=value                                      2.3.2   DONE
 .UNDEF name                                             2.3.2   DONE

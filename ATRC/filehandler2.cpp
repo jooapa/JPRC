@@ -682,6 +682,10 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
             }
             continue;
         }
+        if(_ignore_lines > 0) { //preprocessor ignoring
+            _ignore_lines--;
+            continue;
+        }
         if (_line_trim.empty()) continue;
         if (_line_trim[0] == '#' 
         || inside_preprocessor_block
@@ -839,10 +843,7 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
             }
             continue;
         }
-        if(_ignore_lines > 0) { //preprocessor ignoring
-            _ignore_lines--;
-            continue;
-        }
+        
         if(_preprocessor_blocks.size() > 0){
             for(size_t i = 0; i < _preprocessor_blocks.size(); i++){
                 PreprocessorBlock *_block = &_preprocessor_blocks.top();
