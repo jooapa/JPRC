@@ -163,9 +163,9 @@ uint64_t atrc_std::atrc_to_uint64_t(const char* value){
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument&) {
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_UNSUCCESSFULL_ACTION;
-        if(atrc_std::atrc_stdlib_writecheck) atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
+        atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
     } catch (const std::out_of_range&) {
-        if(atrc_std::atrc_stdlib_writecheck) atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
+        atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_UNSUCCESSFULL_ACTION;
     }
     return res;
@@ -178,9 +178,9 @@ int64_t atrc_std::atrc_to_int64_t(const char* value){
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument&) {
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_UNSUCCESSFULL_ACTION;
-        if(atrc_std::atrc_stdlib_writecheck) atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
+        atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
     } catch (const std::out_of_range&) {
-        if(atrc_std::atrc_stdlib_writecheck) atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
+        atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_UNSUCCESSFULL_ACTION;
     }
     return res;
@@ -193,9 +193,9 @@ double atrc_std::atrc_to_double(const char* value){
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_SUCCESSFULL_ACTION;
     } catch (const std::invalid_argument&) {
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_UNSUCCESSFULL_ACTION;
-        if(atrc_std::atrc_stdlib_writecheck) atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
+        atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
     } catch (const std::out_of_range&) {
-        if(atrc_std::atrc_stdlib_writecheck) atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
+        atrc::errormsg(ERR_STDLIB_CAST_ERROR, -1, value, "atrc_stdlib");
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_UNSUCCESSFULL_ACTION;
     }
     return res;
@@ -396,7 +396,7 @@ double atrc_std::atrc_math_exp(const char* value) {
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_SUCCESSFULL_ACTION;
         return result;
     } catch (const std::exception&) {
-        if(atrc_std::atrc_stdlib_writecheck) atrc::errormsg(ERR_INVALID_EXPRESSION, -1, value, "atrc_stdlib");
+        atrc::errormsg(ERR_INVALID_EXPRESSION, -1, value, "atrc_stdlib");
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_UNSUCCESSFULL_ACTION;
         return 0.0; // Return a default value on error
     }

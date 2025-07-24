@@ -32,14 +32,6 @@ Stdlib functions change this variable according if the function does what it was
 extern uint64_t atrc_stdlib_errval;
 ```
 
-## atrc_stdlib_writecheck
-
-False by default. If the value is true, error messages will NOT be logged by functions
-
-```cpp
-extern bool atrc_stdlib_writecheck;
-```
-
 ## atrc_to_vector
 
 ```cpp
