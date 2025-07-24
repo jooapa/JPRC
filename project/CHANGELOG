@@ -3,10 +3,8 @@
 
 DOCS REDO                                                                       2.3.0   WIP
 ATRC_FD Operator const char* -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.0   WIP
-atrc_replace_injects_c       -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.0   WIP
-atrc_replace_injects_str     -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.0   WIP
 Add to docs: "Use ATRC_FREE_MEMORY() if no other memory if not told otherwise"  2.3.0   WIP
-Error codes to documentation                                                    2.3.0   WIP
+Error codes to documentation                                                    2.3.0   DONE
 
 README REDO                                             2.3.0   DONE
 
@@ -37,7 +35,7 @@ Redo file parser.                                       2.3.0   DONE
 
 InsertVar(_S) -> hold more than 0-9 digits              2.3.0   DONE
 
-Packaging: Add docs, CHANGELOG, VERSION, BUILDNUMBER, LICENSE, README.md            2.3.0   WIP
+Packaging: Add docs, CHANGELOG, VERSION, BUILDNUMBER, LICENSE, README.md            2.3.0   DONE
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,6 +46,8 @@ C# binding                                              2.3.1   WIP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 2.3.2
 stdlib: replace all %*% with "str" or 'c'               2.3.2   WIP
+atrc_replace_injects_c       -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.1   WIP
+atrc_replace_injects_str     -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.1   WIP
 Nested if-statements                                    2.3.2   WIP
 .DEFINE name=value                                      2.3.2   DONE
 .UNDEF name                                             2.3.2   DONE

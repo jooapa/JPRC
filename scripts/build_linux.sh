@@ -1,11 +1,22 @@
 #!/bin/bash
 
 # Define the root of your project
-cd ..
+cd "$(dirname "$0")/.."
 PROJECT_ROOT=$(pwd)
 VERSION=$(< "${PROJECT_ROOT}/project/VERSION")
 OUT_DIR="${PROJECT_ROOT}/out"
-ATRC_DIR="${PROJECT_ROOT}/ATRC_${VERSION}"
+BUILD_NUMBER=$(< "${PROJECT_ROOT}/project/BUILDNUMBER")
+# convert BUILD_NUMBER to hexadecimal
+BUILD_NUMBER=$(printf '%x' "$BUILD_NUMBER")
+# Remove leading zeros from BUILD_NUMBER
+BUILD_NUMBER=${BUILD_NUMBER#0}
+# Ensure BUILD_NUMBER is at least 1 character long
+if [ -z "$BUILD_NUMBER" ]; then
+    BUILD_NUMBER="1"
+fi
+#convert to lowercase
+BUILD_NUMBER=$(echo "$BUILD_NUMBER" | tr '[:upper:]' '[:lower:]')
+ATRC_DIR="${PROJECT_ROOT}/ATRC-${VERSION}_${BUILD_NUMBER}"
 
 # Initialize error handling
 ERROR_ENCOUNTERED=0
@@ -34,7 +45,10 @@ for preset in "${presets[@]}"; do
     toolchain_file="${PROJECT_ROOT}/cmake/toolchain-linux-${atrc_arch}.cmake"
     
     # Generate build files
-    command="cmake --preset $preset -B${OUT_DIR}/${preset}/build -DCMAKE_BUILD_TYPE=$build_type -DCMAKE_TOOLCHAIN_FILE=$toolchain_file"
+    mkdir -p "${OUT_DIR}/${preset}/build"
+    echo "Generating build files for preset: $preset"
+
+    command="cmake -G Ninja --preset $preset -B${OUT_DIR}/${preset}/build -DCMAKE_BUILD_TYPE=$build_type -DCMAKE_TOOLCHAIN_FILE=$toolchain_file -DATRC_BUILD_TESTS=OFF -DATRC_COMPILE_DOCS=OFF"
     echo "Running: $command"
     eval $command
     if [ $? -ne 0 ]; then

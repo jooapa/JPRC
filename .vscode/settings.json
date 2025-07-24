@@ -90,6 +90,7 @@
         "corecrt_math.h": "cpp",
         "corecrt.h": "cpp",
         "unordered_map": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "xpolymorphic_allocator.h": "cpp"
     }
 }

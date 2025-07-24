@@ -1,9 +1,18 @@
 @echo off
 REM Define the project root directory
 cd ..
+
+REM Increment build version
+SET BUILD_VERSION=0
+REM Add contents of BUILDNUMBER file to BUILD_VERSION
+set /P BUILD_VERSION=< "%PROJECT_FOLDER%\BUILDNUMBER"
+FOR /F "delims=" %%i IN ('powershell -Command "[Convert]::ToString(%BUILD_VERSION%, 16)"') DO SET BUILD_VERSION=%%i
+REM Ensure the BUILD_VERSION is uppercase
+SET BUILD_VERSION=%BUILD_VERSION:~0,8%
+
 set PROJECT_ROOT=%cd%
 set /P VERSION=< "%PROJECT_ROOT%\project\VERSION"
-set OUTPUT_DIR=%PROJECT_ROOT%\ATRC_%VERSION%
+set OUTPUT_DIR=%PROJECT_ROOT%\ATRC-%VERSION%_%BUILD_VERSION%
 set ERROR_ENCOUNTERED=0
 
 REM Define configurations for Windows builds
@@ -29,6 +38,8 @@ exit /b 0
 
 REM Build function
 :build
+
+
 set ARCH=%1
 set BUILD_TYPE=%2
 set BUILD_DIR=%PROJECT_ROOT%\out\win_%ARCH%_%BUILD_TYPE%
@@ -38,7 +49,7 @@ set TARGET_DIR=%OUTPUT_DIR%\Windows\%ARCH%\%BUILD_TYPE%
 if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
 
 REM Run CMake commands
-cmake -S . -B %BUILD_DIR% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -G "Visual Studio 17 2022" -A %ARCH%
+cmake -S . -B %BUILD_DIR% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -G "Visual Studio 17 2022" -A %ARCH%   -DATRC_BUILD_TESTS=OFF -DATRC_COMPILE_DOCS=OFF
 if errorlevel 1 (
     echo CMake configuration failed for %ARCH% %BUILD_TYPE%.
     exit /b 1

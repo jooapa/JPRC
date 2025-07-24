@@ -618,6 +618,7 @@ void *Destroy_ATRC_FD(C_PATRC_FD self) {
 
     // Free the main structure
     free(self);
+    self = NULL;
     return self;
 }
 

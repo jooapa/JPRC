@@ -8,6 +8,7 @@
 #include <stack>
 #include <vector>
 #include <unordered_set>
+#include <list>
 #define checkblock_success  1
 #define checkblock_failure  0
 #define checkblock_fatal    2
@@ -75,7 +76,7 @@ bool evaluateArchitectureTag(const std::string &tag) {
 #endif
 }
 
-bool evaluateLogicalOperator(const std::string &op, std::list<std::string> &results, size_t index, const std::vector<atrc::Variable> &variables) {
+bool evaluateLogicalOperator(const std::string &op, std::list<std::string> &results, const std::vector<atrc::Variable> &variables) {
     if (op == "NOT") {
         if (results.empty()) return false;
         std::string value = resolveValue(results.back(), variables);
@@ -290,7 +291,7 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
         for(size_t i = 0; i < tags.size(); i++){
             std::string &tag = tags[i];
             if(tag.empty()) continue;
-            if (tag.front() == '"' && tag.back() == '"' || tag.front() == '\'' && tag.back() == '\'') {
+            if ((tag.front() == '"' && tag.back() == '"') || (tag.front() == '\'' && tag.back() == '\'')) {
                 results.push_back(tag);
                 if(wait_for_next_value > 0) {jump_to_tags = !jump_to_tags; continue;}
             }
@@ -332,7 +333,7 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
                         atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, (int)reus.line_number, tag, reus.filename);
                         return PPRes::InvalidFlagContents;
                     }
-                    results.push_back(std::to_string(evaluateLogicalOperator(logical_operator, results, i, variables)));
+                    results.push_back(std::to_string(evaluateLogicalOperator(logical_operator, results, variables)));
                     wait_for_next_value = 0;
                     logical_operator = "";
                 }
@@ -347,7 +348,7 @@ PPRes parsePreprocessorFlag(const std::string &line, PreprocessorBlock &block, c
                 atrc::errormsg(ERR_INVALID_PREPROCESSOR_TAG, (int)reus.line_number, "~UNKNOWN~", reus.filename);
                 return PPRes::InvalidFlagContents;
             }
-            results.push_back(std::to_string(evaluateLogicalOperator(logical_operator, results, tags.size(), variables)));
+            results.push_back(std::to_string(evaluateLogicalOperator(logical_operator, results, variables)));
             wait_for_next_value = 0;
             logical_operator = "";
         }
@@ -528,7 +529,7 @@ bool check_and_add_block(std::string &curr_block, std::vector<atrc::Block> &bloc
     _block.Name = curr_block;
     _block.line_number = reus.line_number;
     blocks.push_back(_block);
-    if(blocks.size() == -1) {
+    if(blocks.size() == (size_t)-1) {
         atrc::errormsg(ERR_INVALID_BLOCK_DECL, (int)reus.line_number, curr_block, reus.filename);
         return false;
     }
@@ -1122,7 +1123,6 @@ void atrc::_W_Save_(ATRC_FD *filedata, const atrc::ATRC_SAVE &action, const int 
         save_final_data(filedata->GetFilename(), final_data);
     } break;
     case atrc::ATRC_SAVE::ADD_VAR: {
-        bool var_added = false;
         std::string var_line = xtra_info2+"\n";
         add_to_top_of_file(var_line, final_data, {'#'}, file, ln_num);
         file.close(); 

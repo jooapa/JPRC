@@ -20,6 +20,8 @@ else()
     message(STATUS "ATRC_BUILD_TESTS is not defined. Skipping ATRC.Test project. You can set this variable on manually inside ${CMAKE_CURRENT_LIST_FILE}")
 endif()
 
+set(ATRC_COMPILE_DOCS OFF CACHE BOOL "Compile documentation for ATRC library")
+
 if(${ATRC_COMPILE_DOCS} STREQUAL "ON")
     add_subdirectory("compile_docs")
 else()
