@@ -144,10 +144,10 @@ void *atrc_free_list(C_PString_Arr list) {
 bool atrc_std::atrc_to_bool(const char* value){
     std::string temp=atrc::str_to_lower(value);
     atrc::trim(temp);
-    if(temp == "true" || temp == "1") {
+    if(temp == "true" || temp == "1" || temp == "yes" || temp == "on"){
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_SUCCESSFULL_ACTION;
         return true;
-    } else if(temp == "false" || temp == "0"){
+    } else if(temp == "false" || temp == "0" || temp == "no" || temp == "off"){
         atrc_std::atrc_stdlib_errval = atrc_std::_ATRC_SUCCESSFULL_ACTION;
         return false;
     } else {
@@ -263,8 +263,17 @@ std::vector<atrc::MathToken> atrc::MathParser::tokenize(const std::string& input
                     tokens.push_back({MATH_TOKEN_TYPE::NUMBER, ATRC_E, MATH_NUMBER_TYPE::E});
                     i += 1;
                 } else if (input.compare(i, 2, "GR") == 0) {
-                    tokens.push_back({MATH_TOKEN_TYPE::NUMBER, 1.61803398875, MATH_NUMBER_TYPE::GOLDEN_RATIO});
+                    tokens.push_back({MATH_TOKEN_TYPE::NUMBER, ATRC_GOLDEN_RATIO, MATH_NUMBER_TYPE::GOLDEN_RATIO});
                     i += 2;
+                } else if (input.compare(i, 4, "SQRT2") == 0) {
+                    tokens.push_back({MATH_TOKEN_TYPE::NUMBER, ATRC_SQRT2, MATH_NUMBER_TYPE::SQRT2});
+                    i += 4;
+                } else if (input.compare(i, 4, "LOG2E") == 0) {
+                    tokens.push_back({MATH_TOKEN_TYPE::NUMBER, ATRC_LOG2E, MATH_NUMBER_TYPE::LOG2E});
+                    i += 4;
+                } else if (input.compare(i, 6, "LOG10E") == 0) {
+                    tokens.push_back({MATH_TOKEN_TYPE::NUMBER, ATRC_LOG10E, MATH_NUMBER_TYPE::LOG10E});
+                    i += 6;
                 } else {
                     throw std::runtime_error("Unknown token at: " + input.substr(i));
                 }
@@ -362,6 +371,9 @@ double atrc::MathParser::evaluateRPN(const std::vector<atrc::MathToken>& rpn) {
                 case atrc::MATH_OPERATOR_TYPE::SIN: stack.push(sin(b)); break;
                 case atrc::MATH_OPERATOR_TYPE::COS: stack.push(cos(b)); break;
                 case atrc::MATH_OPERATOR_TYPE::TAN: stack.push(tan(b)); break;
+                case atrc::MATH_OPERATOR_TYPE::ASIN: stack.push(asin(b)); break;
+                case atrc::MATH_OPERATOR_TYPE::ACOS: stack.push(acos(b)); break;
+                case atrc::MATH_OPERATOR_TYPE::ATAN: stack.push(atan(b)); break;
 
                 default:
                     throw std::runtime_error("Operator not implemented");

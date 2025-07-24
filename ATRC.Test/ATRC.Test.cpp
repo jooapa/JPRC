@@ -46,4 +46,6 @@ void cpp_main(void)
     std::cout << "Test completed successfully." << std::endl;
     fd.WriteCommentToTop("This is a comment at the top of the file.");
     fd.WriteCommentToBottom("This is a comment at the bottom of the file.");
+
+    fd.GetEnumValue("TestVariable", "TestValue");
 }

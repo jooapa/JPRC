@@ -49,8 +49,8 @@ C# binding                                              2.3.1   WIP
 2.3.2
 stdlib: replace all %*% with "str" or 'c'               2.3.2   WIP
 Nested if-statements                                    2.3.2   WIP
-.DEFINE name=value                                      2.3.2   WIP
-.UNDEF name                                             2.3.2   WIP
+.DEFINE name=value                                      2.3.2   DONE
+.UNDEF name                                             2.3.2   DONE
 Access definition in .ATRC                              2.3.2   WIP
 .LOGS -> Access .DEFINES                                2.3.2   WIP
 

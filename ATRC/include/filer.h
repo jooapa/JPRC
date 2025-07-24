@@ -253,6 +253,9 @@ enum class MATH_NUMBER_TYPE {
     PI,
     E,
     GOLDEN_RATIO,
+    LOG2E,
+    LOG10E,
+    SQRT2,
 };
 
 enum class MATH_OPERATOR_TYPE {

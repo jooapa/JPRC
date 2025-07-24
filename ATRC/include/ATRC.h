@@ -274,7 +274,7 @@ Inject macro for C
 USAGE:
 {
     const char *res = NULL;
-    ATRC_INJECT("INPUT %*%, %*%\n", "arg1", "arg2", ...) // -> "INPUT arg1, arg2\n"
+    ATRC_CINJECT("INPUT %*%, %*%\n", "arg1", "arg2", ...) // -> "INPUT arg1, arg2\n"
     // use res as needed
     free(res);
 }

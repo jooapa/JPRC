@@ -164,7 +164,6 @@ enum class PPRes {
     "OR",
     "AND",
     "NOT",
-
     "EQU",
     "NEQ",
     "GT",
