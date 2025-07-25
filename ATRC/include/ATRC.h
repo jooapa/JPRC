@@ -67,14 +67,14 @@ C declarations
 extern "C" {
 #endif // __cplusplus
 
-typedef enum ReadMode {
+typedef enum _ReadMode {
     ATRC_READ_ONLY,
     ATRC_CREATE_READ,
     ATRC_FORCE_READ,
 } ReadMode;
 
 
-typedef struct C_Variable {
+typedef struct _C_Variable {
     char *Name;
     char *Value;
     bool IsPublic;
@@ -86,7 +86,7 @@ typedef struct _C_Variable_Arr {
     uint64_t VariableCount;
 } C_Variable_Arr, *C_PVariable_Arr;
 
-typedef struct C_Key {
+typedef struct _C_Key {
     char *Name;
     char *Value;
     uint64_t line_number;
