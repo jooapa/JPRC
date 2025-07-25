@@ -37,15 +37,13 @@ void cpp_main(void)
     double math_calculated = atrc_std::atrc_math_exp(fd["PVD_OFFSET"]);
     std::cout << "Math calculated: " << math_calculated << std::endl;
 
-    std::cout << atrc_std::atrc_math_exp(fd["JP_BMI"]) << std::endl;
-
     std::cout << fd["test3"] << std::endl << std::endl;
     std::cout << fd["raw_string"] << std::endl << std::endl;
     std::cout << fd["TESTBLOCK"]["TESTKEY"] << std::endl;
     std::cout << fd.GetEnumValue("PremadeBlock", "PremadeValue") << std::endl;
     std::cout << "Test completed successfully." << std::endl;
-    fd.WriteCommentToTop("This is a comment at the top of the file.");
-    fd.WriteCommentToBottom("This is a comment at the bottom of the file.");
 
-    fd.GetEnumValue("TestVariable", "TestValue");
+    std::cout << "Enum value: " << fd.GetEnumValue("EnumTest", "ENUM0") << std::endl;
+    std::cout << "Enum value: " << fd.GetEnumValue("EnumTest", "ENUM1") << std::endl;
+    std::cout << "Enum value: " << fd.GetEnumValue("EnumTest", "ENUM2") << std::endl;
 }

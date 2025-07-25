@@ -275,7 +275,8 @@ std::vector<atrc::MathToken> atrc::MathParser::tokenize(const std::string& input
                     tokens.push_back({MATH_TOKEN_TYPE::NUMBER, ATRC_LOG10E, MATH_NUMBER_TYPE::LOG10E});
                     i += 6;
                 } else {
-                    throw std::runtime_error("Unknown token at: " + input.substr(i));
+                    // Handle unknown token
+                    atrc::errormsg(ERR_INVALID_EXPRESSION, -1, "Unknown token: " + input.substr(i), "atrc_stdlib");
                 }
             }
         }
@@ -348,9 +349,10 @@ double atrc::MathParser::evaluateRPN(const std::vector<atrc::MathToken>& rpn) {
         } else {
             atrc::MATH_OPERATOR_TYPE op = std::get<atrc::MATH_OPERATOR_TYPE>(token.value);
 
-            if (stack.size() < (op == atrc::MATH_OPERATOR_TYPE::SQRT || op == atrc::MATH_OPERATOR_TYPE::LOG ? 1 : 2))
-                throw std::runtime_error("Insufficient operands for operator");
-
+            if (stack.size() < (op == atrc::MATH_OPERATOR_TYPE::SQRT || op == atrc::MATH_OPERATOR_TYPE::LOG ? 1 : 2)) {
+                atrc::errormsg(ERR_INVALID_EXPRESSION, -1, "Insufficient operands for operator: " + std::to_string(static_cast<int>(op)), "atrc_stdlib");
+                return 0.0; // Return a default value on error
+            }
             double b = stack.top(); stack.pop();
             double a = (stack.empty() ? 0 : stack.top());
             if (op != atrc::MATH_OPERATOR_TYPE::SQRT && op != atrc::MATH_OPERATOR_TYPE::LOG) stack.pop();
@@ -359,8 +361,23 @@ double atrc::MathParser::evaluateRPN(const std::vector<atrc::MathToken>& rpn) {
                 case atrc::MATH_OPERATOR_TYPE::ADD: stack.push(a + b); break;
                 case atrc::MATH_OPERATOR_TYPE::SUBTRACT: stack.push(a - b); break;
                 case atrc::MATH_OPERATOR_TYPE::MULTIPLY: stack.push(a * b); break;
-                case atrc::MATH_OPERATOR_TYPE::DIVIDE: stack.push(a / b); break;
-                case atrc::MATH_OPERATOR_TYPE::MODULO: stack.push(fmod(a, b)); break;
+                case atrc::MATH_OPERATOR_TYPE::DIVIDE: 
+                    if (b == 0) {
+                        atrc::errormsg(ERR_INVALID_EXPRESSION, -1, "Division by zero " + std::to_string(a) + " / " + std::to_string(b), "atrc_stdlib");
+                        return 0.0; // Return a default value on error
+                    }
+                    if (b != 0) {
+                        double res = a / b;
+                        stack.push(res);
+                    } 
+                    break;
+                case atrc::MATH_OPERATOR_TYPE::MODULO: 
+                    if (b == 0) {
+                        atrc::errormsg(ERR_INVALID_EXPRESSION, -1, "Modulo by zero " + std::to_string(a) + " % " + std::to_string(b), "atrc_stdlib");
+                        return 0.0; // Return a default value on error
+                    }
+                    stack.push(fmod(a, b)); 
+                    break;
                 case atrc::MATH_OPERATOR_TYPE::POWER: stack.push(pow(a, b)); break;
 
                 case atrc::MATH_OPERATOR_TYPE::SQRT: stack.push(sqrt(b)); break;
@@ -376,14 +393,17 @@ double atrc::MathParser::evaluateRPN(const std::vector<atrc::MathToken>& rpn) {
                 case atrc::MATH_OPERATOR_TYPE::ATAN: stack.push(atan(b)); break;
 
                 default:
-                    throw std::runtime_error("Operator not implemented");
+                    atrc::errormsg(ERR_INVALID_EXPRESSION, -1, "Unknown operator: " + std::to_string(static_cast<int>(op)), "atrc_stdlib");
+                    return 0.0f; // Return a default value on error
             }
         }
     }
 
-    if (stack.size() != 1)
-        throw std::runtime_error("Invalid RPN expression");
-
+    if (stack.size() != 1) {
+        atrc::errormsg(ERR_INVALID_EXPRESSION, -1, "Invalid expression: stack size is not 1 after evaluation", "atrc_stdlib");
+        stack.empty();
+        stack.push(0.0); // Clear the stack and push a default value
+    }
     return stack.top();
 }
 
