@@ -401,7 +401,6 @@ double atrc::MathParser::evaluateRPN(const std::vector<atrc::MathToken>& rpn) {
 
     if (stack.size() != 1) {
         atrc::errormsg(ERR_INVALID_EXPRESSION, -1, "Invalid expression: stack size is not 1 after evaluation", "atrc_stdlib");
-        stack.empty();
         stack.push(0.0); // Clear the stack and push a default value
     }
     return stack.top();
