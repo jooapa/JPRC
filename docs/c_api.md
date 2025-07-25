@@ -94,7 +94,8 @@ Name of the variable
 #### Value
 Value of the the variable
 #### IsPublic
-Is the variable public
+Is the variable public. See more about private and public variables in `syntax.md`-`Variables`
+
 #### line_number
 Line number of the variable
 
@@ -134,7 +135,7 @@ Value of the key
 #### line_number
 Line number of the key
 #### enum_value
-Enum value of the key
+Enum value of the key. For more information, see `advanced_features.md`-`Enums`
 
 ### C_Block
 
