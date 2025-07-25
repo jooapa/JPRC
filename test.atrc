@@ -22,4 +22,9 @@
 [PremadeBlock]
 PremadeValue=%PremadeVariable%: 10
 
+[EnumTest]
+ENUM0=0
+ENUM1=0
+ENUM2=0
+
 #This is a comment at the bottom of the file.

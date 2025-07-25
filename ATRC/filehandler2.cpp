@@ -560,10 +560,19 @@ bool check_and_add_key(std::string &line_trim, std::vector<atrc::Block> &blocks,
     _key.Value = _key_value;
     _key.line_number = reus.line_number;
     size_t last_block_index = blocks.size() - 1;
+
+    try {
+        _key.enum_value = blocks[last_block_index].Keys.size();
+    } catch (const std::exception &e) {
+        e; // Suppress unused variable warning
+        atrc::errormsg(ERR_INVALID_BLOCK_DECL, (int)reus.line_number, _key_name, reus.filename);
+        return false;
+    }
     try {
         blocks[last_block_index].Keys.push_back(_key);
-        _key.enum_value = blocks[last_block_index].Keys.size() - 1;
+        std::cout << "Added key: " << _key.enum_value << std::endl;
     } catch (const std::exception &e) {
+        e; // Suppress unused variable warning
         atrc::errormsg(ERR_INVALID_KEY_DECL, (int)reus.line_number, _key_name, reus.filename);
         return false;
     }
