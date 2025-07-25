@@ -114,7 +114,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(MyProject "main.cpp")
 
 # Add ATRC
-set(ATRC_DIR "path/to/ATRC-2.3.0")
+set(ATRC_DIR "path/to/ATRC-2.3.0/cmake")
 find_package(ATRC REQUIRED)
 target_include_directories(MyProject PRIVATE ${ATRC_INCLUDE_DIR})
 target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
