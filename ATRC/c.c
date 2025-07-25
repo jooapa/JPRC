@@ -19,7 +19,7 @@ uint64_t GetEnumValue(C_PATRC_FD self, const char* block, const char* key) {
             }
         }
     }
-    return 0; // Return 0 if not found
+    return (uint64_t)-1; // Return -1 if not found
 }
 
 const char* ReadVariable(C_PATRC_FD self, const char* varname) {
