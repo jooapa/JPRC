@@ -138,7 +138,7 @@ ATRC_API double atrc_to_double(const char* value);
 Parses a math expression
 
 Expression string can hold the following values:
- - Numbers, floats
+ - Numbers, floats. (decimals: 0, 0.0) (hexadecimals: 0x0, 0X0) (binary: 0b00000000,0B00000000)
  - PI
  - E
  - GR (Golden Ratio)
