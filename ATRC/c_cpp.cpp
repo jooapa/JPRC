@@ -54,6 +54,9 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
     Destroy_ATRC_FD_Blocks_And_Keys(self);
     Destroy_ATRC_FD_Variables(self);
 
+    bool old_autoSave = self->AutoSave;
+    bool old_writecheck = self->Writecheck;
+
     // Allocate main structures
     self->Variables = (C_PVariable_Arr)malloc(sizeof(C_Variable_Arr));
     self->Blocks = (C_PBlock_Arr)malloc(sizeof(C_Block_Arr));
@@ -65,7 +68,8 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
     self->Blocks->Blocks = nullptr;
     self->Variables->VariableCount = 0;
     self->Blocks->BlockCount = 0;
-
+    self->AutoSave = old_autoSave;
+    self->Writecheck = old_writecheck;
     // Process variables
     self->Variables->VariableCount = variables.size();
     self->Variables->Variables = (C_PVariable)malloc(self->Variables->VariableCount * sizeof(C_Variable));
