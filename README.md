@@ -108,13 +108,14 @@ std::string raw = fd["RawStringExample"]["RawString"]; // Multi-line string pres
 ## ⚙️ CMake Integration
 
 ```cmake
+cmake_minimum_required(VERSION 3.8)
 project(MyProject VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 add_executable(MyProject "main.cpp")
 
 # Add ATRC
-set(ATRC_DIR "path/to/ATRC-2.3.0/cmake")
+set(ATRC_DIR "path/to/ATRC-2.3.0_{BUILD}/cmake")
 find_package(ATRC REQUIRED)
 target_include_directories(MyProject PRIVATE ${ATRC_INCLUDE_DIR})
 target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
