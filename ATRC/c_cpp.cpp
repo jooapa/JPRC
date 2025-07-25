@@ -170,10 +170,6 @@ void _ATRC_WRAP_FUNC_4(char* line, const char** args){
         args_v.push_back(args[i]);
     }
     std::string line_s = line;
-    std::cout << line_s << std::endl;
-    for (const auto& s : args_v) {
-        std::cout << s << "\n";
-    }
     fd.InsertVar(line_s, args_v);
     size_t line_size = strlen(line);
     strncpy(line, line_s.c_str(), line_size - 1);
