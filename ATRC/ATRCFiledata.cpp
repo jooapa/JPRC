@@ -585,7 +585,7 @@ uint64_t atrc::ATRC_FD::GetEnumValue(const std::string& block, const std::string
             }
         }
     }
-    return 0; // Return 0 if not found
+    return (uint64_t)-1; // Return -1 if not found
 }
 
 /*+++
