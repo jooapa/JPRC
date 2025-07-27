@@ -112,24 +112,6 @@ bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
         this->safeToUse = false;
         return false;
     }
-
-    for (auto& block : this->Blocks) {
-        for (auto& key : block.Keys) {
-            std::cout << "Key: " << key.Name << " = " << key.Value << std::endl;
-            if (key.Name == "enum_value") {
-                try {
-                    key.enum_value = std::stoull(key.Value);
-                }
-                catch (const std::invalid_argument&) {
-                    key.enum_value = (uint64_t)-1; // Invalid enum value
-                }
-            }
-        }
-
-    }
-    for (auto& variable : this->Variables) {
-        std::cout << "Variable: " << variable.Name << " = " << variable.Value << std::endl;
-    }
     this->safeToUse = true;
     return true;
 }
