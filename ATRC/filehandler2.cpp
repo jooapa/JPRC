@@ -9,6 +9,8 @@
 #include <vector>
 #include <unordered_set>
 #include <list>
+#include <cstdlib>
+#include <stdexcept>
 #define checkblock_success  1
 #define checkblock_failure  0
 #define checkblock_fatal    2
@@ -560,8 +562,9 @@ bool check_and_add_key(std::string &line_trim, std::vector<atrc::Block> &blocks,
     _key.Value = _key_value;
     _key.line_number = reus.line_number;
     size_t last_block_index = blocks.size() - 1;
-
+    std::cout << "HWERE\n";
     try {
+        std::cout << blocks[last_block_index].Keys.size() << " : " << (blocks[last_block_index].Keys.size() + 1) << "\n";
         _key.enum_value = blocks[last_block_index].Keys.size();
     } catch (const std::exception &e) {
         e; // Suppress unused variable warning
@@ -746,6 +749,7 @@ bool atrc::ParseFile(const std::string &_filename, const std::string &encoding, 
                                 file.close();
                                 return false;
                             }
+                            system("dir");
                             if(!std::filesystem::exists(include_filename)) {
                                 atrc::errormsg(ERR_INVALID_INCLUDE_FILE, (int)REUSABLE.line_number, include_filename, REUSABLE.filename);
                                 file.close();

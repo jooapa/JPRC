@@ -40,11 +40,11 @@ bool _ATRC_WRAP_FUNC_1(C_PATRC_FD self, const char* path, ReadMode readMode) {
     std::vector<atrc::Variable> variables;
     std::vector<atrc::Block> blocks;
     auto parsedData = atrc::ParseFile(filename, encoding, extension, variables, blocks);
-#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
-    self->Filename = _strdup(filename.c_str());
-#else
-    self->Filename = strdup(filename.c_str());
-#endif
+    #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
+        self->Filename = _strdup(filename.c_str());
+    #else
+        self->Filename = strdup(filename.c_str());
+    #endif
     if (!parsedData) {
         atrc::errormsg(ERR_INVALID_FILE, -1, filename, filename);
         return false;
@@ -203,6 +203,7 @@ char* _ATRC_WRAP_FUNC_5(const char* line, const char** args) {
 void *ATRC_FREE_MEMORY(void *ptr){
     if (ptr != NULL) {
         free(ptr);
+		ptr = NULL;
     }
-    return ptr;
+    return NULL;
 }

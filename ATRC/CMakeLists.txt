@@ -12,6 +12,10 @@ if (POLICY CMP0141)
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+if(MSVC)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(ATRC PUBLIC ${CMAKE_BINARY_DIR}/exports)
 if (CMAKE_VERSION VERSION_GREATER 3.12)

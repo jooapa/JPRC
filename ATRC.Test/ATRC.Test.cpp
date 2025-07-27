@@ -5,7 +5,8 @@ using namespace atrc;
 void cpp_main(void)
 {
     std::cout << "ATRC Test Application\n" << std::endl;
-    ATRC_FD fd = ATRC_FD("./test.atrc", ReadMode::ATRC_READ_ONLY);
+    system("dir");
+    ATRC_FD fd = ATRC_FD("../../test.atrc", ReadMode::ATRC_READ_ONLY);
     if (!fd.CheckStatus()) {
         std::cerr << "Failed to read ATRC file. Please check the file path and format." << std::endl;
         return;

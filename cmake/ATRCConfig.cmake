@@ -35,7 +35,11 @@ endif()
 # Platform-specific library directories and files
 if (WIN32)
     # Windows-specific configuration
-    set(ATRC_LIB_DIR "${ATRC_ROOT}/Windows/${ATRC_ARCH}")
+    if(ATRC_ARCH STREQUAL "x86")
+        set(ATRC_LIB_DIR "${ATRC_ROOT}/Win32")
+    else()
+        set(ATRC_LIB_DIR "${ATRC_ROOT}/Windows/${ATRC_ARCH}")
+    endif()
     set(ATRC_DEBUG_LIB_DIR "${ATRC_LIB_DIR}/Debug")
     set(ATRC_RELEASE_LIB_DIR "${ATRC_LIB_DIR}/Release")
     

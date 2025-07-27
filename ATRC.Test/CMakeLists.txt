@@ -57,3 +57,35 @@ add_custom_target(run_tests
 
 # If you want the test target to be built by default when invoking `make`, set it as a default target
 add_dependencies(run_tests ATRC.Test ATRC)
+
+# On windows, copy dlls to the test directory
+if (WIN32)
+    add_custom_command(
+        TARGET run_tests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_BINARY_DIR}/ATRC/Debug/ATRC.dll"
+        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.dll"
+        COMMENT "Copying ATRC DLLs to test directory"
+    )
+    add_custom_command(
+        TARGET run_tests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_BINARY_DIR}/ATRC/Debug/ATRC.lib"
+        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.lib"
+        COMMENT "Copying ATRC LIBs to test directory"
+    )
+    add_custom_command(
+        TARGET run_tests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_BINARY_DIR}/ATRC/Debug/ATRC.pdb"
+        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.pdb"
+        COMMENT "Copying ATRC PDBs to test directory"
+    )
+    add_custom_command(
+        TARGET run_tests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_BINARY_DIR}/ATRC/Debug/ATRC.exp"
+        "${CMAKE_BINARY_DIR}/ATRC.Test/Debug/ATRC.exp"
+        COMMENT "Copying ATRC EXPs to test directory"
+    )
+endif()

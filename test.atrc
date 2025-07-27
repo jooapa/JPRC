@@ -1,7 +1,7 @@
 #!ATRC
 #This is a comment at the top of the file.
 #
-#.INCLUDE test2.atrc
+#.INCLUDE ../../test2.atrc
 #
 #.IF %test2% EQU "LOL"
 #.ERROR abcdefg

@@ -157,21 +157,21 @@ typedef struct ATRC_API _Variable {
     std::string Name;
     std::string Value;
     bool IsPublic = true;
-    uint64_t line_number;
+    uint64_t line_number = (uint64_t)-1;
 } Variable, * PVariable;
 
 typedef struct ATRC_API _Key {
     std::string Name;
     std::string Value;
-    uint64_t line_number;
-    uint64_t enum_value;
+    uint64_t line_number = (uint64_t)-1;
+    uint64_t enum_value = (uint64_t)-1;
 } Key, * PKey;
 
 
 typedef struct ATRC_API _Block {
     std::string Name;
     std::vector<Key> Keys;
-    uint64_t line_number;
+    uint64_t line_number = (uint64_t)-1;
 } Block, * PBlock;
 
 class ATRC_API PROXY_ATRC_FD;
@@ -227,6 +227,7 @@ private:
     std::vector<Variable> Variables;
     std::vector<Block> Blocks;
     std::string Filename;
+    bool safeToUse;
 };
 typedef ATRC_FD* PATRC_FD;
 

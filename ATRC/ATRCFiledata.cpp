@@ -20,7 +20,11 @@ atrc::ATRC_FD::ATRC_FD(const char *path, ReadMode mode){
     std::string _path = path;
     this->MAINCONSTRUCTOR();
     this->Filename = _path;
-    this->ReadAgain(mode);
+    if (!this->ReadAgain(mode)) {
+        errormsg(ERR_INVALID_FILE, -1, "Failed to read file: " + std::string(path), path);
+    }
+
+    
 }
 atrc::ATRC_FD::ATRC_FD(std::string& path, ReadMode mode){
     this->MAINCONSTRUCTOR();
@@ -86,6 +90,7 @@ bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
             ofs << "#!ATRC" << "\n";
         } else {
             atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
+            this->safeToUse = false;
             return false;
         }
     } else if (mode == ATRC_CREATE_READ) {
@@ -96,6 +101,7 @@ bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
                 ofs << "#!ATRC" << "\n";
             } else {
                 atrc::errormsg(FILE_MODE_ERR, -1, filename, filename);
+                this->safeToUse = false;
                 return false;
             }
         }
@@ -103,9 +109,28 @@ bool atrc::ATRC_FD::ReadAgain(ReadMode mode){
 
     bool parsedData = atrc::ParseFile(filename, encoding, extension, this->Variables, this->Blocks);
     if (!parsedData) {
+        this->safeToUse = false;
         return false;
     }
- 
+
+    for (auto& block : this->Blocks) {
+        for (auto& key : block.Keys) {
+            std::cout << "Key: " << key.Name << " = " << key.Value << std::endl;
+            if (key.Name == "enum_value") {
+                try {
+                    key.enum_value = std::stoull(key.Value);
+                }
+                catch (const std::invalid_argument&) {
+                    key.enum_value = (uint64_t)-1; // Invalid enum value
+                }
+            }
+        }
+
+    }
+    for (auto& variable : this->Variables) {
+        std::cout << "Variable: " << variable.Name << " = " << variable.Value << std::endl;
+    }
+    this->safeToUse = true;
     return true;
 }
 
@@ -292,8 +317,7 @@ bool atrc::ATRC_FD::DoesExistVariable(const std::string& varname){
 }
 
 bool atrc::ATRC_FD::CheckStatus() {
-	//if (Variables.empty() && Blocks.empty()) return false;
-    return true;
+    return this->safeToUse;
 }
 
 bool atrc::ATRC_FD::DoesExistKey(const std::string& block, const std::string& key){
@@ -596,7 +620,11 @@ atrc::PROXY_ATRC_FD::PROXY_ATRC_FD(atrc::ATRC_FD& fd, const std::string& key) : 
 
 atrc::PROXY_ATRC_FD atrc::PROXY_ATRC_FD::operator[](const std::string& subKey) {
 	std::string combined_key = key + "]" + subKey;
-	return atrc::PROXY_ATRC_FD(*fd, combined_key);
+	atrc::PROXY_ATRC_FD res = atrc::PROXY_ATRC_FD(*fd, combined_key);
+    if (res == 0) {
+		std::cerr << "312_Error: PROXY_ATRC_FD is null." << std::endl;
+    }
+	return res;
 }
 
 atrc::PROXY_ATRC_FD::operator const char*() const {
@@ -605,6 +633,10 @@ atrc::PROXY_ATRC_FD::operator const char*() const {
         if (x == std::string::npos) {
             std::string res_str = fd->ReadVariable(key);
             const char *res = (char*)malloc(res_str.size() + 1);
+            if (!res) {
+                std::cerr << "513_Memory allocation failed for PROXY_ATRC_FD." << std::endl;
+                return "";
+			}
             std::strcpy(const_cast<char*>(res), res_str.c_str());
             return res;
         }
@@ -612,7 +644,14 @@ atrc::PROXY_ATRC_FD::operator const char*() const {
             std::string block = key.substr(0, x);
             std::string key_ = key.substr(x + 1, key.size() - x - 1);
             std::string res_str = fd->ReadKey(block, key_);
+            if(res_str.empty()) {
+                return "";
+			}
             const char *res = (char*)malloc(res_str.size() + 1);
+            if(!res) {
+                std::cerr << "512_Memory allocation failed for PROXY_ATRC_FD." << std::endl;
+                return "";
+			}
             std::strcpy(const_cast<char*>(res), res_str.c_str());
             return res;
         }

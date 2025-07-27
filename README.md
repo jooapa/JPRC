@@ -125,10 +125,12 @@ target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
 
 ## 🛠️ Build & Test
 
-```bat
-.\vs_run.bat                    # Open in Visual Studio
-.\scripts\run_test.bat          # Run tests
-.\scripts\build_and_package.bat # Create distributable zip
+```bash
+mkdir build
+cd build
+# If you want to compile the test program, switch "ATRC_BUILD_TESTS" to "ON"
+cmake .. -G "Visual Studio 2022 17" -DATRC_BUILD_TESTS=ON
+cmake --build .
 ```
 
 ---

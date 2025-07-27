@@ -165,7 +165,7 @@ bool VariableContainsVariable(std::vector<Variable>& variables, const Variable& 
 std::string ParseLineSTRINGtoATRC(const std::string &line);
 
 typedef struct _REUSABLE {
-    uint64_t line_number;
+    uint64_t line_number = (uint64_t)-1;
     std::string filename;
 } REUSABLE, * P_REUSABLE;
 

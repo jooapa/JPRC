@@ -48,7 +48,7 @@ for preset in "${presets[@]}"; do
     mkdir -p "${OUT_DIR}/${preset}/build"
     echo "Generating build files for preset: $preset"
 
-    command="cmake -G Ninja --preset $preset -B${OUT_DIR}/${preset}/build -DCMAKE_BUILD_TYPE=$build_type -DCMAKE_TOOLCHAIN_FILE=$toolchain_file -DATRC_BUILD_TESTS=OFF -DATRC_COMPILE_DOCS=OFF"
+    command="cmake -G Ninja --preset $preset -B${OUT_DIR}/${preset}/build -DCMAKE_BUILD_TYPE=$build_type -DCMAKE_TOOLCHAIN_FILE=$toolchain_file -DATRC_BUILD_TESTS=OFF "
     echo "Running: $command"
     eval $command
     if [ $? -ne 0 ]; then
