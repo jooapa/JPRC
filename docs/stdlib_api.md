@@ -57,7 +57,7 @@ Array created by `atrc_to_list`. Free with `atrc_free_list`
 typedef struct _C_String_Arr {
     char **list;
     uint64_t count;
-} C_String_Arr, *C_PString_Arr;
+} C_String_Arr, *PString_Arr;
 ```
 
 ## atrc_to_list
@@ -66,7 +66,7 @@ Same as `atrc_to_vector` but works with C.
 Free with `atrc_free_list
 
 ```cpp
-ATRC_API C_PString_Arr atrc_to_list(const char separator, const char* value);
+ATRC_API PString_Arr atrc_to_list(const char separator, const char* value);
 ```
 
 - `const char separator`
@@ -76,7 +76,7 @@ ATRC_API C_PString_Arr atrc_to_list(const char separator, const char* value);
 
 ### Example
 ```c
-C_PString_Arr res = atrc_to_list('|', "this|is|a|list");
+PString_Arr res = atrc_to_list('|', "this|is|a|list");
 for(int i = 0; i < res.count; i++) {
     printf(res.list[i]);
 }
@@ -85,13 +85,13 @@ atrc_free_list(res);
 
 ## atrc_free_list
 
-Frees `C_PString_Arr`, returning NULL on success
+Frees `PString_Arr`, returning NULL on success
 
 ```cpp
-ATRC_API void *atrc_free_list(C_PString_Arr list);
+ATRC_API void *atrc_free_list(PString_Arr list);
 ```
 
-- `C_PString_Arr list`
+- `PString_Arr list`
     - Pointer to list which to free
 
 ## atrc_to_bool

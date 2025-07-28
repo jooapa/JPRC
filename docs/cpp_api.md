@@ -195,7 +195,7 @@ See `c_api.md`-`C_ATRC_FD` for more information.
 This does NOT free the C_ATRC_FD structure from memory.
 
 ```cpp
-ATRC_FD(C_PATRC_FD filedata);
+ATRC_FD(PATRC_FD filedata);
 ```
 
 ### ~ATRC_FD
@@ -554,7 +554,7 @@ TRUE, ATRC_FD is safe to use. FALSE, not safe
 Gets vector of variables
 
 ```cpp
-std::vector<atrc::Variable> GetVariables();
+std::vector<Variable> GetVariables();
 ```
 
 #### Returns
@@ -650,7 +650,7 @@ See `c_api.md`-`C_ATRC_FD` for more information.
 Free with Destroy_ATRC_FD. See `c_api.md`-`Destroy_ATRC_FD` for more information.
 
 ```cpp
-C_PATRC_FD ToCStruct();
+PATRC_FD ToCStruct();
 ```
 
 #### Returns

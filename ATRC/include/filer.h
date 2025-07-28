@@ -2,6 +2,7 @@
 #define FILER_H
 #include "./ATRC.h"
 
+
 /*
 Name            FG  BG
 Black           30  40
@@ -88,7 +89,18 @@ Bright White    97  107
 
 
 #ifdef __cplusplus
-namespace atrc {
+#include <string>
+#include <vector>
+#include <cctype>
+#include <iostream>
+#include <memory>
+#include <algorithm>
+#include <variant>
+#include <cmath>
+#include <unordered_map>
+#include <stdexcept>
+#include <legacy.h>
+
 std::string str_to_lower(const char *str);
 void str_to_lower_s(std::string &str);
 std::string str_to_upper(const char *str);
@@ -110,7 +122,6 @@ ATRC_SAVE{
     WRITE_COMMENT_TO_BOTTOM,
     WRITE_COMMENT_TO_TOP,
 };
-}
 #else 
 typedef enum {
     FULL_SAVE = -1, 
@@ -130,10 +141,10 @@ typedef enum {
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-bool _ATRC_WRAP_FUNC_1(C_PATRC_FD a, const char* b, ReadMode mode);
+bool _ATRC_WRAP_FUNC_1(PATRC_FD a, const char* b, ReadMode mode);
 void _ATRC_WRAP_FUNC_2(int a, int b, const char *c, const char *d);
 void _ATRC_WRAP_FUNC_3(
-    C_PATRC_FD self, 
+    PATRC_FD self, 
     const int action, 
     const int xtra_info, 
     const char *varname, 
@@ -147,21 +158,11 @@ char* _ATRC_WRAP_FUNC_5(const char* b, const char** c);
 #endif // __cplusplus
 
 #ifdef __cplusplus
-#include <string>
-#include <iostream>
-#include <memory>
-#include <vector>
-#include <algorithm>
-#include <ATRC.h>
-#include <variant>
-#include <cmath>
-#include <unordered_map>
-#include <stdexcept>
 
-namespace atrc {
-bool BlockContainsKey(std::vector<Key>& keys, const Key& key);
-bool BlockContainsBlock(std::vector<Block>& blocks,const Block& block);
-bool VariableContainsVariable(std::vector<Variable>& variables, const Variable& variable);
+
+bool BlockContainsKey(std::vector<CPP_Key>& keys, const CPP_Key& key);
+bool BlockContainsBlock(std::vector<CPP_Block>& blocks,const CPP_Block& block);
+bool VariableContainsVariable(std::vector<CPP_Variable>& variables, const CPP_Variable& variable);
 std::string ParseLineSTRINGtoATRC(const std::string &line);
 
 typedef struct _REUSABLE {
@@ -187,12 +188,12 @@ typedef struct RAW_STRING {
 void ParseLineValueATRCtoSTRING(
     std::string& line, 
     const REUSABLE &reus,
-    const std::vector<atrc::Variable> &variables,
+    const std::vector<CPP_Variable> &variables,
     RAW_STRING &raw_str
 );
 
 ATRC_API void _W_Save_(
-ATRC_FD *filedata = nullptr,
+CPP_ATRC_FD *filedata = nullptr,
 const ATRC_SAVE &action = ATRC_SAVE::FULL_SAVE, 
 const int &xtra_info = -2, 
 const std::string &xtra_info2 = "",
@@ -453,9 +454,8 @@ bool ParseFile
     const std::string &_filename, 
     const std::string &encoding, 
     const std::string &extension,
-    std::vector<atrc::Variable> &variables,
-    std::vector<atrc::Block> &blocks
+    std::vector<CPP_Variable> &variables,
+    std::vector<CPP_Block> &blocks
 );
-} // namespace atrc
 #endif // __cplusplus
 #endif // FILER_H

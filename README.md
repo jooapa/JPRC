@@ -1,6 +1,6 @@
 # ATRC - Advanced Tagged Resource Configuration Library
 
-ATRC is a robust **C++17 configuration library** with **full C compatibility**, designed for high-performance applications, game engines, and modular systems.
+ATRC is a robust **C configuration library**, designed for high-performance applications, game engines, and modular systems.
 
 � **[Full Documentation](https://github.com/Antonako1/ATRC/blob/main/docs/)**
 
@@ -8,7 +8,6 @@ ATRC is a robust **C++17 configuration library** with **full C compatibility**, 
 
 ## 🔥 Key Features
 
-- **Dual Language Support**: Full-featured C++ API with C fallback interface
 - **Smart Preprocessor**: Conditional logic, file inclusion, platform detection
 - **Dynamic Variables**: Runtime variable injection and substitution
 - **Cross-Platform**: Windows and Linux support with architecture detection
@@ -19,20 +18,7 @@ ATRC is a robust **C++17 configuration library** with **full C compatibility**, 
 
 ### Basic Usage
 
-```cpp
-#include <ATRC.h>
-
-int main() {
-    atrc::ATRC_FD fd("./config.atrc", ATRC_READ_ONLY);
-    if (!fd.CheckStatus()) return 1;
-
-    fd.AddVariable("Project", "ATRC");
-    fd.AddBlock("Settings");
-    fd.AddKey("Settings", "Version", "2.3.0");
-
-    std::cout << fd["Project"] << std::endl;             // → "ATRC"
-    std::cout << fd["Settings"]["Version"] << std::endl; // → "2.3.0"
-}
+```c
 ```
 
 ### Configuration Example
@@ -66,13 +52,7 @@ Inject1=Inject values from left to right with: %*%, %*%, %*%
 Inject2=Inject values in defined order: %*2%, %*0%, %*1%
 ```
 
-```cpp
-// Variable injection in C++
-std::string result = fd.InsertVar_S(fd["Injection Example"]["Inject1"], {"first", "second", "third"});
-// Result: "Inject values from left to right with: first, second, third"
-
-std::string ordered = fd.InsertVar_S(fd["Injection Example"]["Inject2"], {"A", "B", "C"});
-// Result: "Inject values in defined order: C, A, B"
+```
 ```
 
 #### Enums & Raw Strings
@@ -97,10 +77,8 @@ raw string!
 #.ER
 ```
 
-```cpp
+```c
 // Using enums and raw strings
-int enumVal = fd.GetEnumValue("EnumExample", "Key");  // Returns 0
-std::string raw = fd["RawStringExample"]["RawString"]; // Multi-line string preserved
 ```
 
 ---
@@ -109,10 +87,10 @@ std::string raw = fd["RawStringExample"]["RawString"]; // Multi-line string pres
 
 ```cmake
 cmake_minimum_required(VERSION 3.8)
-project(MyProject VERSION 1.0 LANGUAGES CXX)
+project(MyProject VERSION 1.0 LANGUAGES C)
 
 set(CMAKE_CXX_STANDARD 17)
-add_executable(MyProject "main.cpp")
+add_executable(MyProject "main.c")
 
 # Add ATRC
 set(ATRC_DIR "path/to/ATRC-2.3.0_{BUILD}/cmake")
@@ -129,7 +107,7 @@ target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
 mkdir build
 cd build
 # If you want to compile the test program, switch "ATRC_BUILD_TESTS" to "ON"
-cmake .. -G "Visual Studio 2022 17" -DATRC_BUILD_TESTS=ON
+cmake .. -DATRC_BUILD_TESTS=ON
 cmake --build .
 ```
 
@@ -144,27 +122,6 @@ ATRC files support:
 * **Keys**: `Key=Value` - Settings within blocks
 * **Comments**: `# Comment` - Documentation
 * **Preprocessor**: `#.IF`, `#.INCLUDE`, etc. - Conditional logic
-
----
-
-## 🧰 API Overview
-
-| C++ Class/Function         | C Equivalent                     |
-| -------------------------- | -------------------------------- |
-| `atrc::ATRC_FD`            | `C_ATRC_FD`                      |
-| `Block`, `Key`, `Variable` | `C_Block`, `C_Key`, `C_Variable` |
-
-### Utility Functions
-
-| Function             | Description                    |
-| -------------------- | ------------------------------ |
-| `atrc_to_list()`     | Splits value into string list  |
-| `atrc_to_bool()`     | Converts to `true/false`       |
-| `atrc_to_uint64_t()` | Parses to `uint64_t`           |
-| `atrc_to_double()`   | Parses to `double`             |
-| `atrc_math_exp()`    | Evaluates math expressions     |
-
-See the **[Full Documentation](https://github.com/Antonako1/ATRC/blob/main/docs/)** for more and detailed information
 
 ---
 

@@ -24,7 +24,7 @@ int main()
 #include <stdio.h>
 
 int main() {
-    C_PATRC_FD fd = Create_Empty_ATRC_FD();
+    PATRC_FD fd = Create_Empty_ATRC_FD();
     if(fd == NULL) return 0;
     const char res* = NULL;
     const char line* = "%*%%*% %*%";

@@ -5,24 +5,24 @@
 #include <string>
 #include <vector>
 
-bool atrc::BlockContainsKey(std::vector<atrc::Key>& keys, const atrc::Key& key) {
-    for (const atrc::Key& _key : keys) {
+bool BlockContainsKey(std::vector<CPP_Key>& keys, const CPP_Key& key) {
+    for (const CPP_Key& _key : keys) {
         if (_key.Name == key.Name) {
             return true;
         }
     }
     return false;
 }
-bool atrc::BlockContainsBlock(std::vector<atrc::Block>& blocks,const atrc::Block& block) {
-    for (atrc::Block &_block : blocks) {
+bool BlockContainsBlock(std::vector<CPP_Block>& blocks,const CPP_Block& block) {
+    for (const CPP_Block& _block : blocks) {
         if (_block.Name == block.Name) {
             return true;
         }
     }
     return false;
 }
-bool atrc::VariableContainsVariable(std::vector<atrc::Variable>& variables, const atrc::Variable& variable){
-    for (atrc::Variable &var : variables) {
+bool VariableContainsVariable(std::vector<CPP_Variable>& variables, const CPP_Variable& variable){
+    for (const CPP_Variable& var : variables) {
         if (var.Name == variable.Name) {
             return true;
         }

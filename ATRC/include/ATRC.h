@@ -45,25 +45,8 @@ See the LICENSE file in the project root for license information.
 
 #include <stdint.h>
 #include <stdbool.h>
-#ifdef __cplusplus
-#  include <vector>
-#  include <string>
-#  include <memory>
-#  include <iostream>
-namespace atrc {
-// Disable warning C4251 for std::vector and std::string.
-#  if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
-#    pragma warning(push)
-#    pragma warning(disable: 4251)
-#  endif // (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
-#endif // __cplusplus
 
-
-/*+++
-C declarations
----*/
 #ifdef __cplusplus
-} // namespace atrc
 extern "C" {
 #endif // __cplusplus
 
@@ -74,188 +57,77 @@ typedef enum _ReadMode {
 } ReadMode;
 
 
-typedef struct _C_Variable {
+typedef struct _Variable {
     char *Name;
     char *Value;
     bool IsPublic;
     uint64_t line_number;
-} C_Variable, *C_PVariable;
+} Variable, *PVariable;
 
-typedef struct _C_Variable_Arr {
-    C_Variable *Variables;
+typedef struct _Variable_Arr {
+    Variable *Variables;
     uint64_t VariableCount;
-} C_Variable_Arr, *C_PVariable_Arr;
+} Variable_Arr, *PVariable_Arr;
 
-typedef struct _C_Key {
+typedef struct _Key {
     char *Name;
     char *Value;
     uint64_t line_number;
     uint64_t enum_value;
-} C_Key, *C_PKey;
+} Key, *PKey;
 
-typedef struct _C_Block {
+typedef struct _Block {
     char *Name;
-    C_Key *Keys;
+    Key *Keys;
     uint64_t KeyCount;
     uint64_t line_number;
-} C_Block, *C_PBlock;
+} Block, *PBlock;
 
-typedef struct _C_Block_Arr {
-    C_Block *Blocks;
+typedef struct _Block_Arr {
+    Block *Blocks;
     uint64_t BlockCount;
-} C_Block_Arr, *C_PBlock_Arr;
+} Block_Arr, *PBlock_Arr;
 
 
 
 typedef struct _ATRCFiledata{
-    C_PVariable_Arr Variables;
-    C_PBlock_Arr Blocks;
+    PVariable_Arr Variables;
+    PBlock_Arr Blocks;
     char *Filename;
     bool AutoSave;
     bool Writecheck;
-} C_ATRC_FD, *C_PATRC_FD;
+} ATRC_FD, *PATRC_FD;
 
-ATRC_API bool Read(C_PATRC_FD self, const char* path, ReadMode readMode);
-ATRC_API const char* ReadVariable(C_PATRC_FD self, const char* varname);
-ATRC_API const char* ReadKey(C_PATRC_FD self, const char* block, const char* key);
-ATRC_API bool DoesExistBlock(C_PATRC_FD self, const char* block);
-ATRC_API bool DoesExistVariable(C_PATRC_FD self, const char* varname);
-ATRC_API bool DoesExistKey(C_PATRC_FD self, const char* block, const char* key);
-ATRC_API bool IsPublic(C_PATRC_FD self, const char* varname);
+ATRC_API bool Read(PATRC_FD self, const char* path, ReadMode readMode);
+ATRC_API const char* ReadVariable(PATRC_FD self, const char* varname);
+ATRC_API const char* ReadKey(PATRC_FD self, const char* block, const char* key);
+ATRC_API bool DoesExistBlock(PATRC_FD self, const char* block);
+ATRC_API bool DoesExistVariable(PATRC_FD self, const char* varname);
+ATRC_API bool DoesExistKey(PATRC_FD self, const char* block, const char* key);
+ATRC_API bool IsPublic(PATRC_FD self, const char* varname);
 ATRC_API char* InsertVar_S(const char* line, const char** args);
-ATRC_API bool AddBlock(C_PATRC_FD self, const char* blockname);
-ATRC_API bool RemoveBlock(C_PATRC_FD self, const char* blockname);
-ATRC_API bool AddVariable(C_PATRC_FD self, const char* varname, const char* value);
-ATRC_API bool RemoveVariable(C_PATRC_FD self, const char* varname);
-ATRC_API bool ModifyVariable(C_PATRC_FD self, const char* varname, const char* value);
-ATRC_API bool AddKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
-ATRC_API bool RemoveKey(C_PATRC_FD self, const char* block, const char* key);
-ATRC_API bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
-ATRC_API bool WriteCommentToBottom(C_PATRC_FD self, const char* comment);
-ATRC_API bool WriteCommentToTop(C_PATRC_FD self, const char* comment);
-ATRC_API uint64_t GetEnumValue(C_PATRC_FD self, const char* block, const char* key);
+ATRC_API bool AddBlock(PATRC_FD self, const char* blockname);
+ATRC_API bool RemoveBlock(PATRC_FD self, const char* blockname);
+ATRC_API bool AddVariable(PATRC_FD self, const char* varname, const char* value);
+ATRC_API bool RemoveVariable(PATRC_FD self, const char* varname);
+ATRC_API bool ModifyVariable(PATRC_FD self, const char* varname, const char* value);
+ATRC_API bool AddKey(PATRC_FD self, const char* block, const char* key, const char* value);
+ATRC_API bool RemoveKey(PATRC_FD self, const char* block, const char* key);
+ATRC_API bool ModifyKey(PATRC_FD self, const char* block, const char* key, const char* value);
+ATRC_API bool WriteCommentToBottom(PATRC_FD self, const char* comment);
+ATRC_API bool WriteCommentToTop(PATRC_FD self, const char* comment);
+ATRC_API uint64_t GetEnumValue(PATRC_FD self, const char* block, const char* key);
 
-ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode);
-ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
-ATRC_API void *Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self);
-ATRC_API void *Destroy_ATRC_FD_Variables(C_PATRC_FD self);
-ATRC_API void *Destroy_ATRC_FD(C_PATRC_FD self);
+ATRC_API PATRC_FD Create_ATRC_FD(const char *filename, ReadMode readMode);
+ATRC_API PATRC_FD Create_Empty_ATRC_FD();
+ATRC_API void *Destroy_ATRC_FD_Blocks_And_Keys(PATRC_FD self);
+ATRC_API void *Destroy_ATRC_FD_Variables(PATRC_FD self);
+ATRC_API void *Destroy_ATRC_FD(PATRC_FD self);
 
 ATRC_API void *ATRC_FREE_MEMORY(void *ptr);
 
 #ifdef __cplusplus
 } // extern "C"
-namespace atrc {
-#endif // __cplusplus
-
-
-/*+++
-C++ only declarations
----*/
-#ifdef __cplusplus
-typedef struct ATRC_API _Variable {
-    std::string Name;
-    std::string Value;
-    bool IsPublic = true;
-    uint64_t line_number = (uint64_t)-1;
-} Variable, * PVariable;
-
-typedef struct ATRC_API _Key {
-    std::string Name;
-    std::string Value;
-    uint64_t line_number = (uint64_t)-1;
-    uint64_t enum_value = (uint64_t)-1;
-} Key, * PKey;
-
-
-typedef struct ATRC_API _Block {
-    std::string Name;
-    std::vector<Key> Keys;
-    uint64_t line_number = (uint64_t)-1;
-} Block, * PBlock;
-
-class ATRC_API PROXY_ATRC_FD;
-
-class ATRC_API ATRC_FD {
-public:
-    ATRC_FD();
-    ATRC_FD(std::string& path, ReadMode mode = ATRC_READ_ONLY);
-    ATRC_FD(const char *path, ReadMode mode = ATRC_READ_ONLY);
-    ATRC_FD(C_PATRC_FD filedata);
-    ~ATRC_FD();
-    bool ReadAgain(ReadMode mode = ATRC_READ_ONLY);
-    bool Read(std::string& path, ReadMode mode = ATRC_READ_ONLY);
-    std::string ReadVariable(const std::string& varname);
-    std::string ReadKey(const std::string& block, const std::string& key);
-    bool DoesExistBlock(const std::string& block);
-    bool DoesExistVariable(const std::string& varname);
-    bool DoesExistKey(const std::string& block, const std::string& key);
-    bool IsPublic(const std::string& varname);
-    void InsertVar(std::string& line, std::vector<std::string>& args);
-    std::string InsertVar_S(const std::string& line, std::vector<std::string>& args);
-    bool AddBlock(const std::string& blockname);
-    bool RemoveBlock(const std::string& blockname);
-    bool AddVariable(const std::string& varname, const std::string& value);
-    bool RemoveVariable(const std::string& varname);
-    bool ModifyVariable(const std::string& varname, const std::string& value);
-    bool AddKey(const std::string& block, const std::string& key, const std::string& value);
-    bool RemoveKey(const std::string& block, const std::string& key);
-    bool ModifyKey(const std::string& block, const std::string& key, const std::string& value);
-    bool WriteCommentToTop(const std::string& comment);
-    bool WriteCommentToBottom(const std::string& comment);
-    C_PATRC_FD ToCStruct();
-
-    uint64_t GetEnumValue(const std::string& block, const std::string& key);
-
-    bool CheckStatus();
-
-    std::vector<atrc::Variable> GetVariables();
-    std::vector<Block>* GetBlocks();
-    std::string GetFilename();
-    bool GetAutoSave() const;
-    void SetAutoSave(bool autosave);
-    bool GetWriteCheck() const;
-    void SetWriteCheck(bool writecheck);
-    
-    PROXY_ATRC_FD operator[](const std::string& key);
-    PROXY_ATRC_FD operator[](const std::string& key) const;
-
-private:
-    void MAINCONSTRUCTOR();
-    bool AutoSave;
-    bool Writecheck;
-    std::vector<Variable> Variables;
-    std::vector<Block> Blocks;
-    std::string Filename;
-    bool safeToUse;
-};
-typedef ATRC_FD* PATRC_FD;
-
-class ATRC_API PROXY_ATRC_FD {
-public:
-    PROXY_ATRC_FD(ATRC_FD& fd, const std::string& key);
-    PROXY_ATRC_FD operator[](const std::string& subKey);
-    operator std::string() const;
-    operator const char*() const;
-    PROXY_ATRC_FD& operator=(const std::string& value);    
-    PROXY_ATRC_FD& operator>>(const std::string& value);
-    PROXY_ATRC_FD& operator>>(const char* value);
-
-	inline friend std::ostream& operator<<(std::ostream& os, const PROXY_ATRC_FD& obj) {
-        uint64_t x = obj.key.find("]");
-        if(x == std::string::npos) os << obj.fd->ReadVariable(obj.key);
-        else {
-            std::string block = obj.key.substr(0, x);
-            std::string key_ = obj.key.substr(x + 1, obj.key.size() - x - 1);
-            os << obj.fd->ReadKey(block, key_);
-        }
-		return os;
-	}
-private:
-    PATRC_FD fd;
-    std::string key;
-};
-
 #endif // __cplusplus
 
 
@@ -263,12 +135,10 @@ private:
 
 /*+++
 Start of ATRC standard library
-Namespace: atrc_std
 ---*/
 
 #ifdef __cplusplus
-} // namespace atrc
-namespace atrc_std {
+extern "C" {
 #endif // __cplusplus
 /*
 Inject macro for C
@@ -280,7 +150,7 @@ USAGE:
     free(res);
 }
 */
-#define ATRC_CINJECT(line, ...) \
+#define ATRC_INJECT(line, ...) \
 if(line != NULL) { \
     const char *message = line; \
     const char *args[] = {__VA_ARGS__, NULL}; \
@@ -290,30 +160,9 @@ else { \
     res = NULL; \
 } \
 
-#ifdef __cplusplus
-/*
-Inject macro for C++
-USAGE:
-{
-    std::string res;
-    ATRC_INJECT("INPUT %*%, %*%\n", "arg1", "arg2", ...) // -> "INPUT arg1, arg2\n"
-    // use res as needed
-}
-*/
-#define ATRC_INJECT(fd, line, ...) \
-if(line != "") { \
-    std::string message = line; \
-    std::vector<std::string> args = {__VA_ARGS__}; \
-    res = fd.InsertVar_S(message, args); \
-} \
-else { \
-    res = ""; \
-} 
-#endif // __cplusplus
 
 /*+++
 ATRC STDLIB:
-    - atrc_to_vector    (C++ only)
     - atrc_to_list      (C & C++)
     - atrc_free_list    (C & C++)
     - atrc_to_bool      (C & C++)
@@ -330,19 +179,14 @@ enum ATRC_ERR {
 extern uint64_t atrc_stdlib_errval;
 extern bool atrc_stdlib_writecheck;
 
-#ifdef __cplusplus
-ATRC_API std::vector<std::string> atrc_to_vector(char separator, const std::string &value);
-extern "C" {
-#endif // __cplusplus
-
-typedef struct _C_String_Arr {
+typedef struct _String_Arr {
     char **list;
     uint64_t count;
-} C_String_Arr, *C_PString_Arr;
+} String_Arr, *PString_Arr;
 
-ATRC_API C_PString_Arr atrc_to_list(const char separator, const char* value);
+ATRC_API PString_Arr atrc_to_list(const char separator, const char* value);
 
-ATRC_API void *atrc_free_list(C_PString_Arr list);
+ATRC_API void *atrc_free_list(PString_Arr list);
 
 ATRC_API bool atrc_to_bool(const char* value);
 
@@ -355,11 +199,7 @@ ATRC_API double atrc_to_double(const char* value);
 ATRC_API double atrc_math_exp(const char* value);
 
 #ifdef __cplusplus
-#   if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
-#       pragma warning(pop)
-#   endif // (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
-    } // extern "C"
-} // namespace atrc_std
+} // Extern "C"
 #endif // __cplusplus
 
 #endif // ATRC_H

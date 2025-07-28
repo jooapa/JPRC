@@ -186,7 +186,7 @@ typedef struct _ATRCFiledata{
     char *Filename;
     bool AutoSave;
     bool Writecheck;
-} C_ATRC_FD, *C_PATRC_FD;
+} C_ATRC_FD, *PATRC_FD;
 ```
 
 #### Variables
@@ -215,7 +215,7 @@ Structures writecheck status.
 Reads an ATRC configuration file, returning TRUE on success, FALSE otherwise. Before reading one, you need to create the structure. See [Constructor/Destructor Functions](#constructordestructor-functions)
 
 ```c
-ATRC_API bool Read(C_PATRC_FD self, const char* path, ReadMode readMode);
+ATRC_API bool Read(PATRC_FD self, const char* path, ReadMode readMode);
 ```
 
 #### self
@@ -236,7 +236,7 @@ TRUE on success, FALSE otherwise
 Reads a variable
 
 ```c
-ATRC_API const char* ReadVariable(C_PATRC_FD self, const char* varname);
+ATRC_API const char* ReadVariable(PATRC_FD self, const char* varname);
 ```
 
 #### self
@@ -252,7 +252,7 @@ Variable's value. NULL on error
 Reads a key from a block
 
 ```c
-ATRC_API const char* ReadKey(C_PATRC_FD self, const char* block, const char* key);
+ATRC_API const char* ReadKey(PATRC_FD self, const char* block, const char* key);
 ```
 
 #### self
@@ -273,7 +273,7 @@ Key's value. NULL on error
 Checks if a Block exists.
 
 ```c
-ATRC_API bool DoesExistBlock(C_PATRC_FD self, const char* block);
+ATRC_API bool DoesExistBlock(PATRC_FD self, const char* block);
 ```
 
 #### self
@@ -288,7 +288,7 @@ TRUE if block exists, false otherwise
 Checks if a Variable exists.
 
 ```c
-ATRC_API bool DoesExistVariable(C_PATRC_FD self, const char* varname);
+ATRC_API bool DoesExistVariable(PATRC_FD self, const char* varname);
 ```
 #### self
 Pointer to the C_ATRC_FD structure
@@ -302,7 +302,7 @@ TRUE if exists, FALSE otherwise
 Checks if a Key exists.
 
 ```c
-ATRC_API bool DoesExistKey(C_PATRC_FD self, const char* block, const char* key);
+ATRC_API bool DoesExistKey(PATRC_FD self, const char* block, const char* key);
 ```
 #### self
 Pointer to the C_ATRC_FD structure
@@ -319,7 +319,7 @@ Checks if a variable is public or private.
 See more about private and public variables in `syntax.md`-`Variables`
 
 ```c
-ATRC_API bool IsPublic(C_PATRC_FD self, const char* varname);
+ATRC_API bool IsPublic(PATRC_FD self, const char* varname);
 ```
 
 #### self
@@ -369,7 +369,7 @@ Creates a new block.
 If AutoSave is turned on, the block will be added to the top of the file, after fileheader, comments and variable definitions.
 
 ```c
-ATRC_API bool AddBlock(C_PATRC_FD self, const char* blockname);
+ATRC_API bool AddBlock(PATRC_FD self, const char* blockname);
 ```
 
 #### self
@@ -385,7 +385,7 @@ Removes a block.
 If autosave is turned on, everything below the blocks definition is deleted until a second block definition is found. This includes comments and variables
 
 ```c
-ATRC_API bool RemoveBlock(C_PATRC_FD self, const char* blockname);
+ATRC_API bool RemoveBlock(PATRC_FD self, const char* blockname);
 ```
 
 #### self
@@ -405,7 +405,7 @@ Creates a new variable.
 If autosave is on, the new variable will be added after the fileheader and comments.
 
 ```c
-ATRC_API bool AddVariable(C_PATRC_FD self, const char* varname, const char* value);
+ATRC_API bool AddVariable(PATRC_FD self, const char* varname, const char* value);
 ```
 
 #### self
@@ -420,7 +420,7 @@ TRUE on success, FALSE otherwise
 Deletes a variable
 
 ```c
-ATRC_API bool RemoveVariable(C_PATRC_FD self, const char* varname);
+ATRC_API bool RemoveVariable(PATRC_FD self, const char* varname);
 ```
 
 #### self
@@ -435,7 +435,7 @@ TRUE on success, FALSE otherwise
 Modifies a variable's value with a given new one
 
 ```c
-ATRC_API bool ModifyVariable(C_PATRC_FD self, const char* varname, const char* value);
+ATRC_API bool ModifyVariable(PATRC_FD self, const char* varname, const char* value);
 ```
 
 #### self
@@ -457,7 +457,7 @@ Adds a new key into a block.
 If autosave is turned on, the key will be added right after the block definition.
 
 ```c
-ATRC_API bool AddKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
+ATRC_API bool AddKey(PATRC_FD self, const char* block, const char* key, const char* value);
 ```
 
 #### self
@@ -475,7 +475,7 @@ TRUE on success, FALSE otherwise
 Remove's a key from the given block
 
 ```c
-ATRC_API bool RemoveKey(C_PATRC_FD self, const char* block, const char* key);
+ATRC_API bool RemoveKey(PATRC_FD self, const char* block, const char* key);
 ```
 
 #### self
@@ -493,7 +493,7 @@ TRUE on success, FALSE otherwise
 Modifies a key from a block with the new given value
 
 ```c
-ATRC_API bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value);
+ATRC_API bool ModifyKey(PATRC_FD self, const char* block, const char* key, const char* value);
 ```
 
 #### self
@@ -517,7 +517,7 @@ TRUE on success, FALSE otherwise
 Writes a comment on the last row of the file
 
 ```c
-ATRC_API bool WriteCommentToBottom(C_PATRC_FD self, const char* comment);
+ATRC_API bool WriteCommentToBottom(PATRC_FD self, const char* comment);
 ```
 
 #### self
@@ -535,7 +535,7 @@ If the comment written is "This is a comment", the comment will look like this i
 Writes a comment to the top of the file, just below the fileheader
 
 ```c
-ATRC_API bool WriteCommentToTop(C_PATRC_FD self, const char* comment);
+ATRC_API bool WriteCommentToTop(PATRC_FD self, const char* comment);
 ```
 
 #### self
@@ -558,7 +558,7 @@ Gets the enum value of a key from a block.
 For more information, see `advanced_features.md`-`Enums`
 
 ```c
-ATRC_API uint64_t GetEnumValue(C_PATRC_FD self, const char* block, const char* key);
+ATRC_API uint64_t GetEnumValue(PATRC_FD self, const char* block, const char* key);
 ```
 
 #### self
@@ -579,7 +579,7 @@ Enum value of the key. (uint64_t)-1 on errors
 Creates a new [C_ATRC_FD](#c_atrc_fd) structure, with data from the given filename. Free with [Destroy_ATRC_FD](#destroy_atrc_fd)
 
 ```c
-ATRC_API C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode);
+ATRC_API PATRC_FD Create_ATRC_FD(char *filename, ReadMode readMode);
 ```
 
 #### filename
@@ -597,7 +597,7 @@ Free with [Destroy_ATRC_FD](#destroy_atrc_fd)
 Creates an empty [C_ATRC_FD](#c_atrc_fd) structure. Free with [Destroy_ATRC_FD](#destroy_atrc_fd)
 
 ```c
-ATRC_API C_PATRC_FD Create_Empty_ATRC_FD();
+ATRC_API PATRC_FD Create_Empty_ATRC_FD();
 ```
 
 #### Returns
@@ -613,7 +613,7 @@ Once read, use [Read](#read) to read data into the structure
 Frees memory allocated by blocks and keys from a C_ATRC_FD structure
 
 ```c
-ATRC_API void *Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self);
+ATRC_API void *Destroy_ATRC_FD_Blocks_And_Keys(PATRC_FD self);
 ```
 
 #### self
@@ -626,7 +626,7 @@ Pointer to `self`
 Frees memory allocated by variables
 
 ```c
-ATRC_API void *Destroy_ATRC_FD_Variables(C_PATRC_FD self);
+ATRC_API void *Destroy_ATRC_FD_Variables(PATRC_FD self);
 ```
 
 #### self
@@ -639,7 +639,7 @@ Pointer to `self`
 Frees all the memory allocated my a C_ATRC_FD
 
 ```c
-ATRC_API void *Destroy_ATRC_FD(C_PATRC_FD self);
+ATRC_API void *Destroy_ATRC_FD(PATRC_FD self);
 ```
 
 #### self

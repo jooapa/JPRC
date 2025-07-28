@@ -5,11 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool Read(C_PATRC_FD self, const char* path, ReadMode mode) {
+#error REDO c.c. MEMORY MANAGEMENT IS NOT PROPERLY HANDLED.
+
+bool Read(PATRC_FD self, const char* path, ReadMode mode) {
     return _ATRC_WRAP_FUNC_1(self, path, mode);
 }
 
-uint64_t GetEnumValue(C_PATRC_FD self, const char* block, const char* key) {
+uint64_t GetEnumValue(PATRC_FD self, const char* block, const char* key) {
     for(uint64_t i = 0; i < self->Blocks->BlockCount; i++){
         if(strcmp(block, self->Blocks->Blocks[i].Name) == 0){
             for(uint64_t j = 0; j < self->Blocks->Blocks[i].KeyCount; j++){
@@ -22,7 +24,7 @@ uint64_t GetEnumValue(C_PATRC_FD self, const char* block, const char* key) {
     return (uint64_t)-1; // Return -1 if not found
 }
 
-const char* ReadVariable(C_PATRC_FD self, const char* varname) {
+const char* ReadVariable(PATRC_FD self, const char* varname) {
     const char* res = "";
     for(uint64_t i = 0; i < self->Variables->VariableCount; i++){
         if (self->Variables->Variables[i].Name == NULL) return NULL;
@@ -38,7 +40,7 @@ const char* ReadVariable(C_PATRC_FD self, const char* varname) {
     }
     return res;
 }
-const char* ReadKey(C_PATRC_FD self, const char* block, const char* key) {
+const char* ReadKey(PATRC_FD self, const char* block, const char* key) {
     const char* res = "";
     for(uint64_t i = 0; i < self->Blocks->BlockCount; i++){
         if(strcmp(block, self->Blocks->Blocks[i].Name) == 0){
@@ -53,13 +55,13 @@ const char* ReadKey(C_PATRC_FD self, const char* block, const char* key) {
     if(strcmp(res, "") == 0) return NULL;
     return res;
 }
-bool DoesExistBlock(C_PATRC_FD self, const char* block) {
+bool DoesExistBlock(PATRC_FD self, const char* block) {
     for(uint64_t i = 0; i < self->Blocks->BlockCount; i++){
         if(strcmp(block, self->Blocks->Blocks[i].Name) == 0) return true;
     }
     return false;
 }
-bool DoesExistVariable(C_PATRC_FD self, const char* varname) {
+bool DoesExistVariable(PATRC_FD self, const char* varname) {
     for(uint64_t i = 0; i < self->Variables->VariableCount; i++){
         if(strcmp(varname, self->Variables->Variables[i].Name) == 0){
             if(self->Variables->Variables[i].IsPublic) return true;
@@ -71,7 +73,7 @@ bool DoesExistVariable(C_PATRC_FD self, const char* varname) {
     }
     return false;
 }
-bool DoesExistKey(C_PATRC_FD self, const char* block, const char* key) {
+bool DoesExistKey(PATRC_FD self, const char* block, const char* key) {
     for(uint64_t i = 0; i < self->Blocks->BlockCount; i++){
         if(strcmp(block, self->Blocks->Blocks[i].Name) == 0){
             for(uint64_t j = 0; j < self->Blocks->Blocks[i].KeyCount; j++){
@@ -81,7 +83,7 @@ bool DoesExistKey(C_PATRC_FD self, const char* block, const char* key) {
     }
     return false;
 }
-bool IsPublic(C_PATRC_FD self, const char* varname) {
+bool IsPublic(PATRC_FD self, const char* varname) {
     for(uint64_t i = 0; i < self->Variables->VariableCount; i++){
         if(strcmp(varname, self->Variables->Variables[i].Name) == 0) return self->Variables->Variables[i].IsPublic;
     }
@@ -93,30 +95,25 @@ void InsertVar(char* line, const char** args) {
 char* InsertVar_S(const char* line, const char** args) {
     return _ATRC_WRAP_FUNC_5(line, args);
 }
-bool AddBlock(C_PATRC_FD self, const char* blockname) {
+bool AddBlock(PATRC_FD self, const char* blockname) {
     if (DoesExistBlock(self, blockname)) {
         _ATRC_WRAP_FUNC_2(ERR_BLOCK_EXISTS, -1, blockname, self->Filename);
         return false;
     }
 
-    C_Block blk;
+    Block blk;
     blk.Name = (char*)malloc(strlen(blockname) + 1);
     if (blk.Name == NULL) {
         _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, blockname, self->Filename);
         return false;
     }
     strcpy(blk.Name, blockname);
-
-    blk.Keys = (C_Key*)malloc(sizeof(C_Key)); // Allocate for the keys
-    if (blk.Keys == NULL) {
-        free(blk.Name);
-        _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, blockname, self->Filename);
-        return false;
-    }
+    blk.Keys = NULL;
     blk.KeyCount = 0;
+    blk.line_number = (uint64_t) - 1;
 
-    // Expand Blocks array if necessary
-	C_Block* newBlocks = (C_Block*)realloc(self->Blocks->Blocks, (self->Blocks->BlockCount + 1) * sizeof(C_Block));
+    // Expand Blocks array if 
+	Block* newBlocks = (Block*)realloc(self->Blocks->Blocks, (self->Blocks->BlockCount + 1) * sizeof(Block));
 	if (newBlocks == NULL) {
 		free(blk.Name);
 		free(blk.Keys);
@@ -126,7 +123,6 @@ bool AddBlock(C_PATRC_FD self, const char* blockname) {
 	self->Blocks->Blocks = newBlocks;
     if (self->Blocks->Blocks == NULL) {
         free(blk.Name);
-        free(blk.Keys);
         _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, blockname, self->Filename);
         return false;
     }
@@ -140,7 +136,7 @@ bool AddBlock(C_PATRC_FD self, const char* blockname) {
     return true;
 }
 
-bool RemoveBlock(C_PATRC_FD self, const char* blockname) {
+bool RemoveBlock(PATRC_FD self, const char* blockname) {
     if (!DoesExistBlock(self, blockname)) {
         _ATRC_WRAP_FUNC_2(ERR_BLOCK_NOT_FOUND, -1, blockname, self->Filename);
         return false;
@@ -180,7 +176,7 @@ bool RemoveBlock(C_PATRC_FD self, const char* blockname) {
 
     // Reduce block count and reallocate memory
     self->Blocks->BlockCount--;
-	C_Block* newBlocks = (C_Block*)realloc(self->Blocks->Blocks, self->Blocks->BlockCount * sizeof(C_Block));
+	Block* newBlocks = (Block*)realloc(self->Blocks->Blocks, self->Blocks->BlockCount * sizeof(Block));
 	if (newBlocks == NULL) {
 		_ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, blockname, self->Filename);
 		return false;
@@ -193,13 +189,13 @@ bool RemoveBlock(C_PATRC_FD self, const char* blockname) {
     return true;
 }
 
-bool AddVariable(C_PATRC_FD self, const char* varname, const char* value) {
+bool AddVariable(PATRC_FD self, const char* varname, const char* value) {
     if (DoesExistVariable(self, varname)) {
         _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, varname, self->Filename);
         return false;
     }
 
-    C_Variable var;
+    Variable var;
     var.Name = (char*)malloc(strlen(varname) + 1);
     if (var.Name == NULL) {
         _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, varname, self->Filename);
@@ -218,7 +214,7 @@ bool AddVariable(C_PATRC_FD self, const char* varname, const char* value) {
     var.IsPublic = true;
 
     // Expand Variables array if necessary
-	C_Variable* newVars = (C_Variable*)realloc(self->Variables->Variables, (self->Variables->VariableCount + 1) * sizeof(C_Variable));
+	Variable* newVars = (Variable*)realloc(self->Variables->Variables, (self->Variables->VariableCount + 1) * sizeof(Variable));
 	if (newVars == NULL) {
 		free(var.Name);
 		free(var.Value);
@@ -243,7 +239,7 @@ bool AddVariable(C_PATRC_FD self, const char* varname, const char* value) {
     return true;
 }
 
-bool RemoveVariable(C_PATRC_FD self, const char* varname) {
+bool RemoveVariable(PATRC_FD self, const char* varname) {
     if (!DoesExistVariable(self, varname)) {
         _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, varname, self->Filename);
         return false;
@@ -271,7 +267,7 @@ bool RemoveVariable(C_PATRC_FD self, const char* varname) {
 
     // Reduce variable count and reallocate memory
     self->Variables->VariableCount--;
-	C_Variable* newVars = (C_Variable*)realloc(self->Variables->Variables, self->Variables->VariableCount * sizeof(C_Variable));
+	Variable* newVars = (Variable*)realloc(self->Variables->Variables, self->Variables->VariableCount * sizeof(Variable));
 	if (newVars == NULL) {
 		_ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, varname, self->Filename);
 		return false;
@@ -284,7 +280,7 @@ bool RemoveVariable(C_PATRC_FD self, const char* varname) {
     return true;
 }
 
-bool ModifyVariable(C_PATRC_FD self, const char* varname, const char* value) {
+bool ModifyVariable(PATRC_FD self, const char* varname, const char* value) {
     if (!DoesExistVariable(self, varname)) {
         if(!self->Writecheck){
             _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, varname, self->Filename);
@@ -318,7 +314,7 @@ bool ModifyVariable(C_PATRC_FD self, const char* varname, const char* value) {
 	return false;
 }
 
-bool AddKey(C_PATRC_FD self, const char* block, const char* key, const char* value) {
+bool AddKey(PATRC_FD self, const char* block, const char* key, const char* value) {
     if (!DoesExistBlock(self, block)) {
         _ATRC_WRAP_FUNC_2(ERR_BLOCK_NOT_FOUND, -1, block, self->Filename);
         return false;
@@ -335,14 +331,14 @@ bool AddKey(C_PATRC_FD self, const char* block, const char* key, const char* val
 
     if (blockIndex == (size_t)-1) return false;
 
-    C_Block* blk = &self->Blocks->Blocks[blockIndex];
+    Block* blk = &self->Blocks->Blocks[blockIndex];
     if (DoesExistKey(self, block, key)) {
         _ATRC_WRAP_FUNC_2(ERR_KEY_EXISTS, -1, key, block);
         return false;
     }
 
     // Create the key
-    C_Key newKey;
+    Key newKey;
     newKey.Name = (char*)malloc(strlen(key) + 1);
     if (newKey.Name == NULL) {
         _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, key, block);
@@ -359,7 +355,7 @@ bool AddKey(C_PATRC_FD self, const char* block, const char* key, const char* val
     strcpy(newKey.Value, value);
 
     // Add the key to the block
-	C_Key* newKeys = (C_Key*)realloc(blk->Keys, (blk->KeyCount + 1) * sizeof(C_Key));
+	Key* newKeys = (Key*)realloc(blk->Keys, (blk->KeyCount + 1) * sizeof(Key));
 	if (newKeys == NULL) {
 		free(newKey.Name);
 		free(newKey.Value);
@@ -384,7 +380,7 @@ bool AddKey(C_PATRC_FD self, const char* block, const char* key, const char* val
     return true;
 }
 
-bool RemoveKey(C_PATRC_FD self, const char* block, const char* key) {
+bool RemoveKey(PATRC_FD self, const char* block, const char* key) {
     if (!DoesExistBlock(self, block)) {
         _ATRC_WRAP_FUNC_2(ERR_BLOCK_NOT_FOUND, -1, block, self->Filename);
         return false;
@@ -403,7 +399,7 @@ bool RemoveKey(C_PATRC_FD self, const char* block, const char* key) {
     }
     if (blockIndex == (size_t)-1) return false;
 
-    C_Block* blk = &self->Blocks->Blocks[blockIndex];
+    Block* blk = &self->Blocks->Blocks[blockIndex];
     for (size_t i = 0; i < blk->KeyCount; i++) {
         if (strcmp(blk->Keys[i].Name, key) == 0) {
             keyIndex = i;
@@ -427,7 +423,7 @@ bool RemoveKey(C_PATRC_FD self, const char* block, const char* key) {
         free(blk->Keys);
         blk->Keys = NULL;
     } else {
-        C_Key* newKeys = (C_Key*)realloc(blk->Keys, blk->KeyCount * sizeof(C_Key));
+        Key* newKeys = (Key*)realloc(blk->Keys, blk->KeyCount * sizeof(Key));
         if (newKeys == NULL) {
             _ATRC_WRAP_FUNC_2(ERR_MEMORY_ALLOCATION_FAILED, -1, key, self->Filename);
             return false;
@@ -441,7 +437,7 @@ bool RemoveKey(C_PATRC_FD self, const char* block, const char* key) {
     return true;
 }
 
-bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* value) {
+bool ModifyKey(PATRC_FD self, const char* block, const char* key, const char* value) {
     if (!DoesExistBlock(self, block)) {
         if(!self->Writecheck){
             _ATRC_WRAP_FUNC_2(ERR_BLOCK_NOT_FOUND, -1, block, self->Filename);
@@ -474,7 +470,7 @@ bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* 
     }
     if (blockIndex == (size_t)-1) return false;
 
-    C_Block* blk = &self->Blocks->Blocks[blockIndex];
+    Block* blk = &self->Blocks->Blocks[blockIndex];
     for (size_t i = 0; i < blk->KeyCount; i++) {
         if (strcmp(blk->Keys[i].Name, key) == 0) {
             keyIndex = i;
@@ -498,7 +494,7 @@ bool ModifyKey(C_PATRC_FD self, const char* block, const char* key, const char* 
     return true;
 }
 
-bool WriteCommentToBottom(C_PATRC_FD self, const char* comment) {
+bool WriteCommentToBottom(PATRC_FD self, const char* comment) {
     if (!self) return false;
 
     // Add the comment line to the end of the file
@@ -507,7 +503,7 @@ bool WriteCommentToBottom(C_PATRC_FD self, const char* comment) {
     }
     return true;
 }
-bool WriteCommentToTop(C_PATRC_FD self, const char* comment) {
+bool WriteCommentToTop(PATRC_FD self, const char* comment) {
     if (!self) return false;
 
     // Add the comment line to the top of the file
@@ -517,26 +513,36 @@ bool WriteCommentToTop(C_PATRC_FD self, const char* comment) {
     return true;
 }
 
-C_PATRC_FD Create_ATRC_FD(char *filename, ReadMode mode){
-    C_PATRC_FD res = Create_Empty_ATRC_FD();
+PATRC_FD Create_ATRC_FD(const char *filename, ReadMode mode){
+    PATRC_FD res = Create_Empty_ATRC_FD();
+    printf("Creating ATRC_FD for file: %s\n", filename);
     if(res == NULL) return NULL;
+
+    if(res->Filename != NULL) {
+        free(res->Filename);
+    }
+    res->Filename = (char*)malloc(strlen(filename) + 1);
+    if(res->Filename == NULL) {
+        free(res);
+        return NULL;
+    }
     strcpy(res->Filename, filename);
     if(!Read(res, filename, mode)) return NULL;
     return res;
 }
-C_PATRC_FD Create_Empty_ATRC_FD(void){
-    C_PATRC_FD res = (C_PATRC_FD)malloc(sizeof(C_ATRC_FD));
+PATRC_FD Create_Empty_ATRC_FD(void){
+    PATRC_FD res = (PATRC_FD)malloc(sizeof(ATRC_FD));
     if(res == NULL) return NULL;
     res->AutoSave = false;
     res->Writecheck = false;
-    res->Variables = (C_PVariable_Arr)malloc(sizeof(C_Variable_Arr));
+    res->Variables = (PVariable_Arr)malloc(sizeof(Variable_Arr));
 	if (res->Variables == NULL) {
 		free(res);
 		return NULL;
 	}
 	res->Variables->Variables = NULL;
 	res->Variables->VariableCount = 0;
-    res->Blocks = (C_PBlock_Arr)malloc(sizeof(C_Block_Arr));
+    res->Blocks = (PBlock_Arr)malloc(sizeof(Block_Arr));
 	if (res->Blocks == NULL) {
 		free(res->Variables);
 		free(res);
@@ -549,7 +555,7 @@ C_PATRC_FD Create_Empty_ATRC_FD(void){
     return res;
 }
 
-void *Destroy_ATRC_FD_Variables(C_PATRC_FD self) {
+void *Destroy_ATRC_FD_Variables(PATRC_FD self) {
 	if (!self) return self;
     // Free Variables
     if (self->Variables) {
@@ -572,7 +578,7 @@ void *Destroy_ATRC_FD_Variables(C_PATRC_FD self) {
     }
     return self;
 }
-void *Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self) {
+void *Destroy_ATRC_FD_Blocks_And_Keys(PATRC_FD self) {
 	if (!self) return self;
     // Free Blocks
     if (self->Blocks) {
@@ -606,7 +612,7 @@ void *Destroy_ATRC_FD_Blocks_And_Keys(C_PATRC_FD self) {
     return self;
 }
 
-void *Destroy_ATRC_FD(C_PATRC_FD self) {
+void *Destroy_ATRC_FD(PATRC_FD self) {
     if (!self) return self;
 	if(!Destroy_ATRC_FD_Blocks_And_Keys(self)) return self;
 	if(!Destroy_ATRC_FD_Variables(self)) return self;
