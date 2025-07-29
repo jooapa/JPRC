@@ -61,10 +61,7 @@ Maintained at https://github.com/Antonako1/ATRC
 #endif
 
 #ifdef __cplusplus
-#   ifdef __cplusplus >= 201703L // C++17 or later
-#       include <cstdint>
-#       include <cstdbool>
-#   endif // C++17 or later
+#   include <cstdint>
 #else
 #   include <stdint.h>
 #   include <stdbool.h>
@@ -132,6 +129,12 @@ typedef struct _ATRCFiledata{
 
 #define GLB_ATRC_FD NULL
 
+ATRC_API PATRC_FD Create_Empty_ATRC_FD();
+#ifndef __CREATE_EMPTY_ATRC_FD
+#   define __CREATE_EMPTY_ATRC_FD() \
+        Create_Empty_ATRC_FD()
+#endif // __CREATE_EMPTY_ATRC_FD
+
 ATRC_API PATRC_FD Create_ATRC_FD(const char *filename, ReadMode readMode);
 #ifndef __CREATE_ATRC_FD
 #   define __CREATE_ATRC_FD(filename, readMode) \
@@ -150,13 +153,13 @@ ATRC_API bool Read(PATRC_FD fd, const char* path, ReadMode readMode);
         Read(GLB_ATRC_FD, path, readMode)
 #endif // __READ
     
-ATRC_API const char* ReadVariable(PATRC_FD fd, const char* varname);
+ATRC_API char* ReadVariable(PATRC_FD fd, const char* varname);
 #ifndef __READ_VAR
 #   define __READ_VAR(varname) \
         ReadVariable(GLB_ATRC_FD, varname)
 #endif // __READ_VAR
 
-ATRC_API const char* ReadKey(PATRC_FD fd, const char* block, const char* key);
+ATRC_API char* ReadKey(PATRC_FD fd, const char* block, const char* key);
 #ifndef __READ_KEY
 #   define __READ_KEY(block, key) \
         ReadKey(GLB_ATRC_FD, block, key)
@@ -186,7 +189,7 @@ ATRC_API bool IsPublic(PATRC_FD fd, const char* varname);
         IsPublic(GLB_ATRC_FD, varname)
 #endif // __IS_PUBLIC
 
-ATRC_API const char* InsertVar_S(const char* line, const char** args);
+ATRC_API char* InsertVar_S(const char* line, const char** args);
 #ifndef __INSERT_VAR_S
 #   define __INSERT_VAR_S(line, args) \
         InsertVar_S(line, args)
@@ -258,15 +261,17 @@ ATRC_API uint64_t GetEnumValue(PATRC_FD fd, const char* block, const char* key);
         GetEnumValue(GLB_ATRC_FD, block, key)
 #endif // __GET_ENUM_VALUE
 
-ATRC_API void ATRC_FREE_MEMORY(void **ptr);
+ATRC_API void ATRC_FREE_MEMORY(void *ptr);
 #ifndef __ATRC_FREE_MEMORY
 #   define __ATRC_FREE_MEMORY(ptr) \
-        ATRC_FREE_MEMORY((void**)&ptr)
+        ATRC_FREE_MEMORY(ptr)
 #endif // __ATRC_FREE_MEMORY
 
-#ifndef ATRC_SAFE_FREE
-#define ATRC_SAFE_FREE(p) do { free(p); (p) = NULL; } while (0)
-#endif // ATRC_SAFE_FREE
+#ifndef __ATRC_FREE_MEMORY_EX
+#   define __ATRC_FREE_MEMORY_EX(ptr) \
+        ATRC_FREE_MEMORY(ptr); \
+        ptr = NULL;
+#endif
 
 #ifdef __cplusplus
 } // extern "C"
@@ -290,6 +295,7 @@ USAGE:
     ATRC_INJECT("INPUT %*%, %*%\n", "arg1", "arg2", ...) // -> "INPUT arg1, arg2\n"
     // use res as needed
     ATRC_FREE_MEMORY(res);
+    res = NULL;
 }
 */
 #ifndef ATRC_INJECT

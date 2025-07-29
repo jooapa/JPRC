@@ -59,7 +59,7 @@ bool _ATRC_WRAP_READ(PATRC_FD fd, const char* path, ReadMode readMode) {
         return false;
 	}
 
-    size_t counter = 0, counter2 = 0;
+    size_t counter = 0;
     for(const auto &var : variables) {
         Variable c_var{
             __STRDUP(var.Name.c_str()),
@@ -80,38 +80,46 @@ bool _ATRC_WRAP_READ(PATRC_FD fd, const char* path, ReadMode readMode) {
         return false;
 	}
     
-    counter = 0, counter2 = 0;
-    for(const auto &block : blocks) {
+    for (size_t i = 0; i < blocks.size(); ++i) {
+        const auto& block = blocks[i];
         size_t keys_amount = block.Keys.size();
+
         Block c_block{
-			__STRDUP(block.Name.c_str()),
+            __STRDUP(block.Name.c_str()),
             {
-                (Key*)malloc(keys_amount * sizeof(Key)),
+                (Key*)calloc(keys_amount, sizeof(Key)),
                 (uint64_t)keys_amount
-			},
-			block.line_number
+            },
+            block.line_number
         };
 
-        if(c_block.KeyArray.Keys == NULL) {
-            errormsg(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Key array allocating error", filename);
+        if (!c_block.Name || !c_block.KeyArray.Keys) {
+            errormsg(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Block allocation failed", filename);
             Destroy_ATRC_FD_Variables(fd);
             Destroy_ATRC_FD_Blocks_And_Keys(fd);
             return false;
-		}
+        }
 
-        for(const auto &key : block.Keys) {
+        for (size_t j = 0; j < keys_amount; ++j) {
+            const auto& key = block.Keys[j];
             Key c_key{
                 __STRDUP(key.Name.c_str()),
                 __STRDUP(key.Value.c_str()),
                 key.line_number,
                 key.enum_value
-			};
+            };
 
-			c_block.KeyArray.Keys[counter2] = c_key;
+            if (!c_key.Name || !c_key.Value) {
+                errormsg(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Key strdup failed", filename);
+                Destroy_ATRC_FD_Variables(fd);
+                Destroy_ATRC_FD_Blocks_And_Keys(fd);
+                return false;
+            }
 
-            counter2++;
+            c_block.KeyArray.Keys[j] = c_key;
         }
-        counter++;
+
+        fd->BlockArray.Blocks[i] = c_block;
     }
 
     return true;
@@ -123,20 +131,20 @@ void _ATRC_WRAP_ERRORMSG(int err_num, int line_number, const char *var_name, con
 }
 
 /*_ATRC_WRAP__W_SAVE*/
-void _ATRC_WRAP__W_SAVE(PATRC_FD self, const int action, const int xtra_info, const char *varname, const char *xtra_info4,const char *xtra_info5){
+void _ATRC_WRAP__W_SAVE(PATRC_FD self, const size_t action, const size_t xtra_info, const char *varname, const char *xtra_info4,const char *xtra_info5){
     CPP_ATRC_FD fd(self);
 
     if((ATRC_SAVE)action == ATRC_SAVE::ADD_VAR){
         std::string temp1 = varname;
         std::string temp2 = xtra_info4;
-        _W_Save_(&fd, (ATRC_SAVE)action, xtra_info, "%"+temp1+"%="+ParseLineSTRINGtoATRC(temp2));
+        _W_Save_(&fd, (ATRC_SAVE)action, (int)xtra_info, "%"+temp1+"%="+ParseLineSTRINGtoATRC(temp2));
     } 
     else if((ATRC_SAVE)action == ATRC_SAVE::MODIFY_VAR){
         std::string temp1 = varname;
-        _W_Save_(&fd, (ATRC_SAVE)action, xtra_info, ParseLineSTRINGtoATRC(varname));
+        _W_Save_(&fd, (ATRC_SAVE)action, (int)xtra_info, ParseLineSTRINGtoATRC(varname));
     }
     else {
-        _W_Save_(&fd, (ATRC_SAVE)action, xtra_info, varname, xtra_info4, xtra_info5);
+        _W_Save_(&fd, (ATRC_SAVE)action, (int)xtra_info, varname, xtra_info4, xtra_info5);
     }
 }
 
@@ -156,24 +164,25 @@ void _ATRC_WRAP_INSERTVAR(char* line, const char** args){
 
 /* INSERT_VAR_S */
 char* _ATRC_WRAP_INSERTVAR_S(const char* line, const char** args) {
+    if(line == NULL || args == NULL) {
+        return NULL;
+	}
     CPP_ATRC_FD fd = CPP_ATRC_FD();
     std::vector<std::string> args_v;
     for (uint64_t i = 0; args[i] != NULL; i++) {
         args_v.push_back(args[i]);
     }
-    std::string line_s = line;
+    std::string line_s = std::string(line);
     std::string res = fd.InsertVar_S(line_s, args_v);
 
     if (res.empty()) {
-        return nullptr;
+        return NULL;
     }
 
-    char *cstr = (char*)malloc(res.length() + 1);
+    char *cstr = __STRDUP(res.c_str());
     if (cstr == NULL) {
-        return nullptr; // Memory allocation failed
+        return NULL; // Memory allocation failed
     }
-    strcpy(cstr, res.c_str());
-    cstr[res.length()] = '\0'; // Null-terminate the string
     
     return cstr;
 }

@@ -103,7 +103,7 @@ Bright White    97  107
 
 // Error types
 #define ERR_MEMORY_ALLOCATION_FAILED    502
-
+#define ERR_NULL_POINTER				503
 
 #ifdef __cplusplus
 #include <string>
@@ -177,8 +177,8 @@ bool _ATRC_WRAP_READ(PATRC_FD a, const char* b, ReadMode mode);
 void _ATRC_WRAP_ERRORMSG(int a, int b, const char *c, const char *d);
 void _ATRC_WRAP__W_SAVE(
     PATRC_FD self, 
-    const int action, 
-    const int xtra_info, 
+    const size_t action,
+    const size_t xtra_info,
     const char *varname, 
     const char *xtra_info4,
     const char *xtra_info5
@@ -189,7 +189,7 @@ char* _ATRC_WRAP_INSERTVAR_S(const char* b, const char** c);
 void Destroy_ATRC_FD_Blocks_And_Keys(PATRC_FD self);
 void Destroy_ATRC_FD_Variables(PATRC_FD self);
 
-PATRC_FD Create_Empty_ATRC_FD(void);
+
 
 #ifdef __cplusplus
 } // extern "C"
@@ -357,6 +357,10 @@ inline void errormsg(int err_num=-1,
     std::string msg = "";
     int err_class = -1;
     switch(err_num){
+        case ERR_NULL_POINTER:
+            msg = "Null pointer exception at line " + linecheck(line_number);
+			err_class = ERR_CLASS_MEMORY;
+			break;
         case ERR_INVALID_RAW_STRING:
             msg = "Invalid raw string at or close to: '" + var_name + "' at line " + linecheck(line_number);
             err_class = ERR_CLASS_FILEHANDLER;

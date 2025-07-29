@@ -5,13 +5,14 @@
 
 static void test_read_variable(PATRC_FD fd) {
     const char* varname = "test_variable2";
-    const char* value = ReadVariable(fd, varname);
+    char* value = ReadVariable(fd, varname);
     if (value == NULL || strcmp(value, "") == 0) {
         printf("[FAIL] ReadVariable: Failed to read variable '%s'\n", varname);
     }
     else {
         printf("[PASS] ReadVariable: Value of '%s' is '%s'\n", varname, value);
     }
+    __ATRC_FREE_MEMORY_EX(value);
 }
 
 static void test_block_operations(PATRC_FD fd) {
@@ -95,6 +96,18 @@ static void test_key_operations(PATRC_FD fd) {
         printf("[FAIL] DoesExistKey: Key '%s' does not exist in block '%s'\n", key, block);
     }
 
+    char* value2 = ReadKey(fd, block, key);
+    if (value2 != NULL && strcmp(value2, "") != 0) {
+        printf("[PASS] ReadKey: Key '%s' in block '%s' has value '%s'\n", key, block, value2);
+    }
+    else if (value2 == NULL) {
+        printf("[FAIL] ReadKey: Failed to read key '%s' in block '%s'\n", key, block);
+    }
+	else {
+		printf("[PASS] ReadKey: Key '%s' in block '%s' read successfully\n", key, block);
+    }
+	__ATRC_FREE_MEMORY_EX(value2);
+
     const char* new_value = "modified_value";
     if (ModifyKey(fd, block, key, new_value)) {
         printf("[PASS] ModifyKey: Key '%s' in block '%s' modified successfully\n", key, block);
@@ -115,15 +128,15 @@ static void test_key_operations(PATRC_FD fd) {
 
 static void test_insert(PATRC_FD fd) {
     
-	const char* line2 = ReadVariable(fd, "test");
+	char* line2 = ReadVariable(fd, "test");
 	const char* args2[] = { "test", "test", NULL };
 	char* res = InsertVar_S(line2, args2);
     if (res == NULL) {
 		printf("InsertVar_S: Failed to insert variables\n");
-		return;
     }
     printf("InsertVar_S: '%s'\n", res);
-    __ATRC_FREE_MEMORY(res);
+    __ATRC_FREE_MEMORY_EX(res);
+	__ATRC_FREE_MEMORY_EX(line2);
 }
 
 static int run_tests() {
@@ -171,20 +184,20 @@ printf("Tests completed.\n");
 
 return 0;
 }
-
 int main(int argc, char *argv[]) {
     if(run_tests() != 0) {
         printf("Tests failed.\n");
         return 1;
 	}
-	ATRC_FD* fd = Create_ATRC_FD("../../test.atrc", ATRC_READ_ONLY);
 
-    const char *res =ReadVariable(fd, "PVD_OFFSET");
+	PATRC_FD fd = Create_ATRC_FD("../../test.atrc", ATRC_READ_ONLY);
+
+    char *res = ReadVariable(fd, "PVD_OFFSET");
 	printf("PVD_OFFSET: %s\n", res);
 	double pvd_offset = atrc_math_exp(res);
 	printf("PVD_OFFSET calculated: %f\n", pvd_offset);
 
+    __ATRC_FREE_MEMORY_EX(res);
 	Destroy_ATRC_FD(fd);
-
     return 0;
 }

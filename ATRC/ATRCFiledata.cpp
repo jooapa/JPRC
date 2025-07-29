@@ -40,11 +40,96 @@ CPP_ATRC_FD::CPP_ATRC_FD(std::string& path, ReadMode mode){
 }
 
 CPP_ATRC_FD::CPP_ATRC_FD(PATRC_FD fd){
+	this->MAINCONSTRUCTOR();
+	this->Filename = std::string(fd->Filename);
+	this->AutoSave = fd->AutoSave;
+	this->Writecheck = fd->Writecheck;
+    this->Variables = std::vector<CPP_Variable>();
+    for(uint64_t i = 0; i < fd->VariableArray.VariableCount; i++) {
+        CPP_Variable var;
+        var.Name = std::string(fd->VariableArray.Variables[i].Name);
+        var.Value = std::string(fd->VariableArray.Variables[i].Value);
+        var.IsPublic = fd->VariableArray.Variables[i].IsPublic;
+        var.line_number = fd->VariableArray.Variables[i].line_number;
+        this->Variables.push_back(var);
+	}
 
+    this->Blocks = std::vector<CPP_Block>();
+    for (uint64_t i = 0; i < fd->BlockArray.BlockCount; i++) {
+        CPP_Block block;
+        block.Name = std::string(fd->BlockArray.Blocks[i].Name);
+        block.line_number = fd->BlockArray.Blocks[i].line_number;
+        for (uint64_t j = 0; j < fd->BlockArray.Blocks[i].KeyArray.KeyCount; j++) {
+            CPP_Key key;
+            key.Name = std::string(fd->BlockArray.Blocks[i].KeyArray.Keys[j].Name);
+            key.Value = std::string(fd->BlockArray.Blocks[i].KeyArray.Keys[j].Value);
+            key.line_number = fd->BlockArray.Blocks[i].KeyArray.Keys[j].line_number;
+            key.enum_value = fd->BlockArray.Blocks[i].KeyArray.Keys[j].enum_value;
+            block.Keys.push_back(key);
+        }
+        this->Blocks.push_back(block);
+    }
+	this->safeToUse = true;
 }
 
 PATRC_FD CPP_ATRC_FD::ToCStruct() {
+	PATRC_FD fd = Create_Empty_ATRC_FD();
 
+	fd->AutoSave = this->AutoSave;
+	fd->Writecheck = this->Writecheck;
+	fd->Filename = __STRDUP(this->Filename.c_str());
+
+	fd->VariableArray.VariableCount = (uint64_t)this->Variables.size();
+	fd->VariableArray.Variables = (PVariable)malloc(fd->VariableArray.VariableCount * sizeof(Variable));
+	if (fd->VariableArray.Variables == NULL) {
+		errormsg(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Variable array allocating error", fd->Filename);
+		Destroy_ATRC_FD(fd);
+        fd = NULL;
+		return NULL;
+	}
+	size_t counter = 0, counter2 = 0;
+	for (const auto& var : this->Variables) {
+		fd->VariableArray.Variables[counter].Name = __STRDUP(var.Name.c_str());
+		fd->VariableArray.Variables[counter].Value = __STRDUP(var.Value.c_str());
+		fd->VariableArray.Variables[counter].IsPublic = var.IsPublic;
+		fd->VariableArray.Variables[counter].line_number = var.line_number;
+		counter++;
+	}
+
+	counter = 0, counter2 = 0;
+	fd->BlockArray.BlockCount = (uint64_t)this->Blocks.size();
+	fd->BlockArray.Blocks = (PBlock)malloc(fd->BlockArray.BlockCount * sizeof(Block));
+	if (fd->BlockArray.Blocks == NULL) {
+		errormsg(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Block array allocating error", fd->Filename);
+		Destroy_ATRC_FD(fd);
+        fd = NULL;
+        return NULL;
+	}
+
+    for(const auto& block : this->Blocks) {
+        size_t keys_amount = block.Keys.size();
+        fd->BlockArray.Blocks[counter].Name = __STRDUP(block.Name.c_str());
+        fd->BlockArray.Blocks[counter].line_number = block.line_number;
+        fd->BlockArray.Blocks[counter].KeyArray.KeyCount = (uint64_t)keys_amount;
+        fd->BlockArray.Blocks[counter].KeyArray.Keys = (PKey)malloc(keys_amount * sizeof(Key));
+        if(fd->BlockArray.Blocks[counter].KeyArray.Keys == NULL) {
+            errormsg(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Key array allocating error", fd->Filename);
+            Destroy_ATRC_FD(fd);
+            fd = NULL;
+            return NULL;
+        }
+        for(const auto &key : block.Keys) {
+            fd->BlockArray.Blocks[counter].KeyArray.Keys[counter2].Name = __STRDUP(key.Name.c_str());
+            fd->BlockArray.Blocks[counter].KeyArray.Keys[counter2].Value = __STRDUP(key.Value.c_str());
+            fd->BlockArray.Blocks[counter].KeyArray.Keys[counter2].line_number = key.line_number;
+            fd->BlockArray.Blocks[counter].KeyArray.Keys[counter2].enum_value = key.enum_value;
+            counter2++;
+        }
+        counter2 = 0;
+        counter++;
+	}
+
+    return fd;
 }
 
 CPP_ATRC_FD::~CPP_ATRC_FD(){
@@ -461,14 +546,16 @@ bool CPP_ATRC_FD::ModifyKey(const std::string& block, const std::string& key, co
 bool CPP_ATRC_FD::WriteCommentToTop(const std::string& comment) {
     if (this->AutoSave) {
         _W_Save_(this, ATRC_SAVE::WRITE_COMMENT_TO_TOP, -1, comment);
+        return true;
     }
-    return true;
+    return false;
 }
 bool CPP_ATRC_FD::WriteCommentToBottom(const std::string& comment) {
     if (this->AutoSave) {
         _W_Save_(this, ATRC_SAVE::WRITE_COMMENT_TO_BOTTOM, -1, comment);
+        return true;
     }
-    return true;
+    return false;
 }
 
 uint64_t CPP_ATRC_FD::GetEnumValue(const std::string& block, const std::string& key) {

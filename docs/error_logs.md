@@ -58,4 +58,5 @@ there can be times when this not followed
 #define ERR_INVALID_EXPRESSION          404 // Invalid math expression
 #define ERR_INVALID_NUMBER              405 // Invalid number
 #define ERR_MEMORY_ALLOCATION_FAILED    502 // Memory allocation failed
+#define ERR_NULL_POINTER				503 // Null pointer error 
 ```

@@ -90,13 +90,13 @@ PString_Arr atrc_to_list(const char separator, const char* value) {
 
     std::vector<std::string> temp = atrc_to_vector(separator, value);
     if (temp.empty()) {
-        __ATRC_FREE_MEMORY(res);
+        __ATRC_FREE_MEMORY_EX(res);
         return NULL;
     }
 
     res->list = (char**)malloc(temp.size() * sizeof(char*));
     if (res->list == NULL) {
-        __ATRC_FREE_MEMORY(res);
+        __ATRC_FREE_MEMORY_EX(res);
         return NULL;
     }
 
@@ -106,10 +106,10 @@ PString_Arr atrc_to_list(const char separator, const char* value) {
         if (res->list[i] == NULL) {
             // Cleanup previously allocated memory
             for (size_t j = 0; j < i; j++) {
-                __ATRC_FREE_MEMORY(res->list[j]);
+                __ATRC_FREE_MEMORY_EX(res->list[j]);
             }
-            __ATRC_FREE_MEMORY(res->list);
-            __ATRC_FREE_MEMORY(res);
+            __ATRC_FREE_MEMORY_EX(res->list);
+            __ATRC_FREE_MEMORY_EX(res);
             return NULL;
         }
         std::strcpy(res->list[i], temp[i].c_str());
@@ -127,11 +127,11 @@ void *atrc_free_list(PString_Arr list) {
     }
 
     for (size_t i = 0; i < list->count; i++) {
-        __ATRC_FREE_MEMORY(list->list[i]);
+        __ATRC_FREE_MEMORY_EX(list->list[i]);
     }
-    __ATRC_FREE_MEMORY(list->list);
+    __ATRC_FREE_MEMORY_EX(list->list);
     list->count = 0; // Reset count
-    if(list != NULL) __ATRC_FREE_MEMORY(list);
+    if(list != NULL) __ATRC_FREE_MEMORY_EX(list);
     atrc_stdlib_errval = _ATRC_SUCCESSFULL_ACTION;
     return NULL;
 }
