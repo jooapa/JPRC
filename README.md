@@ -86,8 +86,7 @@ add_executable(MyProject "main.c")
 # Add ATRC
 set(ATRC_DIR "path/to/ATRC-2.3.0_{BUILD}/cmake")
 find_package(ATRC REQUIRED)
-target_include_directories(MyProject PRIVATE ${ATRC_INCLUDE_DIR})
-target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
+target_link_libraries(MyProject PRIVATE ATRC::ATRC)
 ```
 
 ---

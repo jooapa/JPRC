@@ -127,8 +127,6 @@ typedef struct _ATRCFiledata{
     bool Writecheck;
 } ATRC_FD, *PATRC_FD;
 
-#define GLB_ATRC_FD NULL
-
 ATRC_API PATRC_FD Create_Empty_ATRC_FD();
 #ifndef __CREATE_EMPTY_ATRC_FD
 #   define __CREATE_EMPTY_ATRC_FD() \

@@ -54,8 +54,6 @@ mkdir "%OUTPUT_DIR%\docs"
 mkdir "%OUTPUT_DIR%\include"
 mkdir "%OUTPUT_DIR%\Linux\x64\Debug"
 mkdir "%OUTPUT_DIR%\Linux\x64\Release"
-mkdir "%OUTPUT_DIR%\Linux\x86\Debug"
-mkdir "%OUTPUT_DIR%\Linux\x86\Release"
 mkdir "%OUTPUT_DIR%\Windows\x64\Debug"
 mkdir "%OUTPUT_DIR%\Windows\x64\Release"
 mkdir "%OUTPUT_DIR%\Windows\Win32\Release"
@@ -100,9 +98,6 @@ REM Copy README.md
 copy "%PROJECT_ROOT%\README.md" "%OUTPUT_DIR%" /Y
 
 REM Compress the output folder into various formats
-7z a -tzip "%PROJECT_ROOT%\%FOLDER%.zip" "%OUTPUT_DIR%\*" -r                > NUL
-7z a -ttar "%PROJECT_ROOT%\%FOLDER%.tar" "%OUTPUT_DIR%\*" -r                > NUL
-7z a -tgzip "%PROJECT_ROOT%\%FOLDER%.tar.gz" "%PROJECT_ROOT%\%FOLDER%.tar"  > NUL
 7z a -t7z "%PROJECT_ROOT%\%FOLDER%.7z" "%OUTPUT_DIR%\*" -r                  > NUL
 
 REM Clean up temporary files
