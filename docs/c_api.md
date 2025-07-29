@@ -699,6 +699,32 @@ result = null;
 
 ## Macro usage
 
+Macros for C API are defined as follows:
+
+__<FUNCTION_NAME_IN_UPPERCASE>
+
+The function macros allow user to make shorter function calls.
+Before calling these macros, `GLB_ATRC_FD` needs to be defined to a valid ATRC_FD pointer
+
+```c
+#include <ATRC.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[]) {
+    PATRC_FD fd = Create_ATRC_FD("config.atrc", ATRC_CREATE_READ);
+    if(fd == NULL) {
+        return 1;
+    }
+    #define GLB_ATRC_FD fd
+    char *res = __READ_VARIABLE("VarName");
+    /*
+    Macro expands into:
+    char *res = ReadVariable(GLB_ATRC_FD, "varName");
+    */
+
+   ATRC_FREE_MEMORY(res);
+}
+```
 
 
 ---
@@ -733,8 +759,8 @@ int main() {
     AddKey(fd, "ServerConfig", "port", "8080");
 
     // Read values
-    const char* app_name = ReadVariable(fd, "app_name");
-    const char* host = ReadKey(fd, "ServerConfig", "host");
+    char* app_name = ReadVariable(fd, "app_name");
+    char* host = ReadKey(fd, "ServerConfig", "host");
     
     printf("Application: %s\n", app_name ? app_name : "Unknown");
     printf("Host: %s\n", host ? host : "Unknown");
@@ -745,6 +771,8 @@ int main() {
     const char* message = InsertVar_S(template, args);
     printf("%s\n", message);
     ATRC_FREE_MEMORY(message);
+    ATRC_FREE_MEMORY(app_name);
+    ATRC_FREE_MEMORY(host);
     message = NULL;
 
     // Clean up
