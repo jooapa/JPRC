@@ -1,8 +1,5 @@
 /*+++
-NOTE: This file is not in use as of now.
-Part of old class system that didn't work.
-Saved in case a C++ wrapper is made in the future.
-
+NOTE: This file is used only internaly as of now.
 ---*/
 
 #define _CRT_SECURE_NO_DEPRECATE
@@ -43,29 +40,11 @@ CPP_ATRC_FD::CPP_ATRC_FD(std::string& path, ReadMode mode){
 }
 
 CPP_ATRC_FD::CPP_ATRC_FD(PATRC_FD fd){
-    this->MAINCONSTRUCTOR();
-    this->AutoSave = fd->AutoSave;
-    this->Filename = fd->Filename;
-    this->Variables = std::vector<CPP_Variable>();
-    this->Blocks = std::vector<CPP_Block>();
-    for(uint64_t i = 0; i < fd->Variables->VariableCount; i++){
-        CPP_Variable var;
-        var.Name = fd->Variables->Variables[i].Name;
-        var.Value = fd->Variables->Variables[i].Value;
-        var.IsPublic = fd->Variables->Variables[i].IsPublic;
-        this->Variables.push_back(var);
-    }
-    for(uint64_t i = 0; i < fd->Blocks->BlockCount; i++){
-        CPP_Block blk;
-        blk.Name = fd->Blocks->Blocks[i].Name;
-        for(uint64_t j = 0; j < fd->Blocks->Blocks[i].KeyCount; j++){
-            CPP_Key key;
-            key.Name = fd->Blocks->Blocks[i].Keys[j].Name;
-            key.Value = fd->Blocks->Blocks[i].Keys[j].Value;
-            blk.Keys.push_back(key);
-        }
-        this->Blocks.push_back(blk);
-    }
+
+}
+
+PATRC_FD CPP_ATRC_FD::ToCStruct() {
+
 }
 
 CPP_ATRC_FD::~CPP_ATRC_FD(){
@@ -124,104 +103,7 @@ bool CPP_ATRC_FD::ReadAgain(ReadMode mode){
     return true;
 }
 
-PATRC_FD CPP_ATRC_FD::ToCStruct() {
-    PATRC_FD c_struct = Create_Empty_ATRC_FD();
-    if (!c_struct) return NULL;
 
-    c_struct->AutoSave = this->AutoSave;
-
-    // Allocate and copy Filename
-    c_struct->Filename = (char*)malloc(this->Filename.size() + 1);
-    if (!c_struct->Filename) {
-        Destroy_ATRC_FD(c_struct);
-        return NULL;
-    }
-    std::strcpy(c_struct->Filename, this->Filename.c_str());
-
-    // Allocate memory for Variables
-    c_struct->Variables->VariableCount = 0;
-    c_struct->Variables->Variables = (PVariable)malloc(this->Variables.size() * sizeof(Variable));
-    if (!c_struct->Variables->Variables) {
-        Destroy_ATRC_FD(c_struct);
-        return NULL;
-    }
-
-    for (const CPP_Variable& var : this->Variables) {
-        // Allocate Name
-        c_struct->Variables->Variables[c_struct->Variables->VariableCount].Name = (char*)malloc(var.Name.size() + 1);
-        if (!c_struct->Variables->Variables[c_struct->Variables->VariableCount].Name) {
-            Destroy_ATRC_FD(c_struct);
-            return NULL;
-        }
-        std::strcpy(c_struct->Variables->Variables[c_struct->Variables->VariableCount].Name, var.Name.c_str());
-
-        // Allocate Value
-        c_struct->Variables->Variables[c_struct->Variables->VariableCount].Value = (char*)malloc(var.Value.size() + 1);
-        if (!c_struct->Variables->Variables[c_struct->Variables->VariableCount].Value) {
-            Destroy_ATRC_FD(c_struct);
-            return NULL;
-        }
-        std::strcpy(c_struct->Variables->Variables[c_struct->Variables->VariableCount].Value, var.Value.c_str());
-
-        // Copy IsPublic
-        c_struct->Variables->Variables[c_struct->Variables->VariableCount].IsPublic = var.IsPublic;
-        c_struct->Variables->Variables[c_struct->Variables->VariableCount].line_number = var.line_number;
-        c_struct->Variables->VariableCount++;
-    }
-
-    // Allocate memory for Blocks
-    c_struct->Blocks->BlockCount = 0;
-    c_struct->Blocks->Blocks = (Block*)malloc(this->Blocks.size() * sizeof(Block));
-    if (!c_struct->Blocks->Blocks) {
-        Destroy_ATRC_FD(c_struct);
-        return NULL;
-    }
-
-    for (const CPP_Block& block : this->Blocks) {
-        // Allocate Block Name
-        c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Name = (char*)malloc(block.Name.size() + 1);
-        if (!c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Name) {
-            Destroy_ATRC_FD(c_struct);
-            return NULL;
-        }
-        std::strcpy(c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Name, block.Name.c_str());
-        c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].line_number = block.line_number;
-        // Allocate Keys
-        c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount = 0;
-        c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys = (Key*)malloc(block.Keys.size() * sizeof(Key));
-        if (!c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys) {
-            Destroy_ATRC_FD(c_struct);
-            return NULL;
-        }
-
-        for (const CPP_Key& key : block.Keys) {
-            // Allocate Key Name
-            c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys[c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount].Name = (char*)malloc(key.Name.size() + 1);
-            if (!c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys[c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount].Name) {
-                Destroy_ATRC_FD(c_struct);
-                return NULL;
-            }
-            std::strcpy(c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys[c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount].Name, key.Name.c_str());
-
-            // Allocate Key Value
-            c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys[c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount].Value = (char*)malloc(key.Value.size() + 1);
-            if (!c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys[c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount].Value) {
-                Destroy_ATRC_FD(c_struct);
-                return NULL;
-            }
-
-            std::strcpy(c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys[c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount].Value, key.Value.c_str());
-
-            c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys[c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount].line_number = key.line_number;
-            c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].Keys[c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount].enum_value = key.enum_value;
-            c_struct->Blocks->Blocks[c_struct->Blocks->BlockCount].KeyCount++;
-        }
-
-        c_struct->Blocks->BlockCount++;
-    }
-
-    return c_struct;
-}
 
 
 std::vector<CPP_Variable> CPP_ATRC_FD::GetVariables(){

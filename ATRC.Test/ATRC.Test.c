@@ -123,7 +123,7 @@ static void test_insert(PATRC_FD fd) {
 		return;
     }
     printf("InsertVar_S: '%s'\n", res);
-    free(res);
+    __ATRC_FREE_MEMORY(res);
 }
 
 static int run_tests() {
@@ -172,11 +172,7 @@ printf("Tests completed.\n");
 return 0;
 }
 
-int main(void) {
-
-
-    /*
-    */
+int main(int argc, char *argv[]) {
     if(run_tests() != 0) {
         printf("Tests failed.\n");
         return 1;
@@ -189,8 +185,6 @@ int main(void) {
 	printf("PVD_OFFSET calculated: %f\n", pvd_offset);
 
 	Destroy_ATRC_FD(fd);
-
-	// cpp_main();
 
     return 0;
 }

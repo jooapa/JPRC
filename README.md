@@ -2,11 +2,11 @@
 
 ATRC is a robust **C configuration library**, designed for high-performance applications, game engines, and modular systems.
 
-� **[Full Documentation](https://github.com/Antonako1/ATRC/blob/main/docs/)**
+**[Full Documentation](https://github.com/Antonako1/ATRC/blob/main/docs/)**
 
 ---
 
-## 🔥 Key Features
+## Key Features
 
 - **Smart Preprocessor**: Conditional logic, file inclusion, platform detection
 - **Dynamic Variables**: Runtime variable injection and substitution
@@ -14,11 +14,45 @@ ATRC is a robust **C configuration library**, designed for high-performance appl
 
 ---
 
-## 🚀 Quick Start
+## Installation
+
+Download prebuilt release and debug binaries for Windows (x64, x86) and Linux (x64) from [Releases](https://github.com/Antonako1/ATRC/releases)
+
+Windows binaries are compiled with VS 17 2022
+
+Linux prebuilt 64-bit binaries are compiled with CLang
+
+For prebuild binaries, see [Building](#building) section
+
+---
+
+## Quick Start
 
 ### Basic Usage
 
 ```c
+#include <ATRC.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) {
+    ATRC_FD* fd = Create_ATRC_FD("./servercond.atrc", ATRC_READ_ONLY);
+    const char *platform = ReadKey("ServerConfig", "Platform");
+    const char *env = ReadKey("ServerConfig", "Environment");
+    printf("Running %s on %s", platform, env);
+    Destroy_ATRC_FD(fd);
+
+    // Alternatively use macros to shorten function calls
+    ATRC_FD* fd2 = Create_ATRC_FD("./serverconf.atrc", ATRC_READ_ONLY);
+    #define GLB_ATRC_FD fd2
+    const char *platform = __READKEY("ServerConfig", "Platform");
+    const char *env = __READKEY("ServerConfig", "Environment");
+    printf("Running %s on %s", platform, env);
+    __DESTROY_ATRC_FD
+    #define GLB_ATRC_FD NULL
+    
+    return 0;
+}
 ```
 
 ### Configuration Example
@@ -39,57 +73,14 @@ Host=%user%@server.com
 Environment=%env%
 ```
 
-### Advanced Features
-
-#### File Inclusion & Variable Injection
-```ini
-#!ATRC
-# Include global definitions
-#.INCLUDE globals.atrc
-
-[Injection Example]
-Inject1=Inject values from left to right with: %*%, %*%, %*%
-Inject2=Inject values in defined order: %*2%, %*0%, %*1%
-```
-
-```
-```
-
-#### Enums & Raw Strings
-```ini
-#!ATRC
-[EnumExample]
-Key=Value       # Once read with ATRC_FD::GetEnumValue(), it will return 0
-
-[RawStringExample]
-# Use VAR when creating a raw string value for a variable
-#.SR VAR
-%RawVar%=Raw
-STRING!
-#.ER
-
-# Use KEY when creating a raw string value for a key
-#.SR KEY
-RawString=This
-is
-a
-raw string!
-#.ER
-```
-
-```c
-// Using enums and raw strings
-```
-
 ---
 
-## ⚙️ CMake Integration
+## CMake Integration
 
-```cmake
+```bash
 cmake_minimum_required(VERSION 3.8)
 project(MyProject VERSION 1.0 LANGUAGES C)
 
-set(CMAKE_CXX_STANDARD 17)
 add_executable(MyProject "main.c")
 
 # Add ATRC
@@ -101,38 +92,21 @@ target_link_libraries(MyProject PRIVATE ${ATRC_LIB_RELEASE})
 
 ---
 
-## 🛠️ Build & Test
+## Building
+
+Building ATRC requires C++17
 
 ```bash
 mkdir build
 cd build
 # If you want to compile the test program, switch "ATRC_BUILD_TESTS" to "ON"
-cmake .. -DATRC_BUILD_TESTS=ON
+cmake .. -DATRC_BUILD_TESTS=OFF
 cmake --build .
 ```
 
 ---
 
-## 📦 File Format
-
-ATRC files support:
-
-* **Variables**: `%key%=value` - Global runtime variables
-* **Blocks**: `[Name]` - Configuration sections
-* **Keys**: `Key=Value` - Settings within blocks
-* **Comments**: `# Comment` - Documentation
-* **Preprocessor**: `#.IF`, `#.INCLUDE`, etc. - Conditional logic
-
----
-
-## 🖥️ Supported Platforms
-
-* ✅ Windows (x86, x64)
-* ✅ Linux (x86, x64)
-
----
-
-## 📄 License
+## License
 
 ATRC is open-source under the [BSD-2-Clause license](LICENSE.txt).
 

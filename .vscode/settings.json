@@ -91,6 +91,7 @@
         "corecrt.h": "cpp",
         "unordered_map": "cpp",
         "variant": "cpp",
-        "xpolymorphic_allocator.h": "cpp"
+        "xpolymorphic_allocator.h": "cpp",
+        "cstdbool": "c"
     }
 }

@@ -1,9 +1,9 @@
 # Error logs
 
-Error logs are created as shown below
+Error logs are defined as shown below
 
 ```cpp
-"~ATRC~Error<" << err_class << "?" << err_num << ">"<< "<" << filename << ">" <<": " << msg
+"~ATRC~Error<" + err_class + "?" + err_num + ">" + "<" + filename + ">"+ ": " + msg
 // Outputs "~ATRC~ERROR~<100?105><test.atrc>: Re-Rereferenced variable: 'testvar' at line 4"
 ```
 

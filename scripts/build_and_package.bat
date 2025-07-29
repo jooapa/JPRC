@@ -80,6 +80,9 @@ copy "%PROJECT_ROOT%\ATRC\include\ATRC.h" "%OUTPUT_DIR%\include" /Y
 REM Copy CMake configuration
 copy "%PROJECT_ROOT%\cmake\ATRCConfig.cmake" "%OUTPUT_DIR%\cmake" /Y
 
+REM Copy CMake targets
+copy "%PROJECT_ROOT%\cmake\ATRCTargets.cmake" "%OUTPUT_DIR%\cmake" /Y
+
 REM Copy README
 copy "%PROJECT_ROOT%\README.md" "%OUTPUT_DIR%" /Y
 

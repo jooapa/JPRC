@@ -1,7 +1,24 @@
+/*+++
+This project is licensed under the BSD 2-Clause License.
+See the LICENSE file in the project root for license information.
+
+Header file for the ATRC (Advanced Tagged Resource Configuration Library) library.
+  This file contains the declarations for the ATRC library, which provides functionality
+for reading, writing, and manipulating configuration files in a structured format.
+  This library is designed to be used in both C and C++ projects, with a focus on
+ease of use and flexibility.
+
+Author(s): 
+    Antonako1
+
+Maintained at https://github.com/Antonako1/ATRC
+
+---*/
 #ifndef FILER_H
 #define FILER_H
 #include "./ATRC.h"
 
+#define INVALID_INDEX ((uint64_t)-1)
 
 /*
 Name            FG  BG
@@ -138,12 +155,27 @@ typedef enum {
 } ATRC_SAVE;
 #endif // __cplusplus
 
+
+/*+++
+C functions
+---*/
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-bool _ATRC_WRAP_FUNC_1(PATRC_FD a, const char* b, ReadMode mode);
-void _ATRC_WRAP_FUNC_2(int a, int b, const char *c, const char *d);
-void _ATRC_WRAP_FUNC_3(
+
+#include <string.h>
+
+#ifdef WIN32
+#define __STRDUP(src) \
+    _strdup(src)
+#else
+#define __STRDUP(src) \
+    strdup(src)
+#endif
+
+bool _ATRC_WRAP_READ(PATRC_FD a, const char* b, ReadMode mode);
+void _ATRC_WRAP_ERRORMSG(int a, int b, const char *c, const char *d);
+void _ATRC_WRAP__W_SAVE(
     PATRC_FD self, 
     const int action, 
     const int xtra_info, 
@@ -151,15 +183,19 @@ void _ATRC_WRAP_FUNC_3(
     const char *xtra_info4,
     const char *xtra_info5
 );
-void _ATRC_WRAP_FUNC_4(char* b, const char** v);
-char* _ATRC_WRAP_FUNC_5(const char* b, const char** c);
+void _ATRC_WRAP_INSERTVAR(char* b, const char** v);
+char* _ATRC_WRAP_INSERTVAR_S(const char* b, const char** c);
+
+void Destroy_ATRC_FD_Blocks_And_Keys(PATRC_FD self);
+void Destroy_ATRC_FD_Variables(PATRC_FD self);
+
+PATRC_FD Create_Empty_ATRC_FD(void);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
 
 #ifdef __cplusplus
-
-
 bool BlockContainsKey(std::vector<CPP_Key>& keys, const CPP_Key& key);
 bool BlockContainsBlock(std::vector<CPP_Block>& blocks,const CPP_Block& block);
 bool VariableContainsVariable(std::vector<CPP_Variable>& variables, const CPP_Variable& variable);

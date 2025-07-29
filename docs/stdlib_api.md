@@ -32,23 +32,6 @@ Stdlib functions change this variable according if the function does what it was
 extern uint64_t atrc_stdlib_errval;
 ```
 
-## atrc_to_vector
-
-```cpp
-ATRC_API std::vector<std::string> atrc_to_vector(char separator, const std::string &value);
-```
-
-- `char separator`
-    - Characted which to separate values by
-- `const std::string &value`
-    - Value, which to turn into the vector
-
-### Example
-
-```cpp
-std::vector<std::string> res = atrc_to_vector('|', "this|is|a|list");
-```
-
 ## _C_String_Arr
 
 Array created by `atrc_to_list`. Free with `atrc_free_list`

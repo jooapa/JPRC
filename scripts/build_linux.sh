@@ -26,14 +26,11 @@ counter=$1
 # Array of presets for Linux
 declare -a presets=(
     "linux-x64-debug" "linux-x64-release"
-    "linux-x86-debug" "linux-x86-release"
 )
 
 # Create the ATRC directory structure
 mkdir -p "${ATRC_DIR}/Linux/x64/Debug"
 mkdir -p "${ATRC_DIR}/Linux/x64/Release"
-mkdir -p "${ATRC_DIR}/Linux/x86/Debug"
-mkdir -p "${ATRC_DIR}/Linux/x86/Release"
 
 # Loop through presets
 for preset in "${presets[@]}"; do

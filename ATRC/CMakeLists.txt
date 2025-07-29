@@ -1,8 +1,8 @@
 ﻿add_library(ATRC SHARED 
     "filehandler2.cpp"
     "core_dev.cpp"
-    "c.c"
-    "c_cpp.cpp"
+    "c_api.c"
+    "c_wrapper.cpp"
     "ATRCFiledata.cpp"
     "atrc_stdlib.cpp"
 )
@@ -15,6 +15,9 @@ endif()
 if(MSVC)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
+
+# 
+add_compile_definitions(ATRC_EXPORTS)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(ATRC PUBLIC ${CMAKE_BINARY_DIR}/exports)
