@@ -18,11 +18,11 @@ ATRC is a robust **C configuration library**, designed for high-performance appl
 
 Download prebuilt release and debug binaries for Windows (x64, x86) and Linux (x64) from [Releases](https://github.com/Antonako1/ATRC/releases)
 
-Windows binaries are compiled with VS 17 2022
+Windows prebuilt binaries are compiled with VS 17 2022
 
 Linux prebuilt 64-bit binaries are compiled with CLang
 
-For prebuild binaries, see [Building](#building) section
+For building binaries, see [Building](#building) section
 
 ---
 
