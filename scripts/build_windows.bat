@@ -1,21 +1,14 @@
 @echo off
-REM Define the project root directory
+cd /D %~dp0
+
+call "global.bat"
+
 cd ..
 
-REM Increment build version
-SET BUILD_VERSION=0
-REM Add contents of BUILDNUMBER file to BUILD_VERSION
-set /P BUILD_VERSION=< "%PROJECT_FOLDER%\BUILDNUMBER"
-FOR /F "delims=" %%i IN ('powershell -Command "[Convert]::ToString(%BUILD_VERSION%, 16)"') DO SET BUILD_VERSION=%%i
-REM Ensure the BUILD_VERSION is uppercase
-SET BUILD_VERSION=%BUILD_VERSION:~0,8%
-
-set PROJECT_ROOT=%cd%
-set /P VERSION=< "%PROJECT_ROOT%\project\VERSION"
-set OUTPUT_DIR=%PROJECT_ROOT%\ATRC-%VERSION%_%BUILD_VERSION%
 set ERROR_ENCOUNTERED=0
 
 REM Define configurations for Windows builds
+REM Do NOT change the order of these configurations
 call :build Win32 Debug
 if errorlevel 1 set ERROR_ENCOUNTERED=1
 

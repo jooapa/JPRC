@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Platforms>x64</Platforms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Windows native DLL for current configuration -->
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' and '$(Configuration)' == 'Debug'">
+    <None Include="..\lib\Windows\x64\Debug\ATRC.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ATRC.dll</Link>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' and '$(Configuration)' == 'Release'">
+    <None Include="..\lib\Windows\x64\Release\ATRC.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ATRC.dll</Link>
+    </None>
+  </ItemGroup>
+
+  <!-- Linux native library for current configuration -->
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' and '$(Configuration)' == 'Debug'">
+    <None Include="..\lib\Linux\x64\Debug\libATRC.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libATRC.so</Link>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' and '$(Configuration)' == 'Release'">
+    <None Include="..\lib\Linux\x64\Release\libATRC.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libATRC.so</Link>
+    </None>
+  </ItemGroup>
+
+
+
+</Project>
