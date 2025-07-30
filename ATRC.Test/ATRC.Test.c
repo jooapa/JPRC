@@ -1,4 +1,5 @@
 ﻿#include "ATRC.Test.h"
+#include <ATRC.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -185,6 +186,7 @@ printf("Tests completed.\n");
 return 0;
 }
 int main(int argc, char *argv[]) {
+    /*
     if(run_tests() != 0) {
         printf("Tests failed.\n");
         return 1;
@@ -199,5 +201,6 @@ int main(int argc, char *argv[]) {
 
     __ATRC_FREE_MEMORY_EX(res);
 	Destroy_ATRC_FD(fd);
-    return 0;
+    */
+    return cpp_main();
 }

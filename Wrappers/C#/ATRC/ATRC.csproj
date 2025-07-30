@@ -18,9 +18,12 @@
     <IncludeSource>false</IncludeSource>
     <PackageTags>config;wrapper;native;resourcefile;configfile;configurationfile</PackageTags>
     <!-- <PackageIcon>icon.png</PackageIcon> Add icon.png and mark as <None Pack="true" PackagePath=""> -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\ATRC.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="bin\Release\net8.0\ATRC.xml" Pack="true" PackagePath="lib\net8.0" />
     <None Include="../README.md" PackagePath="" Pack="true" /> <!-- NEW -->
     <None Include="../../../LICENSE.txt" PackagePath="" Pack="true" /> <!-- NEW -->
     <!-- Windows x64 -->

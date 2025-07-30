@@ -271,6 +271,12 @@ ATRC_API void ATRC_FREE_MEMORY(void *ptr);
         ptr = NULL;
 #endif
 
+ATRC_API PATRC_FD Copy_ATRC_FD(PATRC_FD fd);
+#ifndef __COPY_ATRC_FD
+#   define __COPY_ATRC_FD(fd) \
+        Copy_ATRC_FD(fd)
+#endif // __COPY_ATRC_FD
+
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

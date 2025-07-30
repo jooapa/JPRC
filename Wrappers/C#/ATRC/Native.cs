@@ -5,7 +5,7 @@ See the LICENSE file in the project root for license information.
 Header file for the ATRC (Advanced Tagged Resource Configuration Library) library.
   This file contains the declarations for the ATRC library, which provides functionality
 for reading, writing, and manipulating configuration files in a structured format.
-  This library is designed to be used in both C and C++ projects, with a focus on
+  This library is designed to be used in both C and C++, with this wrapper for C# projects, with a focus on
 ease of use and flexibility.
 
 Author(s): 
@@ -218,6 +218,10 @@ namespace ATRCNative
         [LibraryImport(LIB)]
         [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
         internal static partial void ATRC_FREE_MEMORY(IntPtr ptr);
+
+        [LibraryImport(LIB)]
+        [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+        internal static partial IntPtr Copy_ATRC_FD(IntPtr ptr);
 
         [LibraryImport(LIB, StringMarshalling = StringMarshalling.Utf16)]
         [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]

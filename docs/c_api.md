@@ -509,7 +509,7 @@ ATRC_API bool AddVariable(PATRC_FD fd, const char* varname, const char* value);
 
 **Example:**
 ```c
-if (AddVariable(fd, "app_version", "2.3.0")) {
+if (AddVariable(fd, "app_version", "2.3.1")) {
     printf("Variable 'app_version' added\n");
 }
 ```
@@ -693,6 +693,23 @@ const char* result = InsertVar_S(template, args);
 // Use result...
 ATRC_FREE_MEMORY(result);
 result = null;
+```
+
+### Copy_ATRC_FD
+
+**Definition:**
+```c
+ATRC_API PATRC_FD Copy_ATRC_FD(PATRC_FD fd);
+```
+
+**Remarks:**
+- Copies ATRC_FD's memory into a new structure
+
+**Example:**
+```c
+PATRC_FD copy = Copy_ATRC_FD(old_fd);
+Destroy_ATRC_FD(fd);
+Destroy_ATRC_FD(copy);
 ```
 
 ---

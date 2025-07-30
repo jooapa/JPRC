@@ -92,6 +92,7 @@
         "unordered_map": "cpp",
         "variant": "cpp",
         "xpolymorphic_allocator.h": "cpp",
-        "cstdbool": "c"
+        "cstdbool": "c",
+        "legacy.h": "cpp"
     }
 }

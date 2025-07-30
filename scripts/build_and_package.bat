@@ -64,12 +64,22 @@ copy "%PROJECT_ROOT%\project\CHANGELOG" "%OUTPUT_DIR%" /Y
 REM Copy README.md
 copy "%PROJECT_ROOT%\README.md" "%OUTPUT_DIR%" /Y
 
+
+
+ECHO Starting C++ packaging...
+copy "%PROJECT_ROOT%\Wrappers\C++\include\ATRC.hpp" "%OUTPUT_DIR%\include" /Y
+ECHO C++ package can be found in "%OUTPUT_DIR%\ATRC.hpp"
+
 REM Compress the output folder into various formats
 7z a -t7z "%PROJECT_ROOT%\%FOLDER%.7z" "%OUTPUT_DIR%\*" -r                  > NUL
 
-REM Clean up temporary files
-del "%PROJECT_ROOT%\%FOLDER%.tar"
-
 REM Completion message
 echo All tasks completed successfully!
+
+
+
+ECHO Starting NUGET packaging...
+call "%PROJECT_ROOT%\scripts\build_cs.bat"
+echo NUGET package can be found in "%PROJECT_ROOT%\ATRC-%VERSION%_%BUILDNUMBER%.nupkg"
+
 endlocal

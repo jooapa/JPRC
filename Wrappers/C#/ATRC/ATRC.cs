@@ -1,3 +1,19 @@
+/*+++
+This project is licensed under the BSD 2-Clause License.
+See the LICENSE file in the project root for license information.
+
+Header file for the ATRC (Advanced Tagged Resource Configuration Library) library.
+  This file contains the declarations for the ATRC library, which provides functionality
+for reading, writing, and manipulating configuration files in a structured format.
+  This library is designed to be used in both C and C++, with this wrapper for C# projects, with a focus on
+ease of use and flexibility.
+
+Author(s): 
+    Antonako1
+
+Maintained at https://github.com/Antonako1/ATRC
+---*/
+
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -297,7 +313,6 @@ namespace ATRC
             return resStr;
         }
 
-
         /// <summary>
         /// Adds a new block to the ATRC file.
         /// If the file descriptor is invalid, it returns false.
@@ -312,7 +327,6 @@ namespace ATRC
             }
             return false;
         }
-
 
         /// <summary>
         /// Removes a block from the ATRC file.
@@ -345,6 +359,12 @@ namespace ATRC
             return false;
         }
 
+        /// <summary>
+        /// Removes a variable from the ATRC file.
+        /// If the variable does not exist, it returns false.
+        /// </summary>
+        /// <param name="varname">Variable name.</param>
+        /// <returns>True if the variable was removed successfully; otherwise, false.</returns>
         public bool RemoveVariable(string varname)
         {
             if (_fd != IntPtr.Zero)
@@ -466,6 +486,41 @@ namespace ATRC
                 value = ATRCNative.ATRC_Native.GetEnumValue(_fd, block, key);
             }
             return value;
+        }
+
+        /// <summary>
+        /// Copies data from one ATRC file descriptor to another.
+        /// This method is used to create a copy of an ATRC file descriptor. 
+        /// </summary>
+        /// <param name="fd">File descriptor to copy.</param>
+        /// <returns>New ATRC file descriptor. Null if the copy failed.</returns>
+        public static ATRC? Copy_ATRC_FD(ATRC fd)
+        {
+            if (fd == null || fd._fd == IntPtr.Zero)
+                return null;
+
+            IntPtr newFd = ATRCNative.ATRC_Native.Copy_ATRC_FD(fd._fd);
+            if (newFd == IntPtr.Zero)
+                return null;
+
+            return new ATRC(newFd);
+        }
+
+        /// <summary>
+        /// Creates a new ATRC instance from an existing file descriptor.
+        /// This constructor is used internally to create an ATRC instance from a native file descriptor.
+        /// </summary>
+        /// <param name="fd">File descriptor to wrap.</param>
+        /// <exception cref="InvalidOperationException">Invalid file descriptor.</exception>
+        private ATRC(IntPtr fd)
+        {
+            if (_fd != IntPtr.Zero)
+            {
+                Dispose();
+            }
+            _fd = fd;
+            if (_fd == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create ATRC file descriptor from IntPtr.");
         }
     }
 

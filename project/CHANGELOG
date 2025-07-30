@@ -1,41 +1,41 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-2.3.0
+2.3.1
 
-DOCS REDO                                                                       2.3.0   WIP
-ATRC_FD Operator const char* -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.0   WIP
-Add to docs: "Use ATRC_FREE_MEMORY() if no other memory if not told otherwise"  2.3.0   WIP
-Error codes to documentation                                                    2.3.0   DONE
+DOCS REDO                                                                       2.3.1   WIP
+ATRC_FD Operator const char* -> Docs (Free memory ATRC_FREE_MEMORY)             2.3.1   WIP
+Add to docs: "Use ATRC_FREE_MEMORY() if no other memory if not told otherwise"  2.3.1   WIP
+Error codes to documentation                                                    2.3.1   DONE
 
-README REDO                                             2.3.0   DONE
+README REDO                                             2.3.1   DONE
 
-Preprocessor directives                                 2.3.0   DONE
-.IGNORE <rows> IGNORES amount of rows during parsing    2.3.0   DONE
-Preprocessor: %var% EQU <value>                         2.3.0   DONE
-Preprocessor directives: EQU, NEQ, GT, LT, GTE, LTE     2.3.0   DONE
-Preprocessor -> Raw string SR <KEY|VAR>, ER             2.3.0   DONE
-Add enums                                               2.3.0   DONE
+Preprocessor directives                                 2.3.1   DONE
+.IGNORE <rows> IGNORES amount of rows during parsing    2.3.1   DONE
+Preprocessor: %var% EQU <value>                         2.3.1   DONE
+Preprocessor directives: EQU, NEQ, GT, LT, GTE, LTE     2.3.1   DONE
+Preprocessor -> Raw string SR <KEY|VAR>, ER             2.3.1   DONE
+Add enums                                               2.3.1   DONE
 
-GetVariables -> Return list without private variables   2.3.0   DONE
-Preprocessor: #.INCLUDE <file> -> Include file in current file                      2.3.0   DONE
+GetVariables -> Return list without private variables   2.3.1   DONE
+Preprocessor: #.INCLUDE <file> -> Include file in current file                      2.3.1   DONE
 
-Parse math expressions in atrc_std                      2.3.0   DONE
+Parse math expressions in atrc_std                      2.3.1   DONE
 MathExp(value):
     %var%=100
     value=1*10-%var%
     -> 1*10-100
     -> -90
-Make MathExp support hex(0x) and binary(0b)             2.3.0   DONE
+Make MathExp support hex(0x) and binary(0b)             2.3.1   DONE
 
-Destroy_ATRC_FD. Return pointer to self.                2.3.0   DONE
-atrc_free_list. Return pointer to self.                 2.3.0   DONE
+Destroy_ATRC_FD. Return pointer to self.                2.3.1   DONE
+atrc_free_list. Return pointer to self.                 2.3.1   DONE
 
 
-ATRC_INJECT -> Fix it                                   2.3.0   DONE
-Redo file parser.                                       2.3.0   DONE
+ATRC_INJECT -> Fix it                                   2.3.1   DONE
+Redo file parser.                                       2.3.1   DONE
 
-InsertVar(_S) -> hold more than 0-9 digits              2.3.0   DONE
+InsertVar(_S) -> hold more than 0-9 digits              2.3.1   DONE
 
-Packaging: Add docs, CHANGELOG, VERSION, BUILDNUMBER, LICENSE, README.md            2.3.0   DONE
+Packaging: Add docs, CHANGELOG, VERSION, BUILDNUMBER, LICENSE, README.md            2.3.1   DONE
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

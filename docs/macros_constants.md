@@ -11,9 +11,9 @@ int main() {
     if(fd == NULL) return 0;
     const char res* = NULL;
     const char line* = "%*%%*% %*%";
-    ATRC_CINJECT(line, "Hello", ",", "World!")
+    ATRC_INJECT(line, "Hello", ",", "World!")
     printf(res);
-    free(res);
+    ATRC_FREE_MEMORY(res);
     Destroy_ATRC_FD(fd);
     return 0;
 }

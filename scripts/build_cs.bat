@@ -19,4 +19,5 @@ set PACKAGE_NAME=ATRC-%VERSION%_%BUILD_VERSION%.nupkg
 echo Building package: %PACKAGE_NAME%
 dotnet pack ATRC -c Release /p:Version=%VERSION%
 ren ATRC\nupkg\ATRC.*.nupkg %PACKAGE_NAME%
+copy /Y/B ATRC\nupkg\%PACKAGE_NAME% %PROJECT_ROOT%\%PACKAGE_NAME%
 endlocal

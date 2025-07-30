@@ -14,7 +14,12 @@ endif()
 target_link_libraries(ATRC.Test PRIVATE ATRC)
 
 # Set include directories (if needed)
-include_directories("${PROJECT_SOURCE_DIR}/ATRC/include")
+
+message(STATUS "SOURCE DIR: ${PROJECT_SOURCE_DIR}")
+include_directories(
+    "${PROJECT_SOURCE_DIR}/ATRC/include"
+    "${PROJECT_SOURCE_DIR}/Wrappers/C++/include"
+)
 
 # Set C++ standard for tests (if CMake version is greater than 3.12)
 if (CMAKE_VERSION VERSION_GREATER 3.12)

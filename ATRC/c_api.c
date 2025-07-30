@@ -624,3 +624,85 @@ void ATRC_FREE_MEMORY(void *ptr) {
     }
     free(ptr);
 }
+
+PATRC_FD Copy_ATRC_FD(PATRC_FD fd) {
+    PATRC_FD copy = Create_Empty_ATRC_FD();
+    if (copy == NULL) {
+        return NULL;
+    }
+    copy->AutoSave = fd->AutoSave;
+    copy->Writecheck = fd->Writecheck;
+    copy->Filename = fd->Filename ? __STRDUP(fd->Filename) : NULL;
+    if(copy->Filename == NULL) {
+        Destroy_ATRC_FD(copy);
+        return NULL;
+    }
+
+    copy->BlockArray.BlockCount = fd->BlockArray.BlockCount;
+    copy->BlockArray.Blocks = (PBlock)malloc(copy->BlockArray.BlockCount * sizeof(Block));
+    if (copy->BlockArray.Blocks == NULL) {
+        _ATRC_WRAP_ERRORMSG(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Block array allocating error", copy->Filename);
+        Destroy_ATRC_FD(copy);
+        return NULL;
+    }
+    for(uint64_t i = 0; i < copy->BlockArray.BlockCount; i++) {
+        PBlock src_block = &fd->BlockArray.Blocks[i];
+        PBlock dest_block = &copy->BlockArray.Blocks[i];
+        dest_block->Name = src_block->Name ? __STRDUP(src_block->Name) : NULL;
+        if (dest_block->Name == NULL && src_block->Name != NULL) {
+            Destroy_ATRC_FD(copy);
+            return NULL;
+        }
+        dest_block->line_number = src_block->line_number;
+        dest_block->KeyArray.KeyCount = src_block->KeyArray.KeyCount;
+        dest_block->KeyArray.Keys = (PKey)malloc(dest_block->KeyArray.KeyCount * sizeof(Key));
+        if (dest_block->KeyArray.Keys == NULL) {
+            _ATRC_WRAP_ERRORMSG(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Key array allocating error", copy->Filename);
+            Destroy_ATRC_FD(copy);
+            return NULL;
+        }
+        for (uint64_t j = 0; j < dest_block->KeyArray.KeyCount; j++) {
+            PKey src_key = &src_block->KeyArray.Keys[j];
+            PKey dest_key = &dest_block->KeyArray.Keys[j];
+            dest_key->Name = src_key->Name ? __STRDUP(src_key->Name) : NULL;
+            if (dest_key->Name == NULL && src_key->Name != NULL) {
+                Destroy_ATRC_FD(copy);
+                return NULL;
+            }
+            dest_key->Value = src_key->Value ? __STRDUP(src_key->Value) : NULL;
+            if (dest_key->Value == NULL && src_key->Value != NULL) {
+                Destroy_ATRC_FD(copy);
+                return NULL;
+            }
+            dest_key->line_number = src_key->line_number;
+            dest_key->enum_value = src_key->enum_value;
+        }
+    }
+
+    copy->VariableArray.VariableCount = fd->VariableArray.VariableCount;
+    copy->VariableArray.Variables = (PVariable)malloc(copy->VariableArray.VariableCount * sizeof(Variable));
+    if (copy->VariableArray.Variables == NULL) {
+        _ATRC_WRAP_ERRORMSG(ERR_MEMORY_ALLOCATION_FAILED, __LINE__, "Variable array allocating error", copy->Filename);
+        Destroy_ATRC_FD(copy);
+        return NULL;
+    }
+
+    for (uint64_t i = 0; i < copy->VariableArray.VariableCount; i++) {
+        PVariable src_var = &fd->VariableArray.Variables[i];
+        PVariable dest_var = &copy->VariableArray.Variables[i];
+        dest_var->Name = src_var->Name ? __STRDUP(src_var->Name) : NULL;
+        if (dest_var->Name == NULL && src_var->Name != NULL) {
+            Destroy_ATRC_FD(copy);
+            return NULL;
+        }
+        dest_var->Value = src_var->Value ? __STRDUP(src_var->Value) : NULL;
+        if (dest_var->Value == NULL && src_var->Value != NULL) {
+            Destroy_ATRC_FD(copy);
+            return NULL;
+        }
+        dest_var->IsPublic = src_var->IsPublic;
+        dest_var->line_number = src_var->line_number;
+    }
+    
+    return copy;
+}

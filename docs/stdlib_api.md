@@ -7,7 +7,7 @@ for fiddling with the values found inside ATRC files. Can be used with normal st
 
 Values used by the `atrc_stdlib_errval`
 
-```cpp
+```c
 enum ATRC_ERR {
 	_ATRC_SUCCESSFULL_ACTION = 0,
 	_ATRC_UNSUCCESSFULL_ACTION = 1
@@ -28,7 +28,7 @@ Stdlib functions change this variable according if the function does what it was
 - _ATRC_UNSUCCESSFULL_ACTION
     - An error occured during the action
 
-```cpp
+```c
 extern uint64_t atrc_stdlib_errval;
 ```
 
@@ -36,7 +36,7 @@ extern uint64_t atrc_stdlib_errval;
 
 Array created by `atrc_to_list`. Free with `atrc_free_list`
 
-```cpp
+```c
 typedef struct _C_String_Arr {
     char **list;
     uint64_t count;
@@ -48,7 +48,7 @@ typedef struct _C_String_Arr {
 Same as `atrc_to_vector` but works with C. 
 Free with `atrc_free_list
 
-```cpp
+```c
 ATRC_API PString_Arr atrc_to_list(const char separator, const char* value);
 ```
 
@@ -70,7 +70,7 @@ atrc_free_list(res);
 
 Frees `PString_Arr`, returning NULL on success
 
-```cpp
+```c
 ATRC_API void *atrc_free_list(PString_Arr list);
 ```
 
@@ -88,7 +88,7 @@ Following values will return true:
 Following values will return false:
     - FALSE, 0, NO, OFF
 
-```cpp
+```c
 ATRC_API bool atrc_to_bool(const char* value);
 ```
 
@@ -96,7 +96,7 @@ ATRC_API bool atrc_to_bool(const char* value);
 
 Turns value into unsigned 64-bit integer
 
-```cpp
+```c
 ATRC_API uint64_t atrc_to_uint64_t(const char* value);
 ```
 
@@ -104,7 +104,7 @@ ATRC_API uint64_t atrc_to_uint64_t(const char* value);
 
 Turns value into signed 64-bit integer
 
-```cpp
+```c
 ATRC_API int64_t atrc_to_int64_t(const char* value);
 ```
 
@@ -112,7 +112,7 @@ ATRC_API int64_t atrc_to_int64_t(const char* value);
 
 Turns value into a double
 
-```cpp
+```c
 ATRC_API double atrc_to_double(const char* value);
 ```
 
@@ -141,7 +141,7 @@ Expression string can hold the following values:
  - ACOS({val})
  - ATAN({val})
 
-```cpp
+```c
 ATRC_API double atrc_math_exp(const char* value);
 ```
 
