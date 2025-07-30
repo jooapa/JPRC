@@ -11,8 +11,12 @@ echo Copying libraries to lib directory...
 XCOPY %OUTPUT_DIR%\Windows\* lib\Windows\ /E /I /Y
 XCOPY %OUTPUT_DIR%\Linux\* lib\Linux\ /E /I /Y
 
-if "%1" == "DEBUG" (
-    dotnet publish ATRCWrapper -c Debug -r win-x64 /p:ATRCVersion="%VERSION%" /p:ATRCBuildVersion="%BUILD_VERSION%" /p:ATRCFolder="%FOLDER%" 
-) else (
-    dotnet publish ATRCWrapper -c Release -r win-x64 /p:ATRCVersion="%VERSION%" /p:ATRCBuildVersion="%BUILD_VERSION%" /p:ATRCFolder="%FOLDER%"
-)
+set PROJECT=ATRC\ATRC.csproj
+
+rmdir /S /Q ATRC\nupkg
+
+set PACKAGE_NAME=ATRC-%VERSION%_%BUILD_VERSION%.nupkg
+echo Building package: %PACKAGE_NAME%
+dotnet pack ATRC -c Release /p:Version=%VERSION%
+ren ATRC\nupkg\ATRC.*.nupkg %PACKAGE_NAME%
+endlocal

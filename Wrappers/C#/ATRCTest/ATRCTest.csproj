@@ -9,7 +9,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ATRCWrapper\ATRCWrapper.csproj" />
+		<ProjectReference Include="..\ATRC\ATRC.csproj" />
 	</ItemGroup>
 
 </Project>

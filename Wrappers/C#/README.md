@@ -8,7 +8,7 @@ To build the library, please use <project_root>\scripts\build_cs.bat or run:
 ```bash
 # Version: Take from <project_root>\VERSION
 # Build Version: Take from <project_root>\BUILDNUMBER
-dotnet publish ATRCWrapper -c Release /p:ATRCVersion="<version>" /p:ATRCBuildVersion="<build_version>" /p:ATRCFolder="."
+dotnet publish ATRCWrapper -c Release /p:ATRCVersion="<version>" /p:ATRCBuildVersion="<build_version>"
 ```
 
 To run the test program, use:

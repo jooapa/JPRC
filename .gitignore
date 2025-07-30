@@ -5,6 +5,7 @@ ATRC-*/
 lib/
 ATRC/Readme.txt
 ATRC/License.txt
+nupkg/
 out/
 !ATRC-c_cpp/ATRC.Test/libs
 ATRC-c_cpp/ATRC.Test/libs/include
